@@ -15,25 +15,43 @@ fullscreen = true;
 perspective_window = {
   view = {
     eyes = {
-      eye = cavr.sixdof("emulated");
+      eye = cavr.sixdof("TallGlass");
       --left_eye = cavr.sixdof("emulated3");
       --right_eye = cavr.sixdof("emulated2");
       --stereo ="mono";
     };
-    lower_left = cavr.sixdof("emulated") * cavr.translate(-1, -1, -1);
-    lower_right = cavr.sixdof("emulated") * cavr.translate(1, -1, -1);
-    upper_left = cavr.sixdof("emulated") * cavr.translate(-1, 1, -1);
+    lower_left = cavr.sixdof("TallGlass") * cavr.translate(-1, -1, -1);
+    lower_right = cavr.sixdof("TallGlass") * cavr.translate(1, -1, -1);
+    upper_left = cavr.sixdof("TallGlass") * cavr.translate(-1, 1, -1);
   };
   fullscreen = true;
 };
 
 x11_renderer = {
   type = "x11gl";
-  display = ":0.0";
+  display = ":1.0";
   windows = {
-    --sim_window = sim_window;
+    sim_window = perspective_window;
     sim_window2 = sim_window;
 
+  };
+};
+
+x11_renderer_projector1 = {
+  type = "x11gl";
+  display = ":0.1";
+  windows = {
+    sim_window = perspective_window;
+    --sim_window2 = sim_window;
+  };
+};
+
+x11_renderer_projector2 = {
+  type = "x11gl";
+  display = ":0.2";
+  windows = {
+    sim_window = perspective_window;
+    --sim_window2 = sim_window;
   };
 };
 
@@ -46,14 +64,14 @@ vrpn = {
   analogs = {
   };
   sixdofs = {
-    --"tracker0@tracker.rd.unr.edu"
+    "TallGlass@tracker.rd.unr.edu"
   };
 };
 
 self = {
-  hostname = HOSTNAME;
-  ssh = HOSTNAME;--"chase@" .. HOSTNAME;
-  address = HOSTNAME;
+  hostname = "hpcvis1";
+  ssh = "hpcvis1.cse.unr.edu";
+  address = "hpcvis1";
   plugins = {
     x11_renderer = x11_renderer;
     vrpn = vrpn;
@@ -62,9 +80,9 @@ self = {
 
 
 others = {
-  hostname = "hpcvis7";
-  ssh = "hpcvis7";
-  address = "hpcvis7";--"tcp://" .. "hpcvis7" .. ":8888";
+  hostname = "hpcvis4";
+  ssh = "hpcvis4";
+  address = "hpcvis4";--"tcp://" .. "hpcvis7" .. ":8888";
   plugins = {
     x11_renderer = x11_renderer;
     vrpn = vrpn;
@@ -72,11 +90,12 @@ others = {
 };
 
 others2 = {
-  hostname = "hpcvis2";
-  ssh = "hpcvis2";
-  address = "hpcvis2";--"tcp://" .. "hpcvis7" .. ":8888";
+  hostname = "projector";
+  ssh = "projector.cse.unr.edu";
+  address = "projector";--"tcp://" .. "hpcvis7" .. ":8888";
   plugins = {
-    x11_renderer = x11_renderer;
+    x11_renderer1 = x11_renderer_projector1;
+    x11_renderer2 = x11_renderer_projector2;
     vrpn = vrpn;
   };
 };
@@ -85,5 +104,5 @@ others2 = {
 machines = {
   self=self;
   --self2 = others;
-  --self3 = others2;
+  self3 = others2;
 };
