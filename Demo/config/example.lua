@@ -1,9 +1,3 @@
-sim_window = {
-  view = {
-    simulator_view = true;
-  };
-fullscreen = true;
-};
 
 sim_window = {
   view = {
@@ -15,14 +9,14 @@ fullscreen = true;
 perspective_window = {
   view = {
     eyes = {
-      eye = cavr.sixdof("TallGlass");
-      --left_eye = cavr.sixdof("emulated3");
-      --right_eye = cavr.sixdof("emulated2");
+      eye = cavr.sixdof("vrpn[TallGlass[0]]");
+      --left_eye = cavr.sixdof("vrpn[TallGlass[[0]]");
+      --right_eye = cavr.sixdof("vrpn[TallGlass[[0]]");
       --stereo ="mono";
     };
-    lower_left = cavr.sixdof("TallGlass") * cavr.translate(-1, -1, -1);
-    lower_right = cavr.sixdof("TallGlass") * cavr.translate(1, -1, -1);
-    upper_left = cavr.sixdof("TallGlass") * cavr.translate(-1, 1, -1);
+    lower_left = cavr.sixdof("vrpn[TallGlass[0]]") * cavr.translate(-1, -1, -1);
+    lower_right = cavr.sixdof("vrpn[TallGlass[0]]") * cavr.translate(1, -1, -1);
+    upper_left = cavr.sixdof("vrpn[TallGlass[0]]") * cavr.translate(-1, 1, -1);
   };
   fullscreen = true;
 };
@@ -59,7 +53,7 @@ vrpn = {
   type = "vrpn";
   input_name = "vrpn";
   buttons = {
-    --"Button0@localhost";
+    --"WiiMote@tracker.rd.unr.edu";
   };
   analogs = {
   };
@@ -71,7 +65,7 @@ vrpn = {
 self = {
   hostname = "hpcvis1";
   ssh = "hpcvis1.cse.unr.edu";
-  address = "hpcvis1";
+  address = "hpcvis1.cse.unr.edu";
   plugins = {
     x11_renderer = x11_renderer;
     vrpn = vrpn;
@@ -80,9 +74,9 @@ self = {
 
 
 others = {
-  hostname = "hpcvis4";
-  ssh = "hpcvis4";
-  address = "hpcvis4";--"tcp://" .. "hpcvis7" .. ":8888";
+  hostname = "hpcvis2";
+  ssh = "hpcvis2";
+  address = "hpcvis2";--"tcp://" .. "hpcvis7" .. ":8888";
   plugins = {
     x11_renderer = x11_renderer;
     vrpn = vrpn;
@@ -92,10 +86,10 @@ others = {
 others2 = {
   hostname = "projector";
   ssh = "projector.cse.unr.edu";
-  address = "projector";--"tcp://" .. "hpcvis7" .. ":8888";
+  address = "projector.cse.unr.edu";--"tcp://" .. "hpcvis7" .. ":8888";
   plugins = {
-    x11_renderer1 = x11_renderer_projector1;
-    x11_renderer2 = x11_renderer_projector2;
+    x11_top = x11_renderer_projector1;
+    x11_bottom = x11_renderer_projector2;
     vrpn = vrpn;
   };
 };

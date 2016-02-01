@@ -152,7 +152,7 @@ void render() {
   cd->sphere_vao->bind();
   glUniformMatrix4fv(cd->projection_uniform, 1, GL_FALSE, cavr::gfx::getProjection().v);
   glUniformMatrix4fv(cd->view_uniform, 1, GL_FALSE, cavr::gfx::getView().v);
-  auto model = mat4f::translate(0, 1, 0) * mat4f::scale(0.1);
+  auto model = mat4f::translate(0, 0.4, 1) * mat4f::scale(0.1);
   glUniformMatrix4fv(cd->model_uniform, 1, GL_FALSE, model.v);
 
 
@@ -180,7 +180,7 @@ void render() {
   cd->cube_angle += 3.14/4.0 * cavr::input::InputManager::dt()*1000;
   
   // Set your current 
-  auto position = cavr::input::getSixDOF("wand")->getPosition();
+  auto position = cavr::input::getSixDOF("glass")->getPosition();
   position.x *= 10;
   position.z *= 10;
 
@@ -229,10 +229,10 @@ int main(int argc, char** argv) {
   input_map.button_map["exit"] = "keyboard[Escape]";
 
   // A wii remote button
-  input_map.button_map["color"] = "vrpn[WiiMote0[0]]";
+  input_map.button_map["color"] = "vrpn[WiiMote[0]]";
 
   // A wand that we want to follow based on some tracker -- we are tracing point 0
-  input_map.sixdof_map["wand"] = "vrpn[Tracker0[1]]";
+  input_map.sixdof_map["glass"] = "vrpn[TallGlass[0]]";
 
 
   if (!cavr::System::init(argc, argv, &input_map)) {
