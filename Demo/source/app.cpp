@@ -1,14 +1,13 @@
 #include <cavr/cavr.h>
 #include <cavr/gfx/renderer.h>
 #include <cavr/gfx/shapes.h>
+#include <cavr/gfx/ray.h>
+#include <cavr/gfx/sphere.h>
 #include <cavr/gl/shader.h>
 #include <cavr/gl/vao.h>
 #include <cavr/gl/vbo.h>
 #include <glog/logging.h>
 #include <math.h>
-
-// Self make files
-#include <Test.h>
 
 // Using IrrKlang for this example
 #include <irrKlang.h>
@@ -22,8 +21,7 @@ using namespace irrklang;
 struct ContextData {
   // Shader Programs
   cavr::gl::Program* simple_program;
-  cavr::gl::Program* cube_program;
-
+  
   // Uniforms
   GLint color_uniform;
   GLint projection_uniform;
@@ -34,13 +32,12 @@ struct ContextData {
   // VBOs and
   cavr::gl::VAO* sphere_vao;
   cavr::gl::VBO* sphere_vbo;
-  cavr::gl::VAO* cube_vao;
-  cavr::gl::VBO* cube_vbo;
   size_t num_triangles_in_sphere;
-  size_t num_triangles_in_cube;
+  cavr::gl::VAO* cylinder_vao;
+  cavr::gl::VBO* cylinder_vbo;
+  size_t num_triangles_in_cylinder;
 
-  // Rotating angle
-  float cube_angle;
+  cavr::math::mat4f sphere_matrix;
 
   // Lets add some sound library stuff here
    ISoundEngine* engine;
@@ -53,19 +50,15 @@ void initContext() {
 
   // Initialize some irrklang music
   cd->engine = createIrrKlangDevice();
-  cd->music = cd->engine->play3D("media/136608__thesoundcatcher__wind-in-small-forrest-01.wav",
+  cd->music = cd->engine->play3D("media/ghibli.wav",
     vec3df(0,1,0), // Music source position
     true, // play looped
     false, //  start paused
     true); //  enable sound
 
   cd->simple_program = cavr::gl::Program::createSimple();
-  
-  // Create a program using some custom code of ours
-  cd->cube_program = new cavr::gl::Program();
 
   // custom shader initialization
-
   cavr::gl::VertexShader* vs = cavr::gl::VertexShader::fromFile("shaders/shader.vert");
   if (!vs) {
     LOG(ERROR) << "Failed to load simple vertex shader";
@@ -79,38 +72,6 @@ void initContext() {
     cavr::System::shutdown();
     return;
   }
-
-  cd->cube_program->addShader(vs);
-  cd->cube_program->addShader(fs);
-
-  cd->cube_program->bindFragDataLocation(0,"color");
-  cd->cube_angle = 0;
-  if(!cd->cube_program->link())
-  {
-    LOG(ERROR) << "Failed to link simple shader";
-    delete vs;
-    delete fs;
-    cavr::System::shutdown();
-    return;
-  }
-  delete vs;
-  delete fs;
-
-  
-  cd->mvp_uniform = cd->cube_program->getUniform("mvp");
-
-  std::vector<cavr::math::vec4f> cubeTriangles = cavr::gfx::Shapes::wireCube();
-  cd->num_triangles_in_cube = cubeTriangles.size();
-
-  cd->cube_vbo = new cavr::gl::VBO(cubeTriangles,GL_STATIC_DRAW);
-  cd->cube_vao = new cavr::gl::VAO();
-  cd->cube_vao->setAttribute(cd->cube_program->getAttribute("pos"),
-    cd->cube_vbo,
-    4,
-    GL_FLOAT,
-    0,
-    0,
-    0);
 
   cd->color_uniform = cd->simple_program->getUniform("color");
   cd->projection_uniform = cd->simple_program->getUniform("projection");
@@ -130,7 +91,21 @@ void initContext() {
                                0,
                                0,
                                0);
-
+  std::vector<cavr::math::vec4f> cylinder_vertices = 
+    cavr::gfx::Shapes::solidCylinder(15, 50, 0.1);
+  cd->num_triangles_in_cylinder = cylinder_vertices.size();
+  cd->cylinder_vbo = new cavr::gl::VBO(cylinder_vertices);
+  cd->cylinder_vao = new cavr::gl::VAO();
+  cd->cylinder_vao->setAttribute(cd->simple_program->getAttribute("in_position"),
+                               cd->cylinder_vbo,
+                               4,
+                               GL_FLOAT,
+                               0,
+                               0,
+                               0);
+  
+  cd->sphere_matrix = cavr::math::mat4f::translate(0, 0.4, 1) * cavr::math::mat4f::scale(0.1);
+ 
   // set context data
   cavr::System::setContextData(cd);
 }
@@ -149,53 +124,50 @@ void render() {
 
   // use the simple program
   cd->simple_program->begin();
+  cd->cylinder_vao->bind();
+  glUniformMatrix4fv(cd->projection_uniform, 1, GL_FALSE, cavr::gfx::getProjection().v);
+  glUniformMatrix4fv(cd->view_uniform, 1, GL_FALSE, cavr::gfx::getView().v);
+  glUniform3f(cd->color_uniform, 0, 0, 1);
+  
+  cavr::math::mat4f ray_matrix = cavr::input::getSixDOF("wand")->getMatrix();
+
+  // Check if a button has been pressed
+  if (cavr::input::getButton("pick")->delta() != cavr::input::Button::Open) 
+  {
+    // Ray and bounding sphere
+    auto look = cavr::input::getSixDOF("wand")->getForward();
+    auto pos = cavr::input::getSixDOF("wand")->getPosition();
+    cavr::gfx::Ray ray = cavr::gfx::Ray(pos, look);
+    cavr::gfx::Sphere bounding_sphere = cavr::gfx::Sphere(cd->sphere_matrix[3].xyz, 30);
+    float dist;
+    if (bounding_sphere.intersect(*(&ray), *(&dist)))
+    {
+        cd->sphere_matrix *= ray_matrix;
+    }
+    glUniformMatrix4fv(cd->model_uniform, 1, GL_FALSE, ray_matrix.v);
+    glDrawArrays(GL_TRIANGLES, 0, cd->num_triangles_in_cylinder);
+    glBindVertexArray(0);
+  } 
+ 
   cd->sphere_vao->bind();
   glUniformMatrix4fv(cd->projection_uniform, 1, GL_FALSE, cavr::gfx::getProjection().v);
   glUniformMatrix4fv(cd->view_uniform, 1, GL_FALSE, cavr::gfx::getView().v);
-  auto model = mat4f::translate(0, 0.4, 1) * mat4f::scale(0.1);
-  glUniformMatrix4fv(cd->model_uniform, 1, GL_FALSE, model.v);
-
-
-  // Check if a button has been pressed
-  if (cavr::input::getButton("color")->delta() == cavr::input::Button::Held ) 
-  {
-    glUniform3f(cd->color_uniform, 0, 0, 1);
-  } 
-  else 
-  {
-    glUniform3f(cd->color_uniform, 1, 0, 0);
-  }
+  glUniform3f(cd->color_uniform, 0, 0, 1);
+  glUniformMatrix4fv(cd->model_uniform, 1, GL_FALSE, cd->sphere_matrix.v);
 
   // draw the sphere for the simple program
   glDrawArrays(GL_TRIANGLES, 0, cd->num_triangles_in_sphere);
   glBindVertexArray(0);
   cd->simple_program->end();  
 
-  
-  // Cube Program
-  cd->cube_program->begin();
-  cd->cube_vao->bind();
-   
-  // set cube angle
-  cd->cube_angle += 3.14/4.0 * cavr::input::InputManager::dt()*1000;
-  
   // Set your current 
   auto position = cavr::input::getSixDOF("glass")->getPosition();
   position.x *= 10;
   position.z *= 10;
 
-  auto model2 = mat4f::translate(0, 0, 0) * mat4f::scale(0.1);
-
   cd->engine->setListenerPosition(vec3df(position.x,position.y,position.z), // Listener's position
   vec3df(0,0,1)); // What direction is the listener's facing directiion -- in this case we are always stareing forward..
 
-  // rotate cube 
-  glUniformMatrix4fv(cd->mvp_uniform, 1, GL_FALSE, (cavr::gfx::getProjection() * cavr::gfx::getView() * model * cavr::math::mat4f::rotate(cd->cube_angle,cavr::math::vec3f(0,1,0))).v );
-
-  // draw cube
-  glDrawArrays(GL_LINES,0,cd->num_triangles_in_cube);
-  glBindVertexArray(0);
-  cd->cube_program->end();
 }
 
 void destructContext() {
@@ -212,7 +184,6 @@ void update() {
 }
 
 int main(int argc, char** argv) {
-  Test *val = new Test();
   LOG(INFO) << "Setting callbacks.";
 
   // cavr is a system of callbacks
@@ -225,16 +196,12 @@ int main(int argc, char** argv) {
 
   // set input map for buttons,keyboard, and sixdofs 
 
-  // A button that is pressed on the keyboard from the x11 plugin
   input_map.button_map["exit"] = "keyboard[Escape]";
+  input_map.sixdof_map["wand"] = "vrpn[Trackable2[0]]";
+  input_map.button_map["pick"] = "vrpn[WiiMote[0]]";
 
-  // A wii remote button
-  input_map.button_map["color"] = "vrpn[WiiMote[0]]";
-
-  // A wand that we want to follow based on some tracker -- we are tracing point 0
   input_map.sixdof_map["glass"] = "vrpn[TallGlass[0]]";
-
-
+  
   if (!cavr::System::init(argc, argv, &input_map)) {
     LOG(ERROR) << "Failed to initialize cavr.";
     return -1;
