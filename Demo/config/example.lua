@@ -43,6 +43,7 @@ x11_renderer_projector1 = {
 x11_renderer_projector2 = {
   type = "x11gl";
   display = ":0.2";
+    "WiiMote@tracker.rd.unr.edu";
   windows = {
     sim_window = perspective_window;
     --sim_window2 = sim_window;
@@ -53,14 +54,13 @@ vrpn = {
   type = "vrpn";
   input_name = "vrpn";
   buttons = {
-    "WiiMote@tracker.rd.unr.edu";
+    --"WiiMote0@projector.unr.edu";
   };
   analogs = {
   };
   sixdofs = {
     "TallGlass@tracker.rd.unr.edu";
-    "Trackable2@tracker.rd.unr.edu";
-    "Test@tracker.rd.unr.edu";
+    "WiiMote@tracker.rd.unr.edu";
   };
 };
 
@@ -74,15 +74,6 @@ self = {
   };
 };
 
-localhost = {
-  hostname = "localhost";
-  ssh = "localhost";
-  address = "localhost";
-  plugins = {
-    x11_renderer = x11_renderer;
-    vrpn = vrpn;
-  };
-};
 
 others = {
   hostname = "hpcvis2";
@@ -91,6 +82,9 @@ others = {
   plugins = {
     x11_renderer = x11_renderer;
     vrpn = vrpn;
+  };
+  buttons = {
+    "WiiMote@tracker.rd.unr.edu";
   };
 };
 
@@ -107,8 +101,7 @@ others2 = {
 
 
 machines = {
-  self = self;
-  --self = localhost;
+  self=self;
   --self2 = others;
-  self3 = others2;
+  --self3 = others2;
 };

@@ -38,6 +38,7 @@ struct ContextData {
   size_t num_triangles_in_cylinder;
 
   cavr::math::mat4f sphere_matrix;
+  bool found;
 
   // Lets add some sound library stuff here
    ISoundEngine* engine;
@@ -89,11 +90,11 @@ void initContext() {
                                4,
                                GL_FLOAT,
                                0,
-                               0,
+                               0, 
                                0);
   std::vector<cavr::math::vec4f> cylinder_vertices = 
-    cavr::gfx::Shapes::solidCylinder(15, 50, 0.1);
-  cd->num_triangles_in_cylinder = cylinder_vertices.size();
+    cavr::gfx::Shapes::solidCylinder(15, 10, 0.01);
+  cd->num_triangles_in_cylinder = cylinder_vertices.size(); 
   cd->cylinder_vbo = new cavr::gl::VBO(cylinder_vertices);
   cd->cylinder_vao = new cavr::gl::VAO();
   cd->cylinder_vao->setAttribute(cd->simple_program->getAttribute("in_position"),
@@ -104,8 +105,9 @@ void initContext() {
                                0,
                                0);
   
-  cd->sphere_matrix = cavr::math::mat4f::translate(0, 0.4, 1) * cavr::math::mat4f::scale(0.1);
- 
+  cd->sphere_matrix = cavr::math::mat4f::translate(0.6, 0.6, 0.6) * cavr::math::mat4f::scale(0.2) * cavr::math::mat4f::translate(0, 0, 10) ;
+  cd->found = false;
+
   // set context data
   cavr::System::setContextData(cd);
 }
@@ -115,7 +117,6 @@ void frame() {
 }
 
 void render() {
-  using cavr::math::mat4f;
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
 
@@ -124,40 +125,49 @@ void render() {
 
   // use the simple program
   cd->simple_program->begin();
-  cd->cylinder_vao->bind();
-  glUniformMatrix4fv(cd->projection_uniform, 1, GL_FALSE, cavr::gfx::getProjection().v);
-  glUniformMatrix4fv(cd->view_uniform, 1, GL_FALSE, cavr::gfx::getView().v);
-  glUniform3f(cd->color_uniform, 0, 0, 1);
-  
   cavr::math::mat4f ray_matrix = cavr::input::getSixDOF("wand")->getMatrix();
 
   // Check if a button has been pressed
-  if (cavr::input::getButton("pick")->delta() != cavr::input::Button::Open) 
+  //if (cavr::input::getButton("pick")->delta() == cavr::input::Button::Held) 
   {
     // Ray and bounding sphere
     auto look = cavr::input::getSixDOF("wand")->getForward();
     auto pos = cavr::input::getSixDOF("wand")->getPosition();
     cavr::gfx::Ray ray = cavr::gfx::Ray(pos, look);
-    cavr::gfx::Sphere bounding_sphere = cavr::gfx::Sphere(cd->sphere_matrix[3].xyz, 30);
+    cavr::gfx::Sphere bounding_sphere = cavr::gfx::Sphere(cd->sphere_matrix[3].xyz, 0.3);
     float dist;
     if (bounding_sphere.intersect(*(&ray), *(&dist)))
     {
-        cd->sphere_matrix *= ray_matrix;
+        cd->found = true;
+        cd->sphere_matrix = ray_matrix * cavr::math::mat4f::translate(0, 0, 10) * cavr::math::mat4f::scale(0.2);
     }
-    glUniformMatrix4fv(cd->model_uniform, 1, GL_FALSE, ray_matrix.v);
-    glDrawArrays(GL_TRIANGLES, 0, cd->num_triangles_in_cylinder);
-    glBindVertexArray(0);
+
   } 
- 
+
+  // Cylinder
+  //if (ray_matrix)
+  {
+      cd->cylinder_vao->bind();
+      glUniformMatrix4fv(cd->projection_uniform, 1, GL_FALSE, cavr::gfx::getProjection().v);
+      glUniformMatrix4fv(cd->view_uniform, 1, GL_FALSE, cavr::gfx::getView().v);
+      glUniform3f(cd->color_uniform, 0, 1, 1);
+      glUniformMatrix4fv(cd->model_uniform, 1, GL_FALSE, ray_matrix.v);
+      glDrawArrays(GL_TRIANGLES, 0, cd->num_triangles_in_cylinder);
+      glBindVertexArray(0); 
+  }
+  
+  // Sphere
   cd->sphere_vao->bind();
   glUniformMatrix4fv(cd->projection_uniform, 1, GL_FALSE, cavr::gfx::getProjection().v);
   glUniformMatrix4fv(cd->view_uniform, 1, GL_FALSE, cavr::gfx::getView().v);
-  glUniform3f(cd->color_uniform, 0, 0, 1);
+  if (cd->found)
+    glUniform3f(cd->color_uniform, 0, 1, 1);
+  else
+    glUniform3f(cd->color_uniform, 0, 0, 1);
   glUniformMatrix4fv(cd->model_uniform, 1, GL_FALSE, cd->sphere_matrix.v);
-
-  // draw the sphere for the simple program
   glDrawArrays(GL_TRIANGLES, 0, cd->num_triangles_in_sphere);
   glBindVertexArray(0);
+
   cd->simple_program->end();  
 
   // Set your current 
@@ -181,6 +191,7 @@ void update() {
     cavr::System::shutdown();
     return;
   }
+
 }
 
 int main(int argc, char** argv) {
@@ -196,9 +207,9 @@ int main(int argc, char** argv) {
 
   // set input map for buttons,keyboard, and sixdofs 
 
-  input_map.button_map["exit"] = "keyboard[Escape]";
-  input_map.sixdof_map["wand"] = "vrpn[Trackable2[0]]";
-  input_map.button_map["pick"] = "vrpn[WiiMote[0]]";
+  input_map.button_map["exit"] = "vrpn[WiiMote0[0]]";
+  input_map.sixdof_map["wand"] = "vrpn[WiiMote[0]]";
+  input_map.button_map["pick"] = "vrpn[WiiMote0[3]]";
 
   input_map.sixdof_map["glass"] = "vrpn[TallGlass[0]]";
   
