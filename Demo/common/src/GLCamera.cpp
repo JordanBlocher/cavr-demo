@@ -22,6 +22,7 @@ GLCamera::~GLCamera()
 
 void GLCamera::Update()
 {
+/*
     cavr::math::mat4f proj = cavr::gfx::getProjection();
     for(int i=0; i<4; i++)
     {
@@ -37,7 +38,7 @@ void GLCamera::Update()
     cavr::math::vec3f eye = cavr::gfx::getEyePosition();
     this->eye_pos.x = eye.x; this->eye_pos.y = eye.y; 
     this->eye_pos.z = eye.z; 
- 
+ */
 }
 
 glm::mat4 GLCamera::Projection()

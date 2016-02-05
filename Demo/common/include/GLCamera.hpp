@@ -20,7 +20,7 @@ public:
     glm::mat4 View();
 
 
-protected:
+//protected:
 
     glm::mat4 projection;
     glm::mat4 view;

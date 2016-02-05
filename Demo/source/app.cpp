@@ -32,6 +32,7 @@ void initContext()
   ContextData* cd = new ContextData();
 
   cd->glView->initializeGL();
+
   // Choose model
   cd->glView->setModel("dragon");
     
@@ -57,7 +58,6 @@ void render()
   auto position = cavr::input::getSixDOF("glass")->getPosition();
   position.x *= 10;
   position.z *= 10;
-
   //cd->engine->setListenerPosition(vec3df(position.x,position.y,position.z), // Listener's position
   //vec3df(0,0,1)); // What direction is the listener's facing directiion -- in this case we are always stareing forward..
 
