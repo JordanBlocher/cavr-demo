@@ -24,7 +24,11 @@ INCLUDE_DIRECTORIES(
 	"${CAVR_INCLUDE_PATH}"
 	"${HOME_BUILD_PATH}/IrrKlang/include"
   	"${PROJECT_SOURCE_DIR}/include"
+  	"${PROJECT_SOURCE_DIR}/common/include"
 	"${GLOG_INCLUDE_DIRS}"
+    "/usr/include/bullet"
+    "/usr/include/ImageMagick"
+    "/usr/include/assimp"
 )
 
 LINK_DIRECTORIES(
@@ -32,10 +36,9 @@ LINK_DIRECTORIES(
 	"${CAVR_LIBRARIES}"
 )
 
-# Set Includes
-SET(INCLUDES ${PROJECT_SOURCE_DIR}/include)
-#MESSAGE( STATUS "FILES: " ${INCLUDES} )
-INCLUDE_DIRECTORIES(${INCLUDES})
+
+ADD_SUBDIRECTORY(common)
+
 
 # Set sources
 file(GLOB_RECURSE SOURCES "source/*.cpp")
@@ -55,5 +58,6 @@ add_custom_target(BUILD_SUCCESSFUL ALL
                   COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/config/cavrplugins.lua ${CMAKE_CURRENT_BINARY_DIR}
                  )
 
-TARGET_LINK_LIBRARIES(Example cavr cavrgl cavrgfx IrrKlang ${GLOG_LIBRARIES} ${OPENGL_LIBRARY} ${GLEW_LIBRARIES} ${CAVR_LIBRARIES} assimp BulletSoftBody
-    BulletDynamics LinearMath )
+             TARGET_LINK_LIBRARIES(Example cavr cavrgl cavrgfx IrrKlang
+                 ${CMAKE_CURRENT_BINARY_DIR}/libassimp.a Magick++ BulletSoftBody
+    BulletDynamics BulletCollision LinearMath common pthread ${GLOG_LIBRARIES} ${OPENGL_LIBRARY} ${GLEW_LIBRARIES} ${CAVR_LIBRARIES} )
