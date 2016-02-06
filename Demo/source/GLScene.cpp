@@ -47,21 +47,6 @@ void GLScene::initializeGL()
 
     // Create camera
     std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
-    cavr::math::mat4f proj = cavr::gfx::getProjection();
-    for(int i=0; i<4; i++)
-    {
-        camera->projection[i].x = proj[i].x; camera->projection[i].y = proj[i].y; 
-        camera->projection[i].z = proj[i].z; camera->projection[i].w = proj[i].w; 
-    }
-    cavr::math::mat4f view = cavr::gfx::getView();
-    for(int i=0; i<4; i++)
-    {
-        camera->view[i].x = view[i].x; camera->view[i].y = view[i].y; 
-        camera->view[i].z = view[i].z; camera->view[i].w = view[i].w; 
-    }
-    cavr::math::vec3f eye = cavr::gfx::getEyePosition();
-    camera->eye_pos.x = eye.x; camera->eye_pos.y = eye.y; 
-    camera->eye_pos.z = eye.z; 
     this->AddToContext(camera);
 
     // Create sound manager

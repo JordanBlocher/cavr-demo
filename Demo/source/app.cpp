@@ -32,9 +32,8 @@ void initContext()
   ContextData* cd = new ContextData();
 
   cd->glView->initializeGL();
-
   // Choose model
-  cd->glView->setModel("dragon");
+  cd->glView->setModel("models/dragon.obj");
     
   cavr::System::setContextData(cd);
 }
@@ -94,10 +93,10 @@ int main(int argc, char** argv)
   // set input map for buttons,keyboard, and sixdofs 
 
   input_map.button_map["exit"] = "vrpn[WiiMote0[0]]";
-  input_map.sixdof_map["wand"] = "vrpn[WiiMote[0]]";
+  input_map.sixdof_map["wand"] = "vrpn[WiiMote0[0]]";
   input_map.button_map["pick"] = "vrpn[WiiMote0[3]]";
 
-  input_map.sixdof_map["glass"] = "vrpn[TallGlass[0]]";
+  input_map.sixdof_map["glass"] = "vrpn[TallGlasses[0]]";
   
   if (!cavr::System::init(argc, argv, &input_map)) {
     LOG(ERROR) << "Failed to initialize cavr.";
