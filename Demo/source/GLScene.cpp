@@ -127,86 +127,74 @@ void GLScene::paintGL()
     //Get view & projection matrices
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
     camera1->Update();
-    glm::mat4 vp = camera1->Projection() * camera1->View();
 
     //Choose Model
-    if( this->Contains("model") )
+    this->paintHelper("dragon");
+    //this->paintHelper("gem");
+
+}
+
+void GLScene::paintHelper(const char* model_name)
+{
+    shared_ptr<GLModel> model = this->Get<GLModel>(model_name);
+    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+    glm::mat4 vp = camera1->Projection() * camera1->View();
+     
+    // Get UBOS
+    shared_ptr<GLUniform> vuniform = this->Get<GLUniform>("GMatrices");
+    shared_ptr<GLUniform> cuniform = this->Get<GLUniform>("GColors");
+    shared_ptr<GLUniform> luniform = this->Get<GLUniform>("GLights");
+    shared_ptr<GLUniform> eye = this->Get<GLUniform>("Eye");
+    
+    // Get Programs
+    shared_ptr<GLProgram> tprogram = this->Get<GLProgram>("texture_program");
+    shared_ptr<GLProgram> cprogram = this->Get<GLProgram>("color_program");
+
+    // Get Lights
+    shared_ptr<GLEmissive> emissive = this->Get<GLEmissive>("lights");
+
+    // Bind MVP
+    Matrices matrices;
+    model->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
+    matrices.mvpMatrix = vp * model->Matrix();
+    matrices.mvMatrix = model->Matrix(); 
+    matrices.normalMatrix = glm::transpose(glm::inverse(model->Matrix()));
+    glBindBuffer(GL_UNIFORM_BUFFER, vuniform->getId());
+    glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(matrices), &matrices);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    // Bind Lights
+    glBindBuffer(GL_UNIFORM_BUFFER, luniform->getId());
+    size_t baseSize = sizeof(emissive->lights.basic);
+    size_t ptSize = sizeof(emissive->lights.point[0]);
+    size_t sptSize = sizeof(emissive->lights.spot[0]); 
+    glBufferSubData( GL_UNIFORM_BUFFER, 0, baseSize, &(emissive->lights.basic));
+    glBufferSubData( GL_UNIFORM_BUFFER, baseSize + 8, ptSize, &(emissive->lights.point[0]));
+    for(int j=0; j<6; j++)
     {
-        shared_ptr<GLModel> model = this->Get<GLModel>("model");
-         
-        //Get UBOS
-        shared_ptr<GLUniform> vuniform = this->Get<GLUniform>("GMatrices");
-        shared_ptr<GLUniform> cuniform = this->Get<GLUniform>("GColors");
-        shared_ptr<GLUniform> luniform = this->Get<GLUniform>("GLights");
-        shared_ptr<GLUniform> eye = this->Get<GLUniform>("Eye");
-        
-        //Get Programs
-        shared_ptr<GLProgram> tprogram = this->Get<GLProgram>("texture_program");
-        shared_ptr<GLProgram> cprogram = this->Get<GLProgram>("color_program");
-
-        //Get Lights
-        shared_ptr<GLEmissive> emissive = this->Get<GLEmissive>("lights");
-
-        //Bind MVP
-        Matrices matrices;
-        matrices.mvpMatrix = vp * model->Matrix();
-        matrices.mvMatrix = model->Matrix();
-        matrices.normalMatrix = glm::transpose(glm::inverse(model->Matrix()));
-        glBindBuffer(GL_UNIFORM_BUFFER, vuniform->getId());
-        glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(matrices), &matrices);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-       
-        // Eye Position & toggle
-        glBindBuffer(GL_UNIFORM_BUFFER, eye->getId());
-        glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4), glm::value_ptr(glm::vec4(camera1->getCameraPosition(), 1.0f)));
-        glBufferSubData( GL_UNIFORM_BUFFER, sizeof(glm::vec4), sizeof(glm::vec4), glm::value_ptr(glm::vec4(1,1,1,1)));
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        // Bind Lights
-        glBindBuffer(GL_UNIFORM_BUFFER, luniform->getId());
-
-        cout<<"matrix "<<vuniform->getBlock()<<endl;
-        cout<<"colors "<<cuniform->getBlock()<<endl;
-        cout<<"lights "<<luniform->getBlock()<<endl;
-        cout<<"eye "<<eye->getBlock()<<endl;
-        GLint offset;
-        std::string uname;
-        GLint numUniforms;
-        GLuint index;
-        glGetActiveUniformBlockiv( tprogram->getId(), luniform->getBlock(), GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &numUniforms );
-        GLint *indices = new GLint[numUniforms];
-        glGetActiveUniformBlockiv( tprogram->getId(), luniform->getBlock(), GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, indices );
-        for( int i = 0; i < numUniforms; i++)
-        {
-            index = (GLuint)indices[i];
-            glGetActiveUniformName(tprogram->getId(), index, 256, 0, &uname[0]);
-            glGetActiveUniformsiv(tprogram->getId(), 1, &index, GL_UNIFORM_OFFSET, &offset);
-            std::cout << "Uniform <" << &uname[0] << "> (offset): " << offset << std::endl;
-        }
-
-        size_t baseSize = sizeof(emissive->lights.basic);
-        size_t ptSize = sizeof(emissive->lights.point[0]);
-        size_t sptSize = sizeof(emissive->lights.spot[0]); 
-        glBufferSubData( GL_UNIFORM_BUFFER, 0, baseSize, &emissive->lights.basic);
-        glBufferSubData( GL_UNIFORM_BUFFER, baseSize + 8, ptSize, &emissive->lights.point[0]);
-        glBufferSubData( GL_UNIFORM_BUFFER, baseSize + ptSize + 16, sptSize, &(emissive->lights.spot[0]));
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        //Get Sampler
-        shared_ptr<GLUniform> tuniform = this->Get<GLUniform>("Texture");
-
-        //Colors Program
-        glUseProgram(cprogram->getId());
-        model->Draw(cuniform, cprogram->getId());
-        glUseProgram(0);
-        
-        //Texture Program
-        glUseProgram(tprogram->getId());
-        model->Draw(tuniform, tprogram->getId());
-        glUseProgram(0);
-
+        glBufferSubData( GL_UNIFORM_BUFFER, baseSize + ptSize + j*sptSize + 8*(j+2), sptSize, &(emissive->lights.spot[j]));
     }
-          
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    // Bind Eye Position & toggle
+    glBindBuffer(GL_UNIFORM_BUFFER, eye->getId());
+    glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4), glm::value_ptr(glm::vec4(camera1->getCameraPosition(), 1.0f)));
+    glBufferSubData( GL_UNIFORM_BUFFER, sizeof(glm::vec4), sizeof(glm::vec4), glm::value_ptr(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+   
+
+    //Get Sampler
+    shared_ptr<GLUniform> tuniform = this->Get<GLUniform>("Texture");
+
+    //Colors Program
+    glUseProgram(cprogram->getId());
+    model->Draw(cuniform, cprogram->getId());
+    glUseProgram(0);
+    
+    //Texture Program
+    glUseProgram(tprogram->getId());
+    model->Draw(tuniform, tprogram->getId());
+    glUseProgram(0);
 
 }
 
@@ -230,10 +218,10 @@ float GLScene::getDT()
 }
 
 
-void GLScene::setModel(const char* name)
+void GLScene::setModel(const char* name, const char* path)
 {
-    this->RemoveFromContext("model");
-    shared_ptr<GLModel> model(new GLModel(name, "model", NUM_ATTRIBUTES));
+    this->RemoveFromContext(name);
+    shared_ptr<GLModel> model(new GLModel(path, name, NUM_ATTRIBUTES));
     if( model->CreateVAO() )
         this->AddToContext(model);
 }

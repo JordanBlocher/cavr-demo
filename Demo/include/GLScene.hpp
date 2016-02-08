@@ -16,7 +16,7 @@ class GLScene : public GLViewport
     GLScene();
 
     void idleGL();
-    void setModel(const char*);
+    void setModel(const char*, const char*);
 
     void initializeGL();
     void paintGL();
@@ -24,9 +24,9 @@ class GLScene : public GLViewport
  protected:
     std::string modelpath;
     std::string materialpath;
+    void paintHelper(const char*);
 
     std::chrono::time_point<std::chrono::high_resolution_clock> time;
-
 };
 
 template <typename T> 

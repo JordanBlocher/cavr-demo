@@ -33,7 +33,7 @@ void initContext()
 
   cd->glView->initializeGL();
   // Choose model
-  cd->glView->setModel("models/dragon.obj");
+  cd->glView->setModel("dragon", "models/dragon.obj");
     
   cavr::System::setContextData(cd);
 }

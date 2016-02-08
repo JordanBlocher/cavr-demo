@@ -240,7 +240,7 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
         mat.diffuse = glm::vec4(diffuse.r, diffuse.g, diffuse.b, 1.0f);
         mat.ambient = glm::vec4(ambient.r, ambient.g, ambient.b, 1.0f);
         mat.specular = glm::vec4(specular.r, specular.g, specular.b, 1.0f);
-        mat.shininess = shininess / 5.0f;
+        mat.shininess = shininess / 1.0f;
         mat.intensity = 1.0f + intensity;
         mat.diffuseBlend = diffuseBlend;
 
