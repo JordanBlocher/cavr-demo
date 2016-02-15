@@ -8,6 +8,7 @@
 #include <cavr/gl/vbo.h>
 #include <glog/logging.h>
 #include <math.h>
+#define GLM_FORCE_RADIANS
 #include <GLScene.hpp>
 
 // Using IrrKlang for this example
@@ -17,65 +18,99 @@ using namespace irrklang;
 #pragma comment(lib, "irrKlang.lib")
 // IrrKlang
 
-
-// Context Data used for this example
-struct ContextData 
-{
-
-  GLScene *glView = new GLScene();
-
-};
+bool UP, DOWN, LEFT, RIGHT, INIT;
 
 // Initialize our program
 void initContext() 
 {
-  ContextData* cd = new ContextData();
+    static GLScene *cd;
+    // Context Data 
+    //shared_ptr<GLScene> cd(new GLScene());
+    cd = new GLScene();
 
-  cd->glView->initializeGL();
-  // Choose model
-  cd->glView->setModel("dragon", "models/dragon.obj");
+    cd->initializeGL();
+    // Choose model
+    cd->setModel("dragon", "models/dragon.obj");
+
+    cavr::System::setContextData(cd);
     
-  cavr::System::setContextData(cd);
+    UP = DOWN = LEFT = RIGHT = INIT = false;
 }
 
 void frame() 
 {
-  ContextData* cd = (ContextData*)cavr::System::getContextData();
+
 }
 
 void render() 
 {
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
+    static GLScene *cd;
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
-  // get the context data
-  ContextData* cd = (ContextData*)cavr::System::getContextData();
+    // get the context data
+    //shared_ptr<GLScene> cd = (shared_ptr<GLScene>)cavr::System::getContextData();
+    cd = static_cast<GLScene*>(cavr::System::getContextData());
 
-  cd->glView->paintGL();
+    //Get view & projection matrices
+    shared_ptr<GLCamera> camera1 = cd->Get<GLCamera>("camera1");
+    //if (!INIT) {
+        camera1->updateCavrProjection();
+        //camera1->updateCavrPosition();
+        camera1->updateView();
+        INIT = true;
+    //}
+    if (UP) {
+        cd->moveCamera(GLCamera::CamDirection::Forward);
+        UP = false;
+    }
+    else if (DOWN) {
+        cd->moveCamera(GLCamera::CamDirection::Backward);
+        DOWN = false;
+    }
+    if (LEFT) {
+        cd->moveCamera(GLCamera::CamDirection::Left);
+        LEFT = false;
+    }
+    else if (RIGHT) {
+        cd->moveCamera(GLCamera::CamDirection::Right);
+        RIGHT = false;
+    }
+    cd->paintGL();
 
-  // Set your current 
-  auto position = cavr::input::getSixDOF("glass")->getPosition();
-  position.x *= 10;
-  position.z *= 10;
-  //cd->engine->setListenerPosition(vec3df(position.x,position.y,position.z), // Listener's position
-  //vec3df(0,0,1)); // What direction is the listener's facing directiion -- in this case we are always stareing forward..
+    auto position = cavr::input::getSixDOF("glass")->getPosition();
+    position.x *= 10;
+    position.z *= 10;
+    //cd->engine->setListenerPosition(vec3df(position.x,position.y,position.z), // Listener's position
+    //vec3df(0,0,1)); // What direction is the listener's facing directiion -- in this case we are always stareing forward..
 
 }
 
 void destructContext() 
 {
-  ContextData* cd = (ContextData*)cavr::System::getContextData();
-  delete cd;
+    //shared_ptr<GLScene> cd = (shared_ptr<GLScene>)cavr::System::getContextData();
+    //cd.reset();
 }
 
 void update() 
 {
-  // shutdown cavr..
-  if (cavr::input::getButton("exit")->delta() == cavr::input::Button::Pressed) {
-    cavr::System::shutdown();
-    return;
-  }
-
+    // shutdown cavr..
+    if (cavr::input::getButton("exit")->delta() == cavr::input::Button::Pressed) {
+       cavr::System::shutdown();
+      return;
+    }
+    if (cavr::input::getButton("up")->delta() == cavr::input::Button::Held) {
+        UP = true;
+    }
+    else if (cavr::input::getButton("down")->delta() == cavr::input::Button::Held) {
+        DOWN = true;
+    }
+    if (cavr::input::getButton("left")->delta() == cavr::input::Button::Held) {
+        LEFT = true;
+    }
+    else if (cavr::input::getButton("right")->delta() == cavr::input::Button::Held) {
+        RIGHT = true;
+    }
 }
 
 int main(int argc, char** argv) 
@@ -91,9 +126,12 @@ int main(int argc, char** argv)
   cavr::input::InputMap input_map;
 
   // set input map for buttons,keyboard, and sixdofs 
-
+  input_map.button_map["up"] = "keyboard[w]";
+  input_map.button_map["down"] = "keyboard[s]";
+  input_map.button_map["left"] = "keyboard[a]";
+  input_map.button_map["right"] = "keyboard[d]";
   input_map.button_map["exit"] = "vrpn[WiiMote0[0]]";
-  input_map.sixdof_map["wand"] = "vrpn[WiiMote0[0]]";
+  //input_map.sixdof_map["wand"] = "vrpn[WiiMote0[0]]";
   input_map.button_map["pick"] = "vrpn[WiiMote0[3]]";
 
   input_map.sixdof_map["glass"] = "vrpn[TallGlasses[0]]";

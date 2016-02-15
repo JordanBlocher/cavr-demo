@@ -2,13 +2,16 @@
 #define GLMAIN_H
 
 #include <GLViewport.hpp>
+#include <GLCamera.hpp>
 
 #include <chrono>
 
 // Also does not belong here
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp> 
+
 
 class GLScene : public GLViewport
 {
@@ -21,6 +24,7 @@ class GLScene : public GLViewport
     void initializeGL();
     void paintGL();
     float getDT();
+    void moveCamera(GLCamera::CamDirection);
  protected:
     std::string modelpath;
     std::string materialpath;

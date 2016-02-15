@@ -1,4 +1,5 @@
 #define CHECKGLERROR if ( glGetError() != GL_NO_ERROR ) cout << __LINE__ << endl;
+#define GLM_FORCE_RADIANS
 
 #include <GL/glew.h>
 
@@ -16,10 +17,9 @@
 #include <GLBufferObject.hpp>
 #include <GLModel.hpp>
 #include <GLUniform.hpp>
-#include <GLCamera.hpp>
 #include <GLEmissive.hpp>
 
-#include "GLScene.hpp"
+#include <GLScene.hpp>
 #include <cavr/cavr.h>
 #include <cavr/gfx/renderer.h>
 
@@ -123,15 +123,10 @@ void GLScene::paintGL()
 {
     //Clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
- 
-    //Get view & projection matrices
-    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
-    camera1->Update();
-
+    
     //Choose Model
     this->paintHelper("dragon");
     //this->paintHelper("gem");
-
 }
 
 void GLScene::paintHelper(const char* model_name)
@@ -155,7 +150,7 @@ void GLScene::paintHelper(const char* model_name)
 
     // Bind MVP
     Matrices matrices;
-    model->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
+    model->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
     matrices.mvpMatrix = vp * model->Matrix();
     matrices.mvMatrix = model->Matrix(); 
     matrices.normalMatrix = glm::transpose(glm::inverse(model->Matrix()));
@@ -196,6 +191,12 @@ void GLScene::paintHelper(const char* model_name)
     model->Draw(tuniform, tprogram->getId());
     glUseProgram(0);
 
+}
+
+void GLScene::moveCamera(GLCamera::CamDirection direction)
+{
+    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+    camera1->moveCamera(direction);
 }
 
 void GLScene::idleGL()

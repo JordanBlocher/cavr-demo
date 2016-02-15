@@ -1,5 +1,6 @@
 #ifndef GLVIEW_H
 #define GLVIEW_H
+#define GLM_FORCE_RADIANS
 
 #include "GLNode.hpp"
 
@@ -35,6 +36,7 @@ class GLViewport
     void quit();
     virtual void pause();
     virtual void idleGL();
+    void ViewContext();
 
  protected: 
     virtual void initializeGL();
@@ -45,7 +47,6 @@ class GLViewport
     bool AddToContext(const std::shared_ptr<GLNode>);
     bool RemoveFromContext(const char*);
     void SetScene(const std::shared_ptr<GLNode>);
-    void ViewContext();
     bool Contains(const char*);
 
     
