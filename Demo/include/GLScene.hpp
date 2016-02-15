@@ -19,7 +19,7 @@ class GLScene : public GLViewport
     GLScene();
 
     void idleGL();
-    void setModel(const char*, const char*);
+    void addModel(const char*, const char*);
 
     void initializeGL();
     void paintGL();

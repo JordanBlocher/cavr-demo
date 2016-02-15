@@ -124,9 +124,17 @@ void GLScene::paintGL()
     //Clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+
     //Choose Model
+    shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
+    dragon->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
     this->paintHelper("dragon");
-    //this->paintHelper("gem");
+
+    camera1->updateCavrView();
+    shared_ptr<GLModel> coords = this->Get<GLModel>("coords");
+    coords->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, 1.0f)));
+    this->paintHelper("coords");
 }
 
 void GLScene::paintHelper(const char* model_name)
@@ -150,7 +158,6 @@ void GLScene::paintHelper(const char* model_name)
 
     // Bind MVP
     Matrices matrices;
-    model->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
     matrices.mvpMatrix = vp * model->Matrix();
     matrices.mvMatrix = model->Matrix(); 
     matrices.normalMatrix = glm::transpose(glm::inverse(model->Matrix()));
@@ -219,9 +226,8 @@ float GLScene::getDT()
 }
 
 
-void GLScene::setModel(const char* name, const char* path)
+void GLScene::addModel(const char* name, const char* path)
 {
-    this->RemoveFromContext(name);
     shared_ptr<GLModel> model(new GLModel(path, name, NUM_ATTRIBUTES));
     if( model->CreateVAO() )
         this->AddToContext(model);

@@ -30,7 +30,8 @@ void initContext()
 
     cd->initializeGL();
     // Choose model
-    cd->setModel("dragon", "models/dragon.obj");
+    cd->addModel("dragon", "models/dragon.obj");
+    cd->addModel("coords", "models/coords.obj");
 
     cavr::System::setContextData(cd);
     
@@ -57,6 +58,7 @@ void render()
     //if (!INIT) {
         camera1->updateCavrProjection();
         //camera1->updateCavrPosition();
+        //camera1->updateCavrView();
         camera1->updateView();
         INIT = true;
     //}
@@ -76,6 +78,7 @@ void render()
         cd->moveCamera(GLCamera::CamDirection::Right);
         RIGHT = false;
     }
+
     cd->paintGL();
 
     auto position = cavr::input::getSixDOF("glass")->getPosition();
@@ -109,6 +112,12 @@ void update()
         LEFT = true;
     }
     else if (cavr::input::getButton("right")->delta() == cavr::input::Button::Held) {
+        RIGHT = true;
+    }
+    if (cavr::input::getButton("forward")->delta() == cavr::input::Button::Held) {
+        LEFT = true;
+    }
+    else if (cavr::input::getButton("backward")->delta() == cavr::input::Button::Held) {
         RIGHT = true;
     }
 }
