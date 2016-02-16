@@ -15,27 +15,28 @@
 #include <irrKlang.h>
 using namespace irrklang;
 
+static GLCamera::CamDirection CAM_DIRECTION;
+
+#define DEBUG 
+
 #pragma comment(lib, "irrKlang.lib")
 // IrrKlang
-
-bool UP, DOWN, LEFT, RIGHT, INIT;
 
 // Initialize our program
 void initContext() 
 {
-    static GLScene *cd;
     // Context Data 
-    //shared_ptr<GLScene> cd(new GLScene());
+    static GLScene *cd;
     cd = new GLScene();
-
     cd->initializeGL();
+
     // Choose model
     cd->addModel("dragon", "models/dragon.obj");
     cd->addModel("coords", "models/coords.obj");
 
+    // Camera
+    CAM_DIRECTION = GLCamera::CamDirection::Nop;
     cavr::System::setContextData(cd);
-    
-    UP = DOWN = LEFT = RIGHT = INIT = false;
 }
 
 void frame() 
@@ -55,30 +56,11 @@ void render()
 
     //Get view & projection matrices
     shared_ptr<GLCamera> camera1 = cd->Get<GLCamera>("camera1");
-    //if (!INIT) {
-        camera1->updateCavrProjection();
-        //camera1->updateCavrPosition();
-        //camera1->updateCavrView();
-        camera1->updateView();
-        INIT = true;
-    //}
-    if (UP) {
-        cd->moveCamera(GLCamera::CamDirection::Forward);
-        UP = false;
-    }
-    else if (DOWN) {
-        cd->moveCamera(GLCamera::CamDirection::Backward);
-        DOWN = false;
-    }
-    if (LEFT) {
-        cd->moveCamera(GLCamera::CamDirection::Left);
-        LEFT = false;
-    }
-    else if (RIGHT) {
-        cd->moveCamera(GLCamera::CamDirection::Right);
-        RIGHT = false;
-    }
-
+    camera1->updateCavrProjection();
+    //camera1->updateCavrPosition();
+    //camera1->updateCavrView();
+    camera1->updateView();
+    cd->moveCamera(CAM_DIRECTION);
     cd->paintGL();
 
     auto position = cavr::input::getSixDOF("glass")->getPosition();
@@ -102,24 +84,20 @@ void update()
        cavr::System::shutdown();
       return;
     }
-    if (cavr::input::getButton("up")->delta() == cavr::input::Button::Held) {
-        UP = true;
-    }
-    else if (cavr::input::getButton("down")->delta() == cavr::input::Button::Held) {
-        DOWN = true;
-    }
-    if (cavr::input::getButton("left")->delta() == cavr::input::Button::Held) {
-        LEFT = true;
-    }
-    else if (cavr::input::getButton("right")->delta() == cavr::input::Button::Held) {
-        RIGHT = true;
-    }
-    if (cavr::input::getButton("forward")->delta() == cavr::input::Button::Held) {
-        LEFT = true;
-    }
-    else if (cavr::input::getButton("backward")->delta() == cavr::input::Button::Held) {
-        RIGHT = true;
-    }
+    else if (cavr::input::getButton("up")->delta() == cavr::input::Button::Held) 
+        CAM_DIRECTION = GLCamera::CamDirection::Up;
+    else if (cavr::input::getButton("down")->delta() == cavr::input::Button::Held) 
+        CAM_DIRECTION = GLCamera::CamDirection::Down;
+    else if (cavr::input::getButton("left")->delta() == cavr::input::Button::Held)
+        CAM_DIRECTION = GLCamera::CamDirection::Left;
+    else if (cavr::input::getButton("right")->delta() == cavr::input::Button::Held) 
+        CAM_DIRECTION = GLCamera::CamDirection::Right;
+    else if (cavr::input::getButton("forward")->delta() == cavr::input::Button::Held) 
+        CAM_DIRECTION = GLCamera::CamDirection::Forward;
+    else if (cavr::input::getButton("backward")->delta() == cavr::input::Button::Held)
+        CAM_DIRECTION = GLCamera::CamDirection::Backward;
+    else
+        CAM_DIRECTION = GLCamera::CamDirection::Nop;
 }
 
 int main(int argc, char** argv) 
@@ -135,13 +113,24 @@ int main(int argc, char** argv)
   cavr::input::InputMap input_map;
 
   // set input map for buttons,keyboard, and sixdofs 
+#ifdef DEBUG
   input_map.button_map["up"] = "keyboard[w]";
   input_map.button_map["down"] = "keyboard[s]";
   input_map.button_map["left"] = "keyboard[a]";
   input_map.button_map["right"] = "keyboard[d]";
+  input_map.button_map["forward"] = "keyboard[i]";
+  input_map.button_map["backward"] = "keyboard[k]";
+#else
+  input_map.button_map["up"] = "WiiMote0[10]";
+  input_map.button_map["down"] = "WiiMote0[9]";
+  input_map.button_map["left"] = "WiiMote0[7]";
+  input_map.button_map["right"] = "WiiMote0[8]";
+  input_map.button_map["forward"] = "WiiMote0[4]";
+  input_map.button_map["backward"] = "WiiMote0[3]";
+#endif
   input_map.button_map["exit"] = "vrpn[WiiMote0[0]]";
   //input_map.sixdof_map["wand"] = "vrpn[WiiMote0[0]]";
-  input_map.button_map["pick"] = "vrpn[WiiMote0[3]]";
+  //input_map.button_map["pick"] = "vrpn[WiiMote0[3]]";
 
   input_map.sixdof_map["glass"] = "vrpn[TallGlasses[0]]";
   

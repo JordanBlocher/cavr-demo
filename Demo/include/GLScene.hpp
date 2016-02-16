@@ -25,12 +25,14 @@ class GLScene : public GLViewport
     void paintGL();
     float getDT();
     void moveCamera(GLCamera::CamDirection);
+
  protected:
     std::string modelpath;
     std::string materialpath;
     void paintHelper(const char*);
 
     std::chrono::time_point<std::chrono::high_resolution_clock> time;
+
 };
 
 template <typename T> 

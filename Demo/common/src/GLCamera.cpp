@@ -18,9 +18,9 @@ GLCamera::GLCamera(const char* name)
     this->near = glm::vec3(0.0f,0.0f,0.1f);
     this->far = glm::vec3(0.0f,0.0f,10000.0f);
 
-    this->radius  = 5.0f;
-    this->azimuth = M_PI;
-    this->polar = M_PI/1.99;
+    this->radius  = 15.0f;
+    this->azimuth = M_PI/2.0;
+    this->polar = M_PI/2.0;
     this->aimTarget = glm::vec3(0.0f,0.0f,-10.0f);
 }
 
@@ -54,8 +54,8 @@ void GLCamera::moveCamera(GLCamera::CamDirection direction)
                 polar += (M_PI/150.0f);
             break;
         case (CamDirection::Down):
-            if(polar <= ((M_PI)))
-                polar = ((M_PI));
+            if(polar <= ((M_PI/25,0)))
+                polar = ((M_PI/25.0));
             else
                 polar -= (M_PI/150.0);
             break;
@@ -87,13 +87,13 @@ void GLCamera::updateView()
     float eyeX, eyeY, eyeZ;
 
     eyeX = radius * sin (polar) * cos (azimuth);
-    eyeZ = radius * sin (polar) * sin (azimuth);
+    eyeZ = -radius * sin (polar) * sin (azimuth);
     eyeY = radius * cos (polar);
     
     //cavr::input::getSixDOF("glass")->setState(GLMath::GLMtomat4f(glm::translate(glm::mat4(1.0f), glm::vec3(eyeX, eyeY, eyeZ))));
     glm::vec3 forward = GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getForward());
     glm::vec3 up = GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getUp());
-    setAimTarget(forward + glm::vec3(0,0,-10));
+    setAimTarget(forward + glm::vec3(0,0,10));
 
     this->view = (glm::lookAt(
                     glm::vec3(eyeX, eyeY, eyeZ),  //eye pos

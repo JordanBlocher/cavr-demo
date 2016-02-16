@@ -11,7 +11,7 @@ class GLCamera : public GLNode
 {
  
 public:
- enum class CamDirection {Up, Down, Left, Right, Forward, Backward};
+ enum class CamDirection {Up, Down, Left, Right, Forward, Backward, Nop};
     GLCamera(const char*);
     ~GLCamera();
     

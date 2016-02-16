@@ -206,6 +206,7 @@ void GLScene::moveCamera(GLCamera::CamDirection direction)
     camera1->moveCamera(direction);
 }
 
+
 void GLScene::idleGL()
 {
     // Timer
