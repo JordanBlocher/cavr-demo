@@ -15,6 +15,7 @@
 #include <GLShader.hpp>
 #include <GLProgram.hpp>
 #include <GLBufferObject.hpp>
+#include <GLFrame.hpp>
 #include <GLModel.hpp>
 #include <GLUniform.hpp>
 #include <GLEmissive.hpp>
@@ -117,6 +118,10 @@ void GLScene::initializeGL()
     //Set Lighting
     shared_ptr<GLEmissive> emissive(new GLEmissive("lights"));
     this->AddToContext(emissive);
+
+    // Add FBO
+    shared_ptr<GLFrame> fbo(new GLFrame("fbo", 600, 600));
+    this->AddToContext(fbo);
 }
 
 void GLScene::paintGL()

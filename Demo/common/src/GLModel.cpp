@@ -1,8 +1,11 @@
 #define CHECKGLERROR if ( glGetError() != GL_NO_ERROR ) std::cout << __FILE__ <<":"<< __LINE__ << std::endl;
+#define GLM_FORCE_RADIANS
+
 #include "GLModel.hpp"
 #include "GLBufferObject.hpp"
 #include "GLUniform.hpp"
 #include "GLTexture.hpp"
+#include "GLFrame.cpp"
 
 #include <fstream>
 #include <boost/algorithm/string/split.hpp>
@@ -384,6 +387,34 @@ void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    glBindVertexArray(0);
+}
+
+void GLModel::DrawToFBO(std::shared_ptr<GLFrame> frame, GLuint program)
+{
+    GLint face_offset = 0;
+    GLint vertex_offset = 0;
+    glBindVertexArray(this->vao);
+
+    bool texture, color;
+
+    glBindBuffer(GL_DRAW_FRAMEBUFFER, frame->getId());
+
+    //Draw Model 
+    for(size_t i=0; i< this->faces->size(); i++)
+    {   
+
+        face_offset += this->faces->at(i).size();
+        vertex_offset += this->positions->at(i).size();
+
+            glDrawElementsBaseVertex(GL_TRIANGLES, 
+                    this->faces->at(i).size(),
+                    GL_UNSIGNED_INT,
+                    (void*)(sizeof(GLuint) * face_offset),
+                    vertex_offset);
+    }
+
+    glBindBuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBindVertexArray(0);
 }
 

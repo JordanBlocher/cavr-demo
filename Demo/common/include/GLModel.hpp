@@ -1,5 +1,6 @@
 #ifndef GLMODEL_H
 #define GLMODEL_H
+#define GLM_FORCE_RADIANS
 
 #include <vector>
 #include <glm/glm.hpp>
@@ -18,6 +19,7 @@ const GLuint UV_INDEX = 2;
 
 class GLUniform;
 class GLTexture;
+class GLFrame;
 
 class GLModel : public GLNode
 {
@@ -35,6 +37,7 @@ class GLModel : public GLNode
     bool LoadVertexData();
 
     void Draw(std::shared_ptr<GLUniform>, GLuint);
+    void DrawToFBO(std::shared_ptr<GLFrame>, GLuint);
     const std::vector<glm::vec3>& Positions(size_t);
     const std::vector<GLuint>& Faces(size_t);
     size_t numVertices();
