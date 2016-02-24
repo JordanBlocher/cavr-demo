@@ -39,3 +39,6 @@ void GLTexture::Bind(GLenum index)
     glActiveTexture(index);
     glBindTexture(this->type, this->id);
 }
+
+
+
