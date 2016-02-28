@@ -1,8 +1,8 @@
 #ifndef GLMAIN_H
 #define GLMAIN_H
 
-#include <GLViewport.hpp>
-#include <GLCamera.hpp>
+//#include <GLViewport.hpp>
+//#include <GLCamera.hpp>
 
 #include <chrono>
 
@@ -24,7 +24,7 @@ class GLScene : public GLViewport
     void initializeGL();
     void paintGL();
     float getDT();
-    void moveCamera(GLCamera::CamDirection);
+    //void moveCamera(GLCamera::CamDirection);
 
  protected:
     std::string modelpath;
