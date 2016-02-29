@@ -29,30 +29,24 @@ class GLPrimitive : public GLNode
     glm::mat4 Matrix();
     glm::vec4 Position();
     void setMatrix(glm::mat4);
-    bool LoadSphere();
+    bool LoadSphere(int num_lats, int num_lons);
     bool LoadCylinder();
     //bool LoadCube();
 
     void Draw(std::shared_ptr<GLUniform>, GLuint);
-    const std::vector<glm::vec3>& Positions(size_t);
-    const std::vector<GLuint>& Faces(size_t);
     size_t numVertices();
     size_t numFaces();
     size_t Size();
 
  private:
     void Allocate();
-    void AddAttributeData(const aiMesh*, unsigned int);
-    void AddVertexData(const aiMesh*, unsigned int);
-    void AddMaterials(aiMaterial**, unsigned int);
     void CreateVBOs();
 
     bool AddMaterials(const char*);
-    std::string toString(MODEL);
+    std::string toString();
 
     std::string path;
     std::string filename;
-    MODEL type;
 
     std::shared_ptr<std::vector<glm::vec3>> positions;
     std::shared_ptr<std::vector<glm::vec3>> normals;

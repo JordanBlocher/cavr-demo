@@ -28,6 +28,8 @@ class GLFrame : public GLNode
     bool Status(GLenum, GLint);
     GLuint Buffer() const;
 
+    void BindForWriting();
+    void BindForReading();
  protected:
     GLuint buffer;
     GLuint textures[GBUFFER_NUM_TEXTURES];

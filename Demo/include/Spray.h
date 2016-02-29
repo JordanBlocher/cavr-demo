@@ -3,34 +3,44 @@
 *  Description: A class for spray painting.
 */
 #pragma once
-#include <GLModel.h>
-
+#include "GLUniform.hpp"
+#include "GLNode.hpp"
+#include <glm/glm.hpp>
+#include "GLBufferObject.hpp"
 using namespace std;
 using namespace glm;
 struct PaintStruct
 {
-	glm::vec4 position;
-	glm::vec4 color;
+	glm::vec3 position;
+	glm::vec3 color;
 	bool Break;
 };
 
-class Spray : public Model
+class Spray : public GLNode
 {
+	const GLuint V_INDEX = 0;
+	const GLuint NORM_INDEX = 1;
+	const GLuint UV_INDEX = 2;
+	const GLuint COLOR_INDEX = 3;
 public:
 	Spray(int max=10000);
-	bool AddPoints(vec4 worldPoint,vec4 Color);
+	bool AddPoints(vec3 worldPoint,vec3 Color);
 	void ClearPoints();
-	virtual bool Init();
-	virtual void Update();
-	virtual void Render(mat4 projection, mat4 view);
+	bool Init();
+	void Update();
+	void Draw(std::shared_ptr<GLUniform> fragment, GLuint program);
 	void AddBreak();
 private:
+	GLBufferObject vbo_pos;
+	GLBufferObject vbo_tex;
+	GLBufferObject vbo_norm;
+	GLBufferObject vbo_color;
+
 	int CurrentPoints;
 	int MaxPoints;
-	renderer Renderer;
+
 	string fShader;
 	string vShader;
-	buffer Buffer;
 	vector<PaintStruct> Points;
 
 	glm::mat4 matrix;

@@ -19,8 +19,6 @@
 
 GLPrimitive::GLPrimitive(const char* name, const GLuint attributes) : GLNode(name)
 {
-    this->filename = this->toString(type);
-    this->type = type;
     this->path = "models/";
     this->attributes = attributes;
     this->Allocate();
@@ -36,22 +34,22 @@ void GLPrimitive::Allocate()
     this->v_size = 0;
 
     // Allocate based on primitive that is loaded in. 
-    this->positions = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
-    this->normals = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
-    this->uvs = std::shared_ptr<std::vector<std::vector<glm::vec2>>>(new std::vector<std::vector<glm::vec2>>);
-    this->faces = std::shared_ptr<std::vector<std::vector<GLuint>>>(new std::vector<std::vector<GLuint>>);
-    this->materials = std::shared_ptr<std::vector<std::pair<aiString,Material>>>(new std::vector<std::pair<aiString,Material>>);
+    this->positions = std::shared_ptr<std::vector<glm::vec3>>(new std::vector<glm::vec3>);
+    this->normals = std::shared_ptr<std::vector<glm::vec3>>(new std::vector<glm::vec3>);
+    this->uvs = std::shared_ptr<std::vector<glm::vec2>>(new std::vector<glm::vec2>);
+    this->faces = std::shared_ptr<std::vector<GLuint>>(new std::vector<GLuint>);
+    //this->materials = std::shared_ptr<std::vector<std::pair<aiString,Material>>>(new std::vector<std::pair<aiString,Material>>);
     this->textures = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);
 
 }
 
-bool GLPrimitive::LoadSphere()
+bool GLPrimitive::LoadSphere(int num_lats, int num_lons)
 {
-// A Thanks to Roger Hoang
-int face_ind = 0;
+    // A Thanks to Roger Hoang
+    int face_ind = 0;
 
-float rads_per_lat = M_PI / float(num_lats);
-float rads_per_lon = 2.0 * M_PI / float(num_lons);
+    float rads_per_lat = M_PI / float(num_lats);
+    float rads_per_lon = 2.0 * M_PI / float(num_lons);
     for (int lat = 0; lat < num_lats; ++lat) 
     {
         float top_rad = rads_per_lat * lat - M_PI / 2.0f;
@@ -67,49 +65,50 @@ float rads_per_lon = 2.0 * M_PI / float(num_lons);
             float cos_l = cos(left_rad);
             float sin_r = sin(right_rad);
             float cos_r = cos(right_rad);
-            vec3 ll(bottom_xz * cos_l, bottom_y, bottom_xz * sin_l);
-            vec3 lr(bottom_xz * cos_r, bottom_y, bottom_xz * sin_r);
-            vec3 ul(top_xz * cos_l, top_y, top_xz * sin_l);
-            vec3 ur(top_xz * cos_r, top_y, top_xz * sin_r);
+            glm::vec3 ll(bottom_xz * cos_l, bottom_y, bottom_xz * sin_l);
+            glm::vec3 lr(bottom_xz * cos_r, bottom_y, bottom_xz * sin_r);
+            glm::vec3 ul(top_xz * cos_l, top_y, top_xz * sin_l);
+            glm::vec3 ur(top_xz * cos_r, top_y, top_xz * sin_r);
 
 
 
-            faces.push_back(face_ind);
-            faces.push_back(face_ind++);
+            faces->push_back(face_ind);
+            faces->push_back(face_ind++);
 
             // face one 
-            positions.push_back(ll);
-            positions.push_back(lr);
-            positions.push_back(ul);
+            positions->push_back(ll);
+            positions->push_back(lr);
+            positions->push_back(ul);
 
             // normals
-            normals.push_back(glm::vec3(0,1,0));
-            normals.push_back(glm::vec3(0,1,0));
-            normals.push_back(glm::vec3(0,1,0));
+            normals->push_back(glm::vec3(0,1,0));
+            normals->push_back(glm::vec3(0,1,0));
+            normals->push_back(glm::vec3(0,1,0));
 
 
             // uvs -- too be filled
-            uvs.push_back(glm::vec2(0,0));
-            uvs.push_back(glm::vec2(0,0));
-            uvs.push_back(glm::vec2(0,0));
+            uvs->push_back(glm::vec2(0,0));
+            uvs->push_back(glm::vec2(0,0));
+            uvs->push_back(glm::vec2(0,0));
 
             // face two 
-            positions.push_back(ul);
-            positions.push_back(lr);
-            positions.push_back(ur);
+            positions->push_back(ul);
+            positions->push_back(lr);
+            positions->push_back(ur);
 
             // normals
-            normals.push_back(glm::vec3(0,1,0));
-            normals.push_back(glm::vec3(0,1,0));
-            normals.push_back(glm::vec3(0,1,0));
+            normals->push_back(glm::vec3(0,1,0));
+            normals->push_back(glm::vec3(0,1,0));
+            normals->push_back(glm::vec3(0,1,0));
 
             // uvs -- too be filled
-            uvs.push_back(glm::vec2(0,0));
-            uvs.push_back(glm::vec2(0,0));
-            uvs.push_back(glm::vec2(0,0));
+            uvs->push_back(glm::vec2(0,0));
+            uvs->push_back(glm::vec2(0,0));
+            uvs->push_back(glm::vec2(0,0));
         }
     }
-    return false;
+    v_size = uvs->size();
+    return true;
 }
 
 bool GLPrimitive::LoadCylinder()
@@ -131,14 +130,6 @@ bool GLPrimitive::CreateVAO()
     return true;
 }
 
-// No VAO Created
-bool GLPrimitive::LoadVertexData()
-{
-    // Load some primitive here.
-
-    return false;
-}
-
 void GLPrimitive::CreateVBOs()
 {
     //Create VBOs 
@@ -148,11 +139,8 @@ void GLPrimitive::CreateVBOs()
             GL_ARRAY_BUFFER,
             GL_STATIC_DRAW);
     size_t offset = 0;
-    for(size_t i=0; i<this->positions->size(); i++)
-    {
-        vbo_pos.LoadSubData(offset, 0, this->positions->at(i));
-        offset += this->positions->at(i).size();
-    }
+    vbo_pos.LoadSubData(0, 0, (*positions));
+
     if( this->attributes > V_INDEX)
     {
         glEnableVertexAttribArray(V_INDEX);
@@ -164,12 +152,9 @@ void GLPrimitive::CreateVBOs()
             this->v_size,
             GL_ARRAY_BUFFER,
             GL_STATIC_DRAW);
-    offset = 0;
-    for(size_t i=0; i<this->positions->size(); i++)
-    {
-        vbo_norms.LoadSubData(offset, 1, this->normals->at(i));
-        offset += this->positions->at(i).size();
-    }
+
+    vbo_norms.LoadSubData(offset, 1, (*normals));
+
     if( this->attributes > NORM_INDEX)
     {
         glEnableVertexAttribArray(NORM_INDEX);
@@ -181,12 +166,9 @@ void GLPrimitive::CreateVBOs()
             this->v_size,
             GL_ARRAY_BUFFER,
             GL_STATIC_DRAW);
-    offset = 0;
-    for(size_t i=0; i<this->positions->size(); i++)
-    {
-        vbo_uvs.LoadSubData(offset, 2, this->uvs->at(i));
-        offset += this->positions->at(i).size();
-    }
+
+    vbo_uvs.LoadSubData(offset, 2, (*uvs));
+
     if( this->attributes > UV_INDEX)
     {
         glEnableVertexAttribArray(UV_INDEX);
@@ -199,16 +181,13 @@ void GLPrimitive::CreateVBOs()
             GL_ELEMENT_ARRAY_BUFFER,
             GL_STATIC_DRAW);
     offset = 0;
-    for(size_t i=0; i<this->faces->size(); i++)
-    {
-        vbo_elements.LoadSubData(offset, 0, this->faces->at(i));
-        offset += this->faces->at(i).size();
-    }
+    vbo_elements.LoadSubData(offset, 0, (*this->faces) );
+
 }
 
 
 void GLPrimitive::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
-{
+{/*
     GLint face_offset = 0;
     GLint vertex_offset = 0;
     glBindVertexArray(this->vao);
@@ -252,7 +231,7 @@ void GLPrimitive::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
-    glBindVertexArray(0);
+    glBindVertexArray(0);*/
 }
 
 size_t GLPrimitive::numFaces()
@@ -270,16 +249,6 @@ size_t GLPrimitive::Size()
     return this->faces->size();
 }
 
-const std::vector<glm::vec3>& GLPrimitive::Positions(size_t index)
-{
-    return this->positions->at(index);
-}
-
-const std::vector<GLuint>& GLPrimitive::Faces(size_t index)
-{
-    return this->faces->at(index);
-}
-
 void GLPrimitive::setMatrix(glm::mat4 m)
 {
     this->matrix = m;
@@ -295,17 +264,9 @@ glm::vec4 GLPrimitive::Position()
     return glm::vec4(10.0f, 10.0f, 10.0f, 1.0f) * this->matrix;
 }
 
-std::string GLPrimitive::toString(MODEL type)
+std::string GLPrimitive::toString()
 {
-    switch(type)
-    {
-        case (CUBE):
-            return "cube.obj";
-            break;
-        default:
-            return "";
-            break;
-    }
+    return "";
 }
 
 

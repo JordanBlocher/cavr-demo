@@ -1,5 +1,8 @@
 #include <Spray.h>
 
+#include "GLUniform.hpp"
+#include "GLTexture.hpp"
+
 Spray::Spray(int max)
 {
 	MaxPoints = 6*max;
@@ -10,63 +13,60 @@ Spray::Spray(int max)
 
 bool Spray::Init()
 {
-	Renderer.init();
-	Renderer.addShader(GL_VERTEX_SHADER, vShader);
-	Renderer.addShader(GL_FRAGMENT_SHADER, fShader);
-
-	if(!Renderer.compile())
-	{
-		std::cout << "FAILED TO COMPILE" << std::endl;
-		// Let the user know that everything is not okay
-		return false;
-	}
-
-	if(!Renderer.link())
-	{
-		std::cout << "FAILED TO LINK" << std::endl;
-		// Let the user know that everything is not okay
-		return false;
-	}
 	std::cout << "SUCCESSFUL" << std::endl;
-	// Load our vertexs -- do we want a loader class
 
-	// Set up the buffers
-	Renderer.useProgram();
-	Buffer.generateBuffer(GL_ARRAY_BUFFER);
-  	Buffer.bindBuffer();
-  	Buffer.allocateBufferData(MaxPoints*sizeof(Vertex),NULL,GL_DYNAMIC_DRAW);
-	Buffer.bindBuffer();
+	//Create VBOs
 
-	//	layout (location = 0) in vec4 Position;
-	//	layout (location = 1) in vec2 TexCoord;
-	//	layout (location = 2) in vec3 Normal;
-	//	layout (location = 3) in vec3 color;
-
-	//{
-	//glm::vec4 position;
-	//	glm::vec3 normal;
-	//	glm::vec4 color;
-	//	glm::vec2 uv;
-	// This only needs to be done once
-	Renderer.enableVertexAttribPointer("Position");
-	Renderer.setGLVertexAttribPointer("Position",4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
-
-	Renderer.enableVertexAttribPointer("TexCoord");
-	Renderer.setGLVertexAttribPointer("TexCoord",2, GL_FLOAT, GL_FALSE, sizeof(Vertex),(void*)offsetof(Vertex, uv));
-
-	Renderer.enableVertexAttribPointer("Normal");
-	Renderer.setGLVertexAttribPointer("Normal",3, GL_FLOAT, GL_FALSE, sizeof(Vertex),(void*)offsetof(Vertex, normal));
-
-	Renderer.enableVertexAttribPointer("color");
-	Renderer.setGLVertexAttribPointer("color",4, GL_FLOAT, GL_FALSE, sizeof(Vertex),(void*)offsetof(Vertex, color));
+	// Allocate Positions 
+     vbo_pos = GLBufferObject("vbopositions",
+            sizeof(glm::vec3),
+            MaxPoints,
+            GL_ARRAY_BUFFER,
+            GL_DYNAMIC_DRAW);
 
 
-	model = mat4(1);
-	Renderer.endProgram();
+    //Allocate uvs
+     vbo_tex = GLBufferObject("vbotextures",
+            sizeof(glm::vec2),
+            MaxPoints,
+            GL_ARRAY_BUFFER,
+            GL_DYNAMIC_DRAW);
+
+
+    //Allocate Normals
+     vbo_norm = GLBufferObject("vbonorms",
+            sizeof(glm::vec3),
+            MaxPoints,
+            GL_ARRAY_BUFFER,
+            GL_DYNAMIC_DRAW);
+
+    //Allocate Colors
+    vbo_color = GLBufferObject("vbocolors",
+            sizeof(GLuint),
+            MaxPoints,
+            GL_ARRAY_BUFFER,
+            GL_DYNAMIC_DRAW);
+    /*
+	const GLuint V_INDEX = 0;
+	const GLuint NORM_INDEX = 1;
+	const GLuint UV_INDEX = 2;
+	const GLuint COLOR_INDEX = 3;*/
+	glEnableVertexAttribArray(V_INDEX);
+    glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glEnableVertexAttribArray(NORM_INDEX);
+    glVertexAttribPointer( NORM_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(UV_INDEX);
+    glVertexAttribPointer( UV_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glEnableVertexAttribArray(COLOR_INDEX);
+    glVertexAttribPointer( COLOR_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
 	return true;
 }
 
-bool Spray::AddPoints(vec4 worldPoint,vec4 Color)
+bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
 {
 	if (CurrentPoints * 6 < MaxPoints)
 	{
@@ -80,29 +80,52 @@ bool Spray::AddPoints(vec4 worldPoint,vec4 Color)
 	if(Points.size() > 1 && !Points[Points.size()-2].Break)
 	{
 		// Add the points at the current position in the buffer
-		vector<Vertex> vs = vector<Vertex>();
-		Vertex one;
-		Vertex two;
-		Vertex three;
-		Vertex four;
+		vector<glm::vec3> pos = vector<glm::vec3>();
+		std::vector<glm::vec3> colors = std::vector<glm::vec3>();
+		glm::vec3 one;
+		glm::vec3 two;
+		glm::vec3 three;
+		glm::vec3 four;
 
-		one.position = Points[Points.size() - 2].position;
-		two.position = Points[Points.size() - 1].position + vec4(0.0,1.0,0.0,0);
-		three.position = Points[Points.size() - 1].position;
-		four.position = Points[Points.size() - 2].position + vec4(0,1.0,0.0,0);
-		one.color = Points[Points.size() - 2].color;
-		two.color = Points[Points.size() - 1].color;
-		three.color = Points[Points.size() - 1].color;
-		four.color = Points[Points.size() - 2].color;
+		glm::vec3 oneColor;
+		glm::vec3 twoColor;
+		glm::vec3 threeColor;
+		glm::vec3 fourColor;
 
-		vs.push_back(one);
-		vs.push_back(two);
-		vs.push_back(three);
+		one = Points[Points.size() - 2].position;
+		two = Points[Points.size() - 1].position + vec3(0.0,1.0,0.0);
+		three = Points[Points.size() - 1].position;
+		four = Points[Points.size() - 2].position + vec3(0,1.0,0.0);
+		oneColor = Points[Points.size() - 2].color;
+		twoColor = Points[Points.size() - 1].color;
+		threeColor = Points[Points.size() - 1].color;
+		fourColor = Points[Points.size() - 2].color;
 
-		vs.push_back(one);
-		vs.push_back(two);
-		vs.push_back(four); 
-		Buffer.updateBuffer(6*CurrentPoints*sizeof(Vertex), sizeof(Vertex)*6, &vs[0]);
+
+
+
+
+		pos.push_back(one);
+		pos.push_back(two);
+		pos.push_back(three);
+
+		colors.push_back(oneColor);
+		colors.push_back(twoColor);
+		colors.push_back(threeColor);
+
+		pos.push_back(one);
+		pos.push_back(two);
+		pos.push_back(four); 
+
+		colors.push_back(oneColor);
+		colors.push_back(twoColor);
+		colors.push_back(fourColor); 
+
+
+		vbo_pos.LoadSubData(CurrentPoints*6, 0, (pos) );
+		vbo_color.LoadSubData(CurrentPoints*6, 0, (colors) );
+
+
 		return true;
 	}
 	return false;
@@ -127,14 +150,15 @@ void Spray::Update()
 
 }
 
-void Spray::Render(mat4 projection, mat4 view)
+void Spray::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
 {
-	Renderer.useProgram();
-	Buffer.bindBuffer();
-	mat4 mvp = projection * view * model;
-	Renderer.setUniformMatrix4x4("mvp", mvp);
-	Renderer.setUniformMatrix4x4("model",model);
-	Renderer.renderRaw(GL_TRIANGLES,6*CurrentPoints);
-	Renderer.endProgram();
-	//cout << CurrentPoints << endl;
+    GLint face_offset = 0;
+    GLint vertex_offset = 0;
+    glBindVertexArray(vao);
+
+    glDrawArrays(GL_TRIANGLES,0,6*CurrentPoints);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindVertexArray(0);
 }
