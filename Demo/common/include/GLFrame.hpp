@@ -6,9 +6,6 @@
 
 #include "GLNode.hpp"
 
-class GLViewport;
-class GLProgram;
-
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
 
 

@@ -31,3 +31,11 @@ glm::vec3 GLMath::vec3ftoGLM(cavr::math::vec3f vec3f)
     return temp;
 }
 
+cavr::math::vec3f GLMath::GLMtovec3f(glm::vec4 vec4)
+{
+    cavr::math::vec3f temp;
+    temp.x = vec4.x; temp.y = vec4.y; 
+    temp.z = vec4.z; 
+    return temp;
+}
+

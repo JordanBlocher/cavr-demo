@@ -16,6 +16,7 @@
 using namespace irrklang;
 
 static GLCamera::CamDirection CAM_DIRECTION;
+static bool PAINT;
 
 #define DEBUG 
 
@@ -32,10 +33,24 @@ void initContext()
 
     // Choose model
     cd->addModel("dragon", "models/dragon.obj");
+    cd->addModel("pallet", "models/pallet.obj");
+    cd->addModel("brush", "models/brush.obj");
+    cd->addModel("blob", "models/blob.obj");
+    cd->addModel("paint", "models/paint.obj");
     cd->addModel("coords", "models/coords.obj");
+    cd->addModel("blue", "models/blue.obj");
+    cd->addModel("red", "models/red.obj");
+    cd->addModel("purple", "models/purple.obj");
+    cd->addModel("white", "models/white.obj");
+    cd->addModel("yellow", "models/yellow.obj");
+    cd->addModel("green", "models/green.obj");
+    cd->addModel("redsphere", "models/redsphere.obj");
+
 
     // Camera
     CAM_DIRECTION = GLCamera::CamDirection::Nop;
+    PAINT = false;
+
     cavr::System::setContextData(cd);
 }
 
@@ -61,7 +76,8 @@ void render()
     //camera1->updateCavrView();
     camera1->updateView();
     cd->moveCamera(CAM_DIRECTION);
-    cd->paintGL();
+
+    cd->paintGL(PAINT);
 
     auto position = cavr::input::getSixDOF("glass")->getPosition();
     position.x *= 10;
@@ -73,8 +89,9 @@ void render()
 
 void destructContext() 
 {
-    //shared_ptr<GLScene> cd = (shared_ptr<GLScene>)cavr::System::getContextData();
-    //cd.reset();
+    static GLScene *cd;
+    cd = static_cast<GLScene*>(cavr::System::getContextData());
+    delete cd;
 }
 
 void update() 
@@ -84,7 +101,12 @@ void update()
        cavr::System::shutdown();
       return;
     }
-    else if (cavr::input::getButton("up")->delta() == cavr::input::Button::Held) 
+    
+    if (cavr::input::getButton("paint")->delta() == cavr::input::Button::Held) 
+        PAINT = true;
+    else PAINT = false;
+
+    if (cavr::input::getButton("up")->delta() == cavr::input::Button::Held) 
         CAM_DIRECTION = GLCamera::CamDirection::Up;
     else if (cavr::input::getButton("down")->delta() == cavr::input::Button::Held) 
         CAM_DIRECTION = GLCamera::CamDirection::Down;
@@ -120,16 +142,18 @@ int main(int argc, char** argv)
   input_map.button_map["right"] = "keyboard[d]";
   input_map.button_map["forward"] = "keyboard[i]";
   input_map.button_map["backward"] = "keyboard[k]";
+  input_map.button_map["paint"] = "keyboard[p]";
+  input_map.button_map["exit"] = "keyboard[Escape]";
 #else
-  input_map.button_map["up"] = "WiiMote0[10]";
-  input_map.button_map["down"] = "WiiMote0[9]";
-  input_map.button_map["left"] = "WiiMote0[7]";
-  input_map.button_map["right"] = "WiiMote0[8]";
-  input_map.button_map["forward"] = "WiiMote0[4]";
-  input_map.button_map["backward"] = "WiiMote0[3]";
-#endif
+  input_map.button_map["up"] = "vrpn[WiiMote0[10]]";
+  input_map.button_map["down"] = "vrpn[WWiiMote0[9]]";
+  input_map.button_map["left"] = "vrpn[WWiiMote0[7]]";
+  input_map.button_map["right"] = "vrpn[WWiiMote0[8]]";
+  input_map.button_map["forward"] = "vrpn[WWiiMote0[4]]";
+  input_map.button_map["backward"] = "vrpn[WWiiMote0[3]]";
   input_map.button_map["exit"] = "vrpn[WiiMote0[0]]";
-  //input_map.sixdof_map["wand"] = "vrpn[WiiMote0[0]]";
+#endif
+  input_map.sixdof_map["wand"] = "vrpn[WiiMote0[0]]";
   //input_map.button_map["pick"] = "vrpn[WiiMote0[3]]";
 
   input_map.sixdof_map["glass"] = "vrpn[TallGlasses[0]]";

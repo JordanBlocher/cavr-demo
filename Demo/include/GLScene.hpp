@@ -2,7 +2,7 @@
 #define GLMAIN_H
 
 #include <GLViewport.hpp>
-#include <GLCamera.hpp>
+//#include <GLCamera.hpp>
 
 #include <chrono>
 
@@ -22,16 +22,18 @@ class GLScene : public GLViewport
     void addModel(const char*, const char*);
 
     void initializeGL();
-    void paintGL();
+    void paintGL(bool);
     float getDT();
-    void moveCamera(GLCamera::CamDirection);
+    //void moveCamera(GLCamera::CamDirection);
 
  protected:
     std::string modelpath;
     std::string materialpath;
-    void paintHelper(const char*);
+    void paintHelper(const char*, GLenum);
 
     std::chrono::time_point<std::chrono::high_resolution_clock> time;
+    std::vector<std::pair<glm::vec4, glm::mat4>> strokes;
+    glm::vec4 color;
 
 };
 

@@ -12,6 +12,7 @@
 #include <Magick++.h>
 
 #include "GLNode.hpp"
+#include "GLFrame.hpp"
 
 const GLuint V_INDEX = 0;
 const GLuint NORM_INDEX = 1;
@@ -19,7 +20,6 @@ const GLuint UV_INDEX = 2;
 
 class GLUniform;
 class GLTexture;
-class GLFrame;
 
 class GLModel : public GLNode
 {
@@ -36,13 +36,15 @@ class GLModel : public GLNode
     void setMatrix(glm::mat4);
     bool LoadVertexData();
 
-    void Draw(std::shared_ptr<GLUniform>, GLuint);
+    void Draw(std::shared_ptr<GLUniform>, GLuint, GLenum);
     void DrawToFBO(std::shared_ptr<GLFrame>, GLuint);
     const std::vector<glm::vec3>& Positions(size_t);
     const std::vector<GLuint>& Faces(size_t);
     size_t numVertices();
     size_t numFaces();
     size_t Size();
+    void setColor(glm::vec4);
+    glm::vec4 getColor();
 
  private:
     void Allocate();

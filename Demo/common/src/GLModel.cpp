@@ -5,7 +5,6 @@
 #include "GLBufferObject.hpp"
 #include "GLUniform.hpp"
 #include "GLTexture.hpp"
-#include "GLFrame.cpp"
 
 #include <fstream>
 #include <boost/algorithm/string/split.hpp>
@@ -205,7 +204,7 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
     for (unsigned int i = 0 ; i < mesh->mNumFaces ; i++) 
     {
         const aiFace* face = &(mesh->mFaces[i]);
-        assert(face->mNumIndices == 3);
+        //assert(face->mNumIndices == 3);
         this->faces->at(index).at(3*i) = face->mIndices[0];
         this->faces->at(index).at(3*i+1) = face->mIndices[1];
         this->faces->at(index).at(3*i+2) = face->mIndices[2];
@@ -294,6 +293,7 @@ void GLModel::CreateVBOs()
         glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
+
     GLBufferObject vbo_norms("vbonormals",
             sizeof(glm::vec3),
             this->v_size,
@@ -311,6 +311,7 @@ void GLModel::CreateVBOs()
         glVertexAttribPointer( NORM_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
+
     GLBufferObject vbo_uvs("vbotextures",
             sizeof(glm::vec2),
             this->v_size,
@@ -322,6 +323,7 @@ void GLModel::CreateVBOs()
         vbo_uvs.LoadSubData(offset, 2, this->uvs->at(i));
         offset += this->positions->at(i).size();
     }
+
     if( this->attributes > UV_INDEX)
     {
         glEnableVertexAttribArray(UV_INDEX);
@@ -342,7 +344,7 @@ void GLModel::CreateVBOs()
 }
 
 
-void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
+void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum MODE)
 {
     GLint face_offset = 0;
     GLint vertex_offset = 0;
@@ -374,7 +376,7 @@ void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
 
         if( (color && !texture) || (!color && texture) )
         {
-            glDrawElementsBaseVertex(GL_TRIANGLES, 
+            glDrawElementsBaseVertex(MODE, 
                     this->faces->at(i).size(),
                     GL_UNSIGNED_INT,
                     (void*)(sizeof(GLuint) * face_offset),
@@ -398,7 +400,7 @@ void GLModel::DrawToFBO(std::shared_ptr<GLFrame> frame, GLuint program)
 
     bool texture, color;
 
-    glBindBuffer(GL_DRAW_FRAMEBUFFER, frame->getId());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame->getId());
 
     //Draw Model 
     for(size_t i=0; i< this->faces->size(); i++)
@@ -414,8 +416,18 @@ void GLModel::DrawToFBO(std::shared_ptr<GLFrame> frame, GLuint program)
                     vertex_offset);
     }
 
-    glBindBuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBindVertexArray(0);
+}
+
+void GLModel::setColor(glm::vec4 diffuse)
+{
+    this->materials->at(this->mtlIndices.at(0)).second.diffuse = diffuse;
+}
+
+glm::vec4 GLModel::getColor()
+{
+    return this->materials->at(this->mtlIndices.at(0)).second.diffuse;
 }
 
 size_t GLModel::numFaces()
@@ -455,7 +467,7 @@ glm::mat4 GLModel::Matrix()
 
 glm::vec4 GLModel::Position()
 {
-    return glm::vec4(10.0f, 10.0f, 10.0f, 1.0f) * this->matrix;
+    return  glm::vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
 }
 
 std::string GLModel::toString(MODEL type)
