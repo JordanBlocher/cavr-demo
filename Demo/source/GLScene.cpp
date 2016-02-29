@@ -14,11 +14,11 @@
 
 #include <GLShader.hpp>
 #include <GLProgram.hpp>
-#include <GLBufferObject.hpp>
-#include <GLFrame.hpp>
-#include <GLModel.hpp>
-#include <GLUniform.hpp>
-#include <GLEmissive.hpp>
+//#include <GLBufferObject.hpp>
+//#include <GLFrame.hpp>
+//#include <GLModel.hpp>
+//#include <GLUniform.hpp>
+//#include <GLEmissive.hpp>
 
 #include <GLScene.hpp>
 #include <cavr/cavr.h>
@@ -47,8 +47,8 @@ void GLScene::initializeGL()
     glDepthFunc(GL_LESS);
 
     // Create camera
-    std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
-    this->AddToContext(camera);
+    //std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
+    //this->AddToContext(camera);
 
     // Create sound manager
     //shared_ptr<SoundManager> soundMan(new SoundManager("soundMan"));
@@ -80,6 +80,7 @@ void GLScene::initializeGL()
         this->AddToContext( tprogram );
     
     //Create UBOs 
+    /*
     cout<<"Matrix UBO"<<endl;
     shared_ptr<GLUniform> vertex_uniform(new GLUniform("GMatrices"));
     vertex_uniform->CreateUBO(cprogram->getId(), 1, GL_STATIC_DRAW);
@@ -114,36 +115,32 @@ void GLScene::initializeGL()
     tprogram->SetUBO(lights_uniform);
     tprogram->SetUBO(eye_uniform);
     tprogram->SetUBO(frag_uniform);
+    */
 
     //Set Lighting
-    shared_ptr<GLEmissive> emissive(new GLEmissive("lights"));
-    this->AddToContext(emissive);
+    //shared_ptr<GLEmissive> emissive(new GLEmissive("lights"));
+    //this->AddToContext(emissive);
 
     // Add FBO
-    shared_ptr<GLFrame> fbo(new GLFrame("fbo", 600, 600));
-    this->AddToContext(fbo);
+    //shared_ptr<GLFrame> fbo(new GLFrame("fbo", 600, 600));
+    //this->AddToContext(fbo);
 }
 
-void GLScene::paintGL()
+void GLScene::paintGL(bool painting)
 {
     //Clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
 
     //Choose Model
-    shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
-    dragon->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
-    this->paintHelper("dragon");
+    //shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
+    //dragon->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
+    //this->paintHelper("dragon");
 
-    camera1->updateCavrView();
-    shared_ptr<GLModel> coords = this->Get<GLModel>("coords");
-    coords->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, 1.0f)));
-    this->paintHelper("coords");
 }
 
-void GLScene::paintHelper(const char* model_name)
+void GLScene::paintHelper(const char* model_name, GLenum MODE)
 {
+    /*
     shared_ptr<GLModel> model = this->Get<GLModel>(model_name);
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
     glm::mat4 vp = camera1->Projection() * camera1->View();
@@ -202,14 +199,15 @@ void GLScene::paintHelper(const char* model_name)
     glUseProgram(tprogram->getId());
     model->Draw(tuniform, tprogram->getId());
     glUseProgram(0);
+    */
 
 }
 
-void GLScene::moveCamera(GLCamera::CamDirection direction)
-{
-    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
-    camera1->moveCamera(direction);
-}
+//void GLScene::moveCamera(GLCamera::CamDirection direction)
+//{
+//    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+//    camera1->moveCamera(direction);
+//}
 
 
 void GLScene::idleGL()
@@ -234,9 +232,9 @@ float GLScene::getDT()
 
 void GLScene::addModel(const char* name, const char* path)
 {
-    shared_ptr<GLModel> model(new GLModel(path, name, NUM_ATTRIBUTES));
-    if( model->CreateVAO() )
-        this->AddToContext(model);
+    //shared_ptr<GLModel> model(new GLModel(path, name, NUM_ATTRIBUTES));
+    //if( model->CreateVAO() )
+        //this->AddToContext(model);
 }
 
 

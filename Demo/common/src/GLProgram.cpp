@@ -1,7 +1,7 @@
 #include "GLProgram.hpp"
 
 #include "GLShader.hpp"
-#include "GLUniform.hpp"
+//#include "GLUniform.hpp"
 
 GLProgram::GLProgram(const char* name) : GLNode(name)
 {
@@ -61,11 +61,11 @@ void GLProgram::SetAttributeIndex(const char* name, GLuint index)
     glBindAttribLocation(this->id, index, name);
 }
 
-void GLProgram::SetUBO(std::shared_ptr<GLUniform> ubo)
-{
-    GLuint block = glGetUniformBlockIndex(this->id, ubo->getName().c_str());
-    std::cout<<"Binding block "<< ubo->getName()<< " to block "<<block<< " ubo block "<<ubo->getBlock()<<" location "<<ubo->getLocation()<< " buffer "<<ubo->getId() <<std::endl;
-    glUniformBlockBinding(this->id, ubo->getBlock(), ubo->getLocation());
-}
+//void GLProgram::SetUBO(std::shared_ptr<GLUniform> ubo)
+//{
+    //GLuint block = glGetUniformBlockIndex(this->id, ubo->getName().c_str());
+    //std::cout<<"Binding block "<< ubo->getName()<< " to block "<<block<< " ubo block "<<ubo->getBlock()<<" location "<<ubo->getLocation()<< " buffer "<<ubo->getId() <<std::endl;
+    //glUniformBlockBinding(this->id, ubo->getBlock(), ubo->getLocation());
+//}
 
 
