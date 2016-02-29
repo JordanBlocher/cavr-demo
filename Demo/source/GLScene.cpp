@@ -19,12 +19,15 @@
 #include <GLModel.hpp>
 #include <GLUniform.hpp>
 #include <GLEmissive.hpp>
+#include <GLMath.hpp>
 
 #include <Spray.hpp>
 
 #include <GLScene.hpp>
 #include <cavr/cavr.h>
 #include <cavr/gfx/renderer.h>
+#include <cavr/gfx/ray.h>
+#include <cavr/gfx/sphere.h>
 
 #include <GLMath.hpp>
 
@@ -87,6 +90,7 @@ void GLScene::initializeGL()
     cout<<"Matrix UBO"<<endl;
     shared_ptr<GLUniform> vertex_uniform(new GLUniform("GMatrices"));
     vertex_uniform->CreateUBO(cprogram->getId(), 1, GL_STATIC_DRAW);
+    const char* colors[] = {"blue", "red", "black", "white", "yellow", "green"};
     this->AddToContext(vertex_uniform);
     
     cout<<"Color UBO"<<endl;
@@ -127,6 +131,7 @@ void GLScene::initializeGL()
     // Add FBO
     shared_ptr<GLFrame> fbo(new GLFrame("fbo", 600, 600));
     this->AddToContext(fbo);
+
 
     // Init a spray
     /*shared_ptr<Spray> spray (new Spray());
@@ -202,7 +207,7 @@ void GLScene::paintHelper(const char* model_name)//, GLenum MODE)
 
     // Bind Eye Position & toggle
     glBindBuffer(GL_UNIFORM_BUFFER, eye->getId());
-    glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4), glm::value_ptr(glm::vec4(0,0,0, 1.0f)));
+    glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4), glm::value_ptr(glm::vec4(camera1->getCameraPosition(), 1.0f)));
     glBufferSubData( GL_UNIFORM_BUFFER, sizeof(glm::vec4), sizeof(glm::vec4), glm::value_ptr(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
    
@@ -221,13 +226,22 @@ void GLScene::paintHelper(const char* model_name)//, GLenum MODE)
     glUseProgram(0);
     
 
+    /*
+    shared_ptr<GLModel> coords = this->Get<GLModel>("coords");
+    coords->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, 1.0f)) * glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 0.0f, 1.0f))  );
+    this->paintHelper("coords", GL_TRIANGLES);
+
+    shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
+    dragon->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
+    this->paintHelper("dragon", GL_TRIANGLES);
+    */
 }
 
-//void GLScene::moveCamera(GLCamera::CamDirection direction)
-//{
-//    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
-//    camera1->moveCamera(direction);
-//}
+void GLScene::moveCamera(GLCamera::CamDirection direction)
+{
+    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+    camera1->moveCamera(direction);
+}
 
 
 void GLScene::idleGL()

@@ -13,6 +13,7 @@ class GLBufferObject : public GLNode
 {
 
  public:
+
     GLBufferObject(const char*, GLsizeiptr, GLuint, GLenum, GLenum);
     GLBufferObject(){};
     ~GLBufferObject();

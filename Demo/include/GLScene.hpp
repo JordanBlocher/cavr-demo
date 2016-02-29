@@ -4,6 +4,8 @@
 #include <GLViewport.hpp>
 #include <GLCamera.hpp>
 
+
+
 #include <chrono>
 
 // Also does not belong here
@@ -24,7 +26,7 @@ class GLScene : public GLViewport
     void initializeGL();
     void paintGL(bool);
     float getDT();
-    //void moveCamera(GLCamera::CamDirection);
+    void moveCamera(GLCamera::CamDirection);
 
  protected:
     std::string modelpath;

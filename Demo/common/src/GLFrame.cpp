@@ -55,6 +55,7 @@ GLuint GLFrame::Buffer() const
     return this->buffer;
 }
 
+
 void GLFrame::BindForWriting()
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, buffer);
