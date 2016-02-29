@@ -19,15 +19,6 @@
 #include <assimp/postprocess.h>
 
 
-GLModel::GLModel(MODEL type, const char* name, const GLuint attributes) : GLNode(name)
-{
-    this->filename = this->toString(type);
-    this->type = type;
-    this->path = "models/";
-    this->attributes = attributes;
-    this->Allocate();
-}
-
 GLModel::GLModel(const char* filename, const char* name, const GLuint attributes) : GLNode(name)
 {
     this->filename = filename;
@@ -363,13 +354,13 @@ void GLModel::CreateVBOs()
 }
 
 
-void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum MODE)
+void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum MODE, RENDER type)
 {
     GLint face_offset = 0;
     GLint vertex_offset = 0;
     glBindVertexArray(this->vao);
-    bool texture, color, bump;
-
+    bool texture, bump;
+    aiString color;
 
     glBindBuffer(GL_UNIFORM_BUFFER, fragment->getId());
 
@@ -379,12 +370,12 @@ void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum M
 
         texture = this->textures->at(this->mtlIndices.at(i)).first;
         bump = this->bumpmaps->at(this->mtlIndices.at(i)).first;
-        color = (fragment->getId() != UINT_MAX);
-        if(texture)
+        color = this->materials->at(this->mtlIndices.at(i)).first;
+        if(type == RENDER::TEXTURE && texture)
             this->textures->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE0);
-        //if(bump)
-            //this->bumpmaps->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE1);
-        if(color)
+        if(type == RENDER::BUMP && bump)
+            this->bumpmaps->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE1);
+        if(type == RENDER::COLOR)
         {
             glBufferSubData(GL_UNIFORM_BUFFER,
                         0,
@@ -392,7 +383,6 @@ void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum M
                         &(this->materials->at(this->mtlIndices.at(i)).second) );
         }
 
-        if( (color && !texture) || (!color && texture) )
         {
             glDrawElementsBaseVertex(MODE, 
                     this->faces->at(i).size(),
@@ -488,17 +478,5 @@ glm::vec4 GLModel::Position()
     return  glm::vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
 }
 
-std::string GLModel::toString(MODEL type)
-{
-    switch(type)
-    {
-        case (CUBE):
-            return "cube.obj";
-            break;
-        default:
-            return "";
-            break;
-    }
-}
 
 

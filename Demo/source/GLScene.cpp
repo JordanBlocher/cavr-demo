@@ -20,7 +20,7 @@
 #include <GLUniform.hpp>
 #include <GLEmissive.hpp>
 #include <GLMath.hpp>
-#include <Spray.hpp>
+//#include <Spray.hpp>
 #include <GLScene.hpp>
 #include <cavr/cavr.h>
 #include <cavr/gfx/renderer.h>
@@ -154,13 +154,14 @@ void GLScene::paintGL(bool painting)
 
 void GLScene::paintHelper(const char* model_name, GLenum MODE)
 {
-    shared_ptr<Spray> model = this->Get<Spray>(model_name);
+    shared_ptr<GLModel> model = this->Get<GLModel>(model_name);
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
     glm::mat4 vp = camera1->Projection() * camera1->View() *GLMath::mat4ftoGLM(cavr::gfx::getView());
      
     // Get UBOS
     shared_ptr<GLUniform> vuniform = this->Get<GLUniform>("GMatrices");
-    shared_ptr<GLUniform> cuniform = this->Get<GLUniform>("GColors");
+    shared_ptr<GLUniform> coloruniform = this->Get<GLUniform>("GColors");
+    shared_ptr<GLUniform> texuniform = this->Get<GLUniform>("Texture");
     shared_ptr<GLUniform> luniform = this->Get<GLUniform>("GLights");
     shared_ptr<GLUniform> eye = this->Get<GLUniform>("Eye");
     shared_ptr<GLUniform> control = this->Get<GLUniform>("Control");
@@ -200,19 +201,17 @@ void GLScene::paintHelper(const char* model_name, GLenum MODE)
     glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4), glm::value_ptr(glm::vec4(camera1->getCameraPosition(), 1.0f)));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     
+    // Bind Controls
     int texture = true, bump = false;
     glBindBuffer(GL_UNIFORM_BUFFER, control->getId());
     glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(int), &texture);
     glBufferSubData( GL_UNIFORM_BUFFER, sizeof(int), sizeof(int), &bump);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    //Get Sampler
-    shared_ptr<GLUniform> uniform = this->Get<GLUniform>("Texture");
-
     //Program
     glUseProgram(program->getId());
-    model->Draw(cuniform, program->getId(), MODE);
-    model->Draw(uniform, program->getId(), MODE);
+    //model->Draw(coloruniform, program->getId(), MODE, GLModel::RENDER::COLOR);
+    model->Draw(texuniform, program->getId(), MODE, GLModel::RENDER::TEXTURE);
     glUseProgram(0);
 }
 

@@ -23,10 +23,9 @@ class GLTexture;
 
 class GLModel : public GLNode
 {
- enum MODEL {CUBE};
  
  public:
-    GLModel(MODEL, const char*, const GLuint);
+    enum RENDER {COLOR, TEXTURE, BUMP};
     GLModel(const char*, const char*, const GLuint);
     ~GLModel();
 
@@ -36,7 +35,7 @@ class GLModel : public GLNode
     void setMatrix(glm::mat4);
     bool LoadVertexData();
 
-    void Draw(std::shared_ptr<GLUniform>, GLuint, GLenum);
+    void Draw(std::shared_ptr<GLUniform>, GLuint, GLenum, RENDER);
     void DrawToFBO(std::shared_ptr<GLFrame>, GLuint);
     const std::vector<glm::vec3>& Positions(size_t);
     const std::vector<GLuint>& Faces(size_t);
@@ -54,11 +53,9 @@ class GLModel : public GLNode
     void CreateVBOs();
 
     bool AddMaterials(const char*);
-    std::string toString(MODEL);
 
     std::string path;
     std::string filename;
-    MODEL type;
 
     std::shared_ptr<std::vector<std::vector<glm::vec3>>> positions;
     std::shared_ptr<std::vector<std::vector<glm::vec3>>> normals;
