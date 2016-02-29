@@ -26,6 +26,8 @@
 #include <cavr/cavr.h>
 #include <cavr/gfx/renderer.h>
 
+#include <GLMath.hpp>
+
 #define FOV 45.0f
 #define SENSOR_DISTANCE 0.01f
 #define FOCAL_DISTANCE 100.0f
@@ -127,7 +129,7 @@ void GLScene::initializeGL()
     this->AddToContext(fbo);
 
     // Init a spray
-    shared_ptr<Spray> spray (new Spray());
+    /*shared_ptr<Spray> spray (new Spray());
 
     if(spray->Init())
     {
@@ -136,7 +138,7 @@ void GLScene::initializeGL()
         spray->AddPoints(glm::vec3(1,0,1),glm::vec3(0,0,0));
         spray->AddPoints(glm::vec3(0,0,0),glm::vec3(0,0,0));
         this->AddToContext(spray);
-    }
+    }*/
 
 }
 
@@ -146,14 +148,14 @@ void GLScene::paintGL(bool painting)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Choose Model
-    shared_ptr<Spray> spray = this->Get<Spray>("spray");
+    /*shared_ptr<Spray> spray = this->Get<Spray>("spray");
     if(spray != nullptr)
     {
-        paintHelper("spray");
-    }
-    //shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
+        //paintHelper("spray");
+    }*/
+    shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
     //dragon->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
-    //this->paintHelper("dragon");
+    this->paintHelper("dragon");
 
 }
 
@@ -161,7 +163,7 @@ void GLScene::paintHelper(const char* model_name)//, GLenum MODE)
 {
     shared_ptr<Spray> model = this->Get<Spray>(model_name);
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
-    glm::mat4 vp = camera1->Projection() * camera1->View();
+    glm::mat4 vp = GLMath::mat4ftoGLM( cavr::math::mat4f(cavr::gfx::getView()) ) ;//camera1->Projection() * camera1->View();
      
     // Get UBOS
     shared_ptr<GLUniform> vuniform = this->Get<GLUniform>("GMatrices");
@@ -200,7 +202,7 @@ void GLScene::paintHelper(const char* model_name)//, GLenum MODE)
 
     // Bind Eye Position & toggle
     glBindBuffer(GL_UNIFORM_BUFFER, eye->getId());
-    glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4), glm::value_ptr(glm::vec4(camera1->getCameraPosition(), 1.0f)));
+    glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4), glm::value_ptr(glm::vec4(0,0,0, 1.0f)));
     glBufferSubData( GL_UNIFORM_BUFFER, sizeof(glm::vec4), sizeof(glm::vec4), glm::value_ptr(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
    
@@ -214,9 +216,9 @@ void GLScene::paintHelper(const char* model_name)//, GLenum MODE)
     glUseProgram(0);
     
     //Texture Program
-   // glUseProgram(tprogram->getId());
-    //model->Draw(tuniform, tprogram->getId());
-    //glUseProgram(0);
+    glUseProgram(tprogram->getId());
+    model->Draw(tuniform, tprogram->getId());
+    glUseProgram(0);
     
 
 }
@@ -250,9 +252,9 @@ float GLScene::getDT()
 
 void GLScene::addModel(const char* name, const char* path)
 {
-    //shared_ptr<GLModel> model(new GLModel(path, name, NUM_ATTRIBUTES));
-    //if( model->CreateVAO() )
-        //this->AddToContext(model);
+    shared_ptr<GLModel> model(new GLModel(path, name, NUM_ATTRIBUTES));
+    if( model->CreateVAO() )
+        this->AddToContext(model);
 }
 
 

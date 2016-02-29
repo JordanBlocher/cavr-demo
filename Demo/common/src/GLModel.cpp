@@ -1,4 +1,6 @@
 #define CHECKGLERROR if ( glGetError() != GL_NO_ERROR ) std::cout << __FILE__ <<":"<< __LINE__ << std::endl;
+#define GLM_FORCE_RADIANS
+
 #include "GLModel.hpp"
 #include "GLBufferObject.hpp"
 #include "GLUniform.hpp"
@@ -202,7 +204,7 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
     for (unsigned int i = 0 ; i < mesh->mNumFaces ; i++) 
     {
         const aiFace* face = &(mesh->mFaces[i]);
-        assert(face->mNumIndices == 3);
+        //assert(face->mNumIndices == 3);
         this->faces->at(index).at(3*i) = face->mIndices[0];
         this->faces->at(index).at(3*i+1) = face->mIndices[1];
         this->faces->at(index).at(3*i+2) = face->mIndices[2];
@@ -240,7 +242,7 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
         mat.diffuse = glm::vec4(diffuse.r, diffuse.g, diffuse.b, 1.0f);
         mat.ambient = glm::vec4(ambient.r, ambient.g, ambient.b, 1.0f);
         mat.specular = glm::vec4(specular.r, specular.g, specular.b, 1.0f);
-        mat.shininess = shininess / 5.0f;
+        mat.shininess = shininess / 1.0f;
         mat.intensity = 1.0f + intensity;
         mat.diffuseBlend = diffuseBlend;
 
@@ -291,6 +293,7 @@ void GLModel::CreateVBOs()
         glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
+
     GLBufferObject vbo_norms("vbonormals",
             sizeof(glm::vec3),
             this->v_size,
@@ -308,6 +311,7 @@ void GLModel::CreateVBOs()
         glVertexAttribPointer( NORM_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
+
     GLBufferObject vbo_uvs("vbotextures",
             sizeof(glm::vec2),
             this->v_size,
@@ -319,6 +323,7 @@ void GLModel::CreateVBOs()
         vbo_uvs.LoadSubData(offset, 2, this->uvs->at(i));
         offset += this->positions->at(i).size();
     }
+
     if( this->attributes > UV_INDEX)
     {
         glEnableVertexAttribArray(UV_INDEX);
@@ -339,7 +344,7 @@ void GLModel::CreateVBOs()
 }
 
 
-void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
+void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum MODE)
 {
     GLint face_offset = 0;
     GLint vertex_offset = 0;
@@ -371,7 +376,7 @@ void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
 
         if( (color && !texture) || (!color && texture) )
         {
-            glDrawElementsBaseVertex(GL_TRIANGLES, 
+            glDrawElementsBaseVertex(MODE, 
                     this->faces->at(i).size(),
                     GL_UNSIGNED_INT,
                     (void*)(sizeof(GLuint) * face_offset),
@@ -385,6 +390,44 @@ void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
+}
+
+void GLModel::DrawToFBO(std::shared_ptr<GLFrame> frame, GLuint program)
+{
+    GLint face_offset = 0;
+    GLint vertex_offset = 0;
+    glBindVertexArray(this->vao);
+
+    bool texture, color;
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame->getId());
+
+    //Draw Model 
+    for(size_t i=0; i< this->faces->size(); i++)
+    {   
+
+        face_offset += this->faces->at(i).size();
+        vertex_offset += this->positions->at(i).size();
+
+            glDrawElementsBaseVertex(GL_TRIANGLES, 
+                    this->faces->at(i).size(),
+                    GL_UNSIGNED_INT,
+                    (void*)(sizeof(GLuint) * face_offset),
+                    vertex_offset);
+    }
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindVertexArray(0);
+}
+
+void GLModel::setColor(glm::vec4 diffuse)
+{
+    this->materials->at(this->mtlIndices.at(0)).second.diffuse = diffuse;
+}
+
+glm::vec4 GLModel::getColor()
+{
+    return this->materials->at(this->mtlIndices.at(0)).second.diffuse;
 }
 
 size_t GLModel::numFaces()
@@ -424,7 +467,7 @@ glm::mat4 GLModel::Matrix()
 
 glm::vec4 GLModel::Position()
 {
-    return glm::vec4(10.0f, 10.0f, 10.0f, 1.0f) * this->matrix;
+    return  glm::vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
 }
 
 std::string GLModel::toString(MODEL type)

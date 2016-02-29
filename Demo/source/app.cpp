@@ -33,8 +33,8 @@ void initContext()
 
     // Choose model
     cd->addModel("dragon", "models/dragon.obj");
-    /*
-    cd->addModel("pallet", "models/pallet.obj");
+    
+    /*cd->addModel("pallet", "models/pallet.obj");
     cd->addModel("brush", "models/brush.obj");
     cd->addModel("blob", "models/blob.obj");
     cd->addModel("paint", "models/paint.obj");
@@ -45,8 +45,8 @@ void initContext()
     cd->addModel("white", "models/white.obj");
     cd->addModel("yellow", "models/yellow.obj");
     cd->addModel("green", "models/green.obj");
-    cd->addModel("redsphere", "models/redsphere.obj");
-    */
+    cd->addModel("redsphere", "models/redsphere.obj");*/
+    
 
 
     // Camera
