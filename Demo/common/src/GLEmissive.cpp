@@ -5,8 +5,8 @@ GLEmissive::GLEmissive(const char* name) : GLNode(name)
 {
     //Basic ambient/diffuse
     BaseLight base = {glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
-                      0.8f,
-                      0.8f };
+                      0.3f,
+                      0.5f };
     DirectionalLight dir = {glm::vec4(0.0f, -1.0f, 0.0f, 1.0f),
                             base };
     this->lights.basic = dir; 
@@ -14,8 +14,8 @@ GLEmissive::GLEmissive(const char* name) : GLNode(name)
     //Pointlights
     this->lights.point.resize(1);
     BaseLight bpt0 = {glm::vec4(1.0f, 1.0f, 1.0f, 0.0f),
-                     0.8f,
-                     0.8f};
+                     0.3f,
+                     0.5f};
     PointLight pt0 = {glm::vec4(1.0f, 10.0f, -5.0f, 0.0f),
                      bpt0 };
     this->lights.point[0] = pt0;

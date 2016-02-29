@@ -4,8 +4,6 @@
 #include <GLViewport.hpp>
 #include <GLCamera.hpp>
 
-
-
 #include <chrono>
 
 // Also does not belong here
@@ -31,7 +29,7 @@ class GLScene : public GLViewport
  protected:
     std::string modelpath;
     std::string materialpath;
-    void paintHelper(const char*);//, GLenum);
+    void paintHelper(const char*, GLenum);
 
     std::chrono::time_point<std::chrono::high_resolution_clock> time;
     std::vector<std::pair<glm::vec4, glm::mat4>> strokes;

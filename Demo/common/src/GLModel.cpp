@@ -54,6 +54,7 @@ void GLModel::Allocate()
     this->faces = std::shared_ptr<std::vector<std::vector<GLuint>>>(new std::vector<std::vector<GLuint>>);
     this->materials = std::shared_ptr<std::vector<std::pair<aiString,Material>>>(new std::vector<std::pair<aiString,Material>>);
     this->textures = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);
+    this->bumpmaps = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);
 
 }
 
@@ -250,6 +251,7 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
 
         aiString texPath;
         this->textures->resize(this->textures->size() + 1 + 1);
+        this->bumpmaps->resize(this->bumpmaps->size() + 1 + 1);
 
         if ( material.Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE,0), texPath) == AI_SUCCESS )
         {
@@ -266,6 +268,23 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
                 printf("Error loading texture '%s'\n", location.c_str());
             }
             this->textures->at(i) = std::pair<bool, GLTexture>(true, texture);
+        }
+
+        if ( material.Get(AI_MATKEY_TEXTURE(aiTextureType_HEIGHT,0), texPath) == AI_SUCCESS )
+        {
+            std::string location;
+            if( this->path == "./")
+                location = this->path + texPath.data;
+            else
+                location = this->path + "/" + texPath.data;
+            std::cout << "Bump Map at " << location << std::endl;
+            GLTexture texture(name.C_Str(), GL_TEXTURE_2D, location.c_str());
+
+            if (!texture.Load()) 
+            {
+                printf("Error loading texture '%s'\n", location.c_str());
+            }
+            this->bumpmaps->at(i) = std::pair<bool, GLTexture>(true, texture);
         }
 
         if(std::string(name.C_Str()) != std::string("DefaultMaterial") || numMaterials == 1)
@@ -349,23 +368,22 @@ void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum M
     GLint face_offset = 0;
     GLint vertex_offset = 0;
     glBindVertexArray(this->vao);
+    bool texture, color, bump;
 
-    bool texture, color;
 
-    color = (fragment->getId() != UINT_MAX);
-
-    if(color)
-    {
-        glBindBuffer(GL_UNIFORM_BUFFER, fragment->getId());
-    }
+    glBindBuffer(GL_UNIFORM_BUFFER, fragment->getId());
 
     //Draw Model 
     for(size_t i=0; i< this->faces->size(); i++)
     {   
 
         texture = this->textures->at(this->mtlIndices.at(i)).first;
+        bump = this->bumpmaps->at(this->mtlIndices.at(i)).first;
+        color = (fragment->getId() != UINT_MAX);
         if(texture)
             this->textures->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE0);
+        //if(bump)
+            //this->bumpmaps->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE1);
         if(color)
         {
             glBufferSubData(GL_UNIFORM_BUFFER,

@@ -66,6 +66,7 @@ class GLModel : public GLNode
     std::shared_ptr<std::vector<std::vector<GLuint>>> faces;
     std::shared_ptr<std::vector<std::pair<aiString, Material>>> materials;
     std::shared_ptr<std::vector<std::pair<bool,GLTexture>>> textures;
+    std::shared_ptr<std::vector<std::pair<bool,GLTexture>>> bumpmaps;
     std::vector<GLuint> mtlIndices;
 
     size_t e_size;

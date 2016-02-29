@@ -14,7 +14,7 @@
 #include <string>
 
 class GLProgram;
-//class GLCamera;
+class GLCamera;
 //struct Dynamics;
 
 typedef std::map<std::string, std::shared_ptr<GLNode>> sceneData;
@@ -57,7 +57,6 @@ class GLViewport
     dataPtr context;
     // Physics Engine
     //std::shared_ptr<Dynamics> dynamics;
-    
 
 };
 

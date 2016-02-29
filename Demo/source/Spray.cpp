@@ -162,7 +162,7 @@ void Spray::Update()
 
 }
 
-void Spray::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
+void Spray::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum)
 {
     GLint face_offset = 0;
     GLint vertex_offset = 0;
