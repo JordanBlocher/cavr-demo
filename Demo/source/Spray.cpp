@@ -9,6 +9,7 @@ Spray::Spray(int max,std::string name) :GLNode(name.c_str())
 	CurrentPoints = 0;
 	vShader = "shaders/defer.vert";
 	fShader = "shaders/defer.frag";
+	matrix = glm::mat4(1);
 }
 
 bool Spray::Init()
@@ -47,7 +48,7 @@ bool Spray::Init()
     glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 
-     vbo_norm = GLBufferObject("vbonorms",
+     vbo_norm = GLBufferObject("vbonormals",
             sizeof(glm::vec3),
             MaxPoints,
             GL_ARRAY_BUFFER,
@@ -65,14 +66,13 @@ bool Spray::Init()
     glVertexAttribPointer( UV_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     vbo_color = GLBufferObject("vbocolors",
-            sizeof(GLuint),
+            sizeof(glm::vec3),
             MaxPoints,
             GL_ARRAY_BUFFER,
             GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(COLOR_INDEX);
     glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
 	return true;
 }
 
@@ -118,12 +118,12 @@ bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
 
 
 		pos.push_back(one);
-		pos.push_back(two);
 		pos.push_back(three);
+		pos.push_back(two);
 
 		colors.push_back(oneColor);
-		colors.push_back(twoColor);
 		colors.push_back(threeColor);
+		colors.push_back(twoColor);
 
 		pos.push_back(one);
 		pos.push_back(two);
@@ -133,10 +133,8 @@ bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
 		colors.push_back(twoColor);
 		colors.push_back(fourColor); 
 
-
-		vbo_pos.LoadSubData(CurrentPoints*6, 0, (pos) );
-		vbo_color.LoadSubData(CurrentPoints*6, 0, (colors) );
-
+		vbo_pos.LoadSubData((CurrentPoints-2)*6, 0, (pos) );
+		vbo_color.LoadSubData((CurrentPoints-2)*6, 3, (colors) );
 
 		return true;
 	}
@@ -162,14 +160,17 @@ void Spray::Update()
 
 }
 
-void Spray::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum)
+void Spray::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum drawmode,int)
 {
     GLint face_offset = 0;
     GLint vertex_offset = 0;
     glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES,0,6*CurrentPoints);
+    glBindBuffer(GL_UNIFORM_BUFFER, fragment->getId());
+
+    glDrawArrays(drawmode,0,48);
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

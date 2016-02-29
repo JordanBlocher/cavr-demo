@@ -20,7 +20,7 @@
 #include <GLUniform.hpp>
 #include <GLEmissive.hpp>
 #include <GLMath.hpp>
-//#include <Spray.hpp>
+#include <Spray.hpp>
 #include <GLScene.hpp>
 #include <cavr/cavr.h>
 #include <cavr/gfx/renderer.h>
@@ -40,6 +40,7 @@ GLScene::GLScene()
     // Start the timer
     this->time = std::chrono::high_resolution_clock::now();
     GLViewport::start_time = std::chrono::high_resolution_clock::now();  
+    
 }
 
 void GLScene::initializeGL()
@@ -122,39 +123,47 @@ void GLScene::initializeGL()
     program->SetUBO(control_uniform);
 
     // Init a spray
-    /*shared_ptr<Spray> spray (new Spray());
+    shared_ptr<Spray> spray (new Spray());
 
     if(spray->Init())
     {
-        spray->AddPoints(glm::vec3(0,0,0),glm::vec3(0,0,0));
-        spray->AddPoints(glm::vec3(0,0,1),glm::vec3(0,0,0));
-        spray->AddPoints(glm::vec3(1,0,1),glm::vec3(0,0,0));
-        spray->AddPoints(glm::vec3(0,0,0),glm::vec3(0,0,0));
+        spray->AddPoints(glm::vec3(0,0,0),glm::vec3(0,0,1));
+        spray->AddPoints(glm::vec3(0,0,1),glm::vec3(0,0,1));
+        spray->AddPoints(glm::vec3(1,0,1),glm::vec3(0,0,1));
+        spray->AddPoints(glm::vec3(0,0,-1),glm::vec3(0,0,1));
         this->AddToContext(spray);
-    }*/
+    }
 
 }
 
 void GLScene::paintGL(bool painting)
 {
     //Clear the screen
+    glClearColor(0.0,0.5,0.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Choose Model
-    /*shared_ptr<Spray> spray = this->Get<Spray>("spray");
+    shared_ptr<Spray> spray = this->Get<Spray>("spray");
     if(spray != nullptr)
     {
-        //paintHelper("spray");
-    }*/
+        paintHelper("spray",GL_TRIANGLES);
+    }
     shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
     dragon->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
-    this->paintHelper("dragon", GL_TRIANGLES);
+    //this->paintHelper("dragon", GL_TRIANGLES);
 
 }
 
 void GLScene::paintHelper(const char* model_name, GLenum MODE)
 {
-    shared_ptr<GLModel> model = this->Get<GLModel>(model_name);
+    //shared_ptr<GLModel> model = this->Get<GLModel>(model_name);
+    shared_ptr<Spray> model = this->Get<Spray>(model_name);
+    if (model == nullptr)
+    {
+        cout << "Null" << endl;
+        return;
+    }
+
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
     glm::mat4 vp = camera1->Projection() * camera1->View() *GLMath::mat4ftoGLM(cavr::gfx::getView());
      
@@ -213,6 +222,7 @@ void GLScene::paintHelper(const char* model_name, GLenum MODE)
     //model->Draw(coloruniform, program->getId(), MODE, GLModel::RENDER::COLOR);
     model->Draw(texuniform, program->getId(), MODE, GLModel::RENDER::TEXTURE);
     glUseProgram(0);
+
 }
 
 void GLScene::moveCamera(GLCamera::CamDirection direction)

@@ -76,8 +76,9 @@ void render()
     //camera1->updateCavrPosition();
     //camera1->updateCavrView();
     //camera1->updateView();
-    //cd->moveCamera(CAM_DIRECTION);
-
+    cd->moveCamera(CAM_DIRECTION);
+    
+    camera1->updateView();
     cd->paintGL(PAINT);
 
     auto position = cavr::input::getSixDOF("glass")->getPosition();

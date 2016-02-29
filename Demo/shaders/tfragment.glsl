@@ -170,7 +170,7 @@ void main(void)
     totalLight += LightSpt(light.spot[4], normal);
     totalLight += LightSpt(light.spot[5], normal);
 
-    f_out = totalLight;
+    f_out = vec4(1,0,0,1) + totalLight;
 
 }
 

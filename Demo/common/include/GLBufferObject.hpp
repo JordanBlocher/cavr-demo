@@ -32,11 +32,14 @@ class GLBufferObject : public GLNode
     GLuint block;
 };
 
+
+
 // Default VBO
 template < class T >
 void GLBufferObject::LoadSubData(size_t offset, int index, const std::vector<T> &vec)
 {
     this->block = index;
+    glBindBuffer(type, this->buffer);
     glBufferSubData(this->type, sizeof(T) * offset, sizeof(T) * vec.size(), vec.data());
 }
 

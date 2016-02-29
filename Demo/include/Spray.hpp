@@ -30,7 +30,7 @@ public:
 	void ClearPoints();
 	bool Init();
 	void Update();
-	void Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum);
+	void Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum,int);
 	void AddBreak();
 	glm::mat4 Matrix()
 	{
