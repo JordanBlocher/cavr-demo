@@ -136,7 +136,7 @@ void main(void)
    totalLight += LightSpt(light.spot[4], normal);
    totalLight += LightSpt(light.spot[5], normal);
 
-   colout = vec4(totalLight.xyz, 1.0);
+   colout = vec4(1,0,0,1);//vec4(totalLight.xyz, 1.0);
 }
 
 

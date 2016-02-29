@@ -1,9 +1,9 @@
-#include <Spray.h>
+#include <Spray.hpp>
 
-#include "GLUniform.hpp"
+
 #include "GLTexture.hpp"
 
-Spray::Spray(int max)
+Spray::Spray(int max,std::string name) :GLNode(name.c_str())
 {
 	MaxPoints = 6*max;
 	CurrentPoints = 0;
@@ -17,51 +17,61 @@ bool Spray::Init()
 
 	//Create VBOs
 
+	glGenVertexArrays(1, &(this->vao));
+    glBindVertexArray(this->vao);
+    
 	// Allocate Positions 
-     vbo_pos = GLBufferObject("vbopositions",
-            sizeof(glm::vec3),
-            MaxPoints,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
+
 
 
     //Allocate uvs
-     vbo_tex = GLBufferObject("vbotextures",
-            sizeof(glm::vec2),
-            MaxPoints,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
+
 
 
     //Allocate Normals
-     vbo_norm = GLBufferObject("vbonorms",
-            sizeof(glm::vec3),
-            MaxPoints,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
+
 
     //Allocate Colors
-    vbo_color = GLBufferObject("vbocolors",
-            sizeof(GLuint),
-            MaxPoints,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
+
     /*
 	const GLuint V_INDEX = 0;
 	const GLuint NORM_INDEX = 1;
 	const GLuint UV_INDEX = 2;
 	const GLuint COLOR_INDEX = 3;*/
+	     vbo_pos = GLBufferObject("vbopositions",
+            sizeof(glm::vec3),
+            MaxPoints,
+            GL_ARRAY_BUFFER,
+            GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(V_INDEX);
     glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+
+     vbo_norm = GLBufferObject("vbonorms",
+            sizeof(glm::vec3),
+            MaxPoints,
+            GL_ARRAY_BUFFER,
+            GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(NORM_INDEX);
     glVertexAttribPointer( NORM_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+
+     vbo_tex = GLBufferObject("vbotextures",
+            sizeof(glm::vec2),
+            MaxPoints,
+            GL_ARRAY_BUFFER,
+            GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(UV_INDEX);
     glVertexAttribPointer( UV_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+    vbo_color = GLBufferObject("vbocolors",
+            sizeof(GLuint),
+            MaxPoints,
+            GL_ARRAY_BUFFER,
+            GL_DYNAMIC_DRAW);
+
     glEnableVertexAttribArray(COLOR_INDEX);
-    glVertexAttribPointer( COLOR_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	return true;
 }
@@ -79,6 +89,8 @@ bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
 	}
 	if(Points.size() > 1 && !Points[Points.size()-2].Break)
 	{
+		
+
 		// Add the points at the current position in the buffer
 		vector<glm::vec3> pos = vector<glm::vec3>();
 		std::vector<glm::vec3> colors = std::vector<glm::vec3>();
@@ -133,7 +145,7 @@ bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
 
 void Spray::AddBreak()
 {
-	//cout << "ADD BREAK" << std::endl;
+	
 	CurrentPoints++;
 	PaintStruct temp;
 	temp.Break = true;
@@ -155,7 +167,6 @@ void Spray::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
     GLint face_offset = 0;
     GLint vertex_offset = 0;
     glBindVertexArray(vao);
-
     glDrawArrays(GL_TRIANGLES,0,6*CurrentPoints);
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
