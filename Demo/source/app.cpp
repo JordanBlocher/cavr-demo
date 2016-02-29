@@ -15,7 +15,7 @@
 #include <irrKlang.h>
 using namespace irrklang;
 
-//static GLCamera::CamDirection CAM_DIRECTION;
+static GLCamera::CamDirection CAM_DIRECTION;
 static bool PAINT;
 
 #define DEBUG 
@@ -50,7 +50,7 @@ void initContext()
 
 
     // Camera
-    //CAM_DIRECTION = GLCamera::CamDirection::Nop;
+    CAM_DIRECTION = GLCamera::CamDirection::Nop;
     PAINT = false;
 
     cavr::System::setContextData(cd);
@@ -68,15 +68,16 @@ void render()
     glCullFace(GL_BACK);
 
     // get the context data
+    //shared_ptr<GLScene> cd = (shared_ptr<GLScene>)cavr::System::getContextData();
     cd = static_cast<GLScene*>(cavr::System::getContextData());
 
     //Get view & projection matrices
-    //shared_ptr<GLCamera> camera1 = cd->Get<GLCamera>("camera1");
-    //camera1->updateCavrProjection();
+    shared_ptr<GLCamera> camera1 = cd->Get<GLCamera>("camera1");
+    camera1->updateCavrProjection();
     //camera1->updateCavrPosition();
     //camera1->updateCavrView();
-    //cd->moveCamera(CAM_DIRECTION);
     //camera1->updateView();
+    //cd->moveCamera(CAM_DIRECTION);
 
     cd->paintGL(PAINT);
 
@@ -107,7 +108,6 @@ void update()
         PAINT = true;
     else PAINT = false;
 
-    /*
     if (cavr::input::getButton("up")->delta() == cavr::input::Button::Held) 
         CAM_DIRECTION = GLCamera::CamDirection::Up;
     else if (cavr::input::getButton("down")->delta() == cavr::input::Button::Held) 
@@ -122,7 +122,6 @@ void update()
         CAM_DIRECTION = GLCamera::CamDirection::Backward;
     else
         CAM_DIRECTION = GLCamera::CamDirection::Nop;
-    */
 }
 
 int main(int argc, char** argv) 
@@ -157,6 +156,7 @@ int main(int argc, char** argv)
   input_map.button_map["exit"] = "vrpn[WiiMote0[0]]";
 #endif
   input_map.sixdof_map["wand"] = "vrpn[WiiMote0[0]]";
+  //input_map.button_map["pick"] = "vrpn[WiiMote0[3]]";
 
   input_map.sixdof_map["glass"] = "vrpn[TallGlasses[0]]";
   

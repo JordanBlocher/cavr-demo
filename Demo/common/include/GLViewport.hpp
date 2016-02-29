@@ -15,7 +15,8 @@
 
 class GLProgram;
 //class GLCamera;
-//struct Dynamics;
+struct Dynamics;
+struct Player;
 
 typedef std::map<std::string, std::shared_ptr<GLNode>> sceneData;
 typedef std::shared_ptr<sceneData> dataPtr;
@@ -56,7 +57,7 @@ class GLViewport
     // Data Structure for Nodes
     dataPtr context;
     // Physics Engine
-    //std::shared_ptr<Dynamics> dynamics;
+    std::shared_ptr<Dynamics> dynamics;
     
 
 };

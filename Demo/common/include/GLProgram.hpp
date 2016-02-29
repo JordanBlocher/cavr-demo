@@ -6,8 +6,8 @@
 #include <vector>
 
 class GLShader;
-//class GLBufferObject;
-///class GLUniform;
+class GLBufferObject;
+class GLUniform;
 
 class GLProgram : public GLNode
 {
@@ -21,7 +21,7 @@ class GLProgram : public GLNode
     bool AddShader(std::shared_ptr<GLShader>);
     bool RemoveShader(std::shared_ptr<GLShader>);
 
-    //void SetUBO(std::shared_ptr<GLUniform>);
+    void SetUBO(std::shared_ptr<GLUniform>);
     void SetAttributeIndex(const char*, GLuint);
 
 };
