@@ -51,9 +51,9 @@ vrpn = {
 };
 
 self = {
-  hostname = HOSTNAME;
-  ssh = HOSTNAME;--"chase@" .. HOSTNAME;
-  address = HOSTNAME;
+  hostname = "hpcvis6";
+  ssh = "hpcvis6.cse.unr.edu";
+  address = "hpcvis6.cse.unr.edu";
   plugins = {
     x11_renderer = x11_renderer;
     vrpn = vrpn;
