@@ -370,12 +370,8 @@ void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum M
     glBindVertexArray(this->vao);
     bool texture, color, bump;
 
-    color = (fragment->getId() != UINT_MAX);
 
-    if(color)
-    {
-        glBindBuffer(GL_UNIFORM_BUFFER, fragment->getId());
-    }
+    glBindBuffer(GL_UNIFORM_BUFFER, fragment->getId());
 
     //Draw Model 
     for(size_t i=0; i< this->faces->size(); i++)
@@ -383,10 +379,11 @@ void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum M
 
         texture = this->textures->at(this->mtlIndices.at(i)).first;
         bump = this->bumpmaps->at(this->mtlIndices.at(i)).first;
+        color = (fragment->getId() != UINT_MAX);
         if(texture)
             this->textures->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE0);
-        if(bump)
-            this->bumpmaps->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE1);
+        //if(bump)
+            //this->bumpmaps->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE1);
         if(color)
         {
             glBufferSubData(GL_UNIFORM_BUFFER,

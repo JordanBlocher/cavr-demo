@@ -278,9 +278,9 @@ void GLScene::paintHelper(const char* model_name, GLenum MODE)
 
     //Program
     glUseProgram(program->getId());
+    model->Draw(cuniform, program->getId(), MODE);
     model->Draw(uniform, program->getId(), MODE);
     glUseProgram(0);
-    
 
 }
 
