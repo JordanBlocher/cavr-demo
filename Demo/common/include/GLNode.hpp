@@ -15,12 +15,14 @@ class GLNode
  public:
     GLNode();
     GLNode(const char*);
+    GLNode(const char*, const char*);
     GLNode(const char*, GLenum);
     GLNode(const std::shared_ptr<GLNode>);
     ~GLNode();
 
     GLuint getId() const;
     std::string getName() const;
+    std::string getTypeName() const;
  
 protected:
     virtual bool Status();
@@ -30,6 +32,7 @@ protected:
     GLint status;
     std::string msg;
     std::string name;
+    std::string typeName;
 };
 
 #endif 

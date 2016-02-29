@@ -29,10 +29,10 @@ void initContext()
     // Context Data 
     static GLScene *cd;
     cd = new GLScene();
-    cd->initializeGL();
+    cd->InitializeGL();
 
     // Choose model
-    cd->addModel("dragon", "models/dragon.obj");
+    cd->AddModel("dragon", "models/dragon.obj");
     /*cd->addModel("pallet", "models/pallet.obj");
     cd->addModel("pallet", "models/pallet.obj");
     cd->addModel("brush", "models/brush.obj");
@@ -76,10 +76,10 @@ void render()
     //camera1->updateCavrPosition();
     //camera1->updateCavrView();
     //camera1->updateView();
-    cd->moveCamera(CAM_DIRECTION);
+    cd->MoveCamera(CAM_DIRECTION);
     
     camera1->updateView();
-    cd->paintGL(PAINT);
+    cd->Paint();
 
     auto position = cavr::input::getSixDOF("glass")->getPosition();
     position.x *= 10;

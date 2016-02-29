@@ -13,13 +13,8 @@
 #include <glm/virtrev/xstream.hpp>
 
 #include <GLShader.hpp>
-#include <GLProgram.hpp>
 #include <GLBufferObject.hpp>
-#include <GLFrame.hpp>
-#include <GLModel.hpp>
-#include <GLUniform.hpp>
 #include <GLEmissive.hpp>
-#include <GLMath.hpp>
 #include <Spray.hpp>
 #include <GLScene.hpp>
 #include <cavr/cavr.h>
@@ -43,9 +38,9 @@ GLScene::GLScene()
     
 }
 
-void GLScene::initializeGL()
+void GLScene::InitializeGL()
 {
-    GLViewport::initializeGL();
+    GLViewport::InitializeGL();
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -61,8 +56,8 @@ void GLScene::initializeGL()
 
        /****** Deep GPU Stuff ******/
     //Shaders
-    shared_ptr<GLShader> vertex(new GLShader("tvertex.glsl", GL_VERTEX_SHADER, "vshader"));
-    shared_ptr<GLShader> fragment(new GLShader("tfragment.glsl", GL_FRAGMENT_SHADER, "fshader"));
+    shared_ptr<GLShader> vertex(new GLShader("vertex.glsl", GL_VERTEX_SHADER, "vshader"));
+    shared_ptr<GLShader> fragment(new GLShader("fragment.glsl", GL_FRAGMENT_SHADER, "fshader"));
 
     //Programs
     shared_ptr<GLProgram> program(new GLProgram("program"));
@@ -70,6 +65,9 @@ void GLScene::initializeGL()
     //Add Shaders
     program->AddShader(vertex); 
     program->AddShader(fragment); 
+    program->SetAttributeIndex("v_position", 0);
+    program->SetAttributeIndex("v_normal", 1);
+    program->SetAttributeIndex("v_uv", 2);
 
     //Add Program
     if( this->AddProgram(program) )
@@ -136,7 +134,7 @@ void GLScene::initializeGL()
 
 }
 
-void GLScene::paintGL(bool painting)
+void GLScene::Paint()
 {
     //Clear the screen
     glClearColor(0.0,0.5,0.0,1.0);
@@ -144,55 +142,28 @@ void GLScene::paintGL(bool painting)
 
     //Choose Model
     shared_ptr<Spray> spray = this->Get<Spray>("spray");
-    if(spray != nullptr)
-    {
-        paintHelper("spray",GL_TRIANGLES);
-    }
+    this->PaintHelper(spray, GL_TRIANGLES);
+
     shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
     dragon->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
-    //this->paintHelper("dragon", GL_TRIANGLES);
+    //this->paintHelper(dragon, GL_TRIANGLES);
 
 }
 
-void GLScene::paintHelper(const char* model_name, GLenum MODE)
+void GLScene::LoadGlobalUBOs(Matrices matrices)
 {
-    //shared_ptr<GLModel> model = this->Get<GLModel>(model_name);
-    shared_ptr<Spray> model = this->Get<Spray>(model_name);
-    if (model == nullptr)
-    {
-        cout << "Null" << endl;
-        return;
-    }
 
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
-    glm::mat4 vp = camera1->Projection() * camera1->View() *GLMath::mat4ftoGLM(cavr::gfx::getView());
-     
-    // Get UBOS
-    shared_ptr<GLUniform> vuniform = this->Get<GLUniform>("GMatrices");
-    shared_ptr<GLUniform> coloruniform = this->Get<GLUniform>("GColors");
-    shared_ptr<GLUniform> texuniform = this->Get<GLUniform>("Texture");
-    shared_ptr<GLUniform> luniform = this->Get<GLUniform>("GLights");
-    shared_ptr<GLUniform> eye = this->Get<GLUniform>("Eye");
-    shared_ptr<GLUniform> control = this->Get<GLUniform>("Control");
-   
-    // Get ProgramsS
-    shared_ptr<GLProgram> program = this->Get<GLProgram>("program");
-
-    // Get Lights
-    shared_ptr<GLEmissive> emissive = this->Get<GLEmissive>("lights");
 
     // Bind MVP
-    Matrices matrices;
-    
-    //model->setMatrix(camera1->View()*model->Matrix());
-    matrices.mvpMatrix = vp * model->Matrix();
-    matrices.mvMatrix = model->Matrix(); 
-    matrices.normalMatrix = glm::transpose(glm::inverse(model->Matrix()));
+    shared_ptr<GLUniform> vuniform = this->Get<GLUniform>("GMatrices");
     glBindBuffer(GL_UNIFORM_BUFFER, vuniform->getId());
     glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(matrices), &matrices);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     // Bind Lights
+    shared_ptr<GLUniform> luniform = this->Get<GLUniform>("GLights");
+    shared_ptr<GLEmissive> emissive = this->Get<GLEmissive>("lights");
     glBindBuffer(GL_UNIFORM_BUFFER, luniform->getId());
     size_t baseSize = sizeof(emissive->lights.basic);
     size_t ptSize = sizeof(emissive->lights.point[0]);
@@ -206,56 +177,32 @@ void GLScene::paintHelper(const char* model_name, GLenum MODE)
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     // Bind Eye Position
+    shared_ptr<GLUniform> eye = this->Get<GLUniform>("Eye");
     glBindBuffer(GL_UNIFORM_BUFFER, eye->getId());
     glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4), glm::value_ptr(glm::vec4(camera1->getCameraPosition(), 1.0f)));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     
     // Bind Controls
+    shared_ptr<GLUniform> control = this->Get<GLUniform>("Control");
     int texture = true, bump = false;
     glBindBuffer(GL_UNIFORM_BUFFER, control->getId());
     glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(int), &texture);
     glBufferSubData( GL_UNIFORM_BUFFER, sizeof(int), sizeof(int), &bump);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    //Program
-    glUseProgram(program->getId());
-    //model->Draw(coloruniform, program->getId(), MODE, GLModel::RENDER::COLOR);
-    model->Draw(texuniform, program->getId(), MODE, GLModel::RENDER::TEXTURE);
-    glUseProgram(0);
-
 }
 
-void GLScene::moveCamera(GLCamera::CamDirection direction)
+void GLScene::MoveCamera(GLCamera::CamDirection direction)
 {
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
     camera1->moveCamera(direction);
 }
 
 
-void GLScene::idleGL()
-{
-    // Timer
-    float dt;
-    time = chrono::high_resolution_clock::now();
-    dt = chrono::duration_cast< std::chrono::duration<float> >(time-this->start_time).count();
-    this->start_time = chrono::high_resolution_clock::now();
-
-}
-
-float GLScene::getDT()
-{
-    float ret;
-    time = chrono::high_resolution_clock::now();
-    ret = chrono::duration_cast< std::chrono::duration<float> >(time-this->start_time).count();
-    this->start_time = chrono::high_resolution_clock::now();
-    return ret;
-}
-
-
-void GLScene::addModel(const char* name, const char* path)
+void GLScene::AddModel(const char* name, const char* path)
 {
     shared_ptr<GLModel> model(new GLModel(path, name, NUM_ATTRIBUTES));
-    if( model->CreateVAO() )
+    if( model->Create() )
         this->AddToContext(model);
 }
 

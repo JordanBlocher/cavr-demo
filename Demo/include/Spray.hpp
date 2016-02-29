@@ -6,51 +6,40 @@
 #include "GLUniform.hpp"
 #include "GLNode.hpp"
 #include <glm/glm.hpp>
-#include "GLBufferObject.hpp"
-#include <GLModel.hpp>
+#include <GLPrimitive.hpp>
 #include <iostream>
+
 using namespace std;
 using namespace glm;
-struct PaintStruct
-{
-	glm::vec3 position;
-	glm::vec3 color;
-	bool Break;
-};
 
-class Spray : public GLNode
+const long MAX_POINTS = 10000;
+
+
+class Spray : public GLPrimitive
 {
-	const GLuint V_INDEX = 0;
-	const GLuint NORM_INDEX = 1;
-	const GLuint UV_INDEX = 2;
-	const GLuint COLOR_INDEX = 3;
-public:
-	Spray(int max=10000,std::string name="spray");
+    public:
+
+    struct PaintStruct
+    {
+        glm::vec3 position;
+        glm::vec3 color;
+        bool Break;
+    };
+	Spray(const char* name = "spray", long maxPoints = MAX_POINTS);
+    ~Spray();
+
 	bool AddPoints(vec3 worldPoint,vec3 Color);
 	void ClearPoints();
 	bool Init();
 	void Update();
-	void Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum,int);
+	void Draw(GLenum);
 	void AddBreak();
-	glm::mat4 Matrix()
-	{
-		return matrix;
-	}
-private:
-	GLBufferObject vbo_pos;
-	GLBufferObject vbo_tex;
-	GLBufferObject vbo_norm;
-	GLBufferObject vbo_color;
 
+private:
 	int CurrentPoints;
 	int MaxPoints;
 
 	string fShader;
 	string vShader;
 	vector<PaintStruct> Points;
-
-	glm::mat4 matrix;
-    GLuint vao;
-    GLuint vbo[4];
-    GLuint attributes;
 };

@@ -27,19 +27,16 @@ class GLViewport
     GLViewport();
     ~GLViewport();
 
-    dataPtr getContext();
+    dataPtr GetContext();
 
     template<class T>
     std::shared_ptr<T> Get(const char*) const;
 
-    void quit();
-    virtual void pause();
-    virtual void idleGL();
     void ViewContext();
 
  protected: 
-    virtual void initializeGL();
-    virtual void paintGL();
+    virtual void InitializeGL();
+    virtual void Paint();
     virtual void Event();
 
     bool AddProgram(std::shared_ptr<GLProgram>);

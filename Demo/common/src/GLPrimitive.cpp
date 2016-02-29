@@ -17,9 +17,16 @@
 #include <assimp/postprocess.h>
 
 
-GLPrimitive::GLPrimitive(const char* name, const GLuint attributes) : GLNode(name)
+GLPrimitive::GLPrimitive(const char* name, GLuint attributes, long maxPoints) : GLModel(name, "GLPrimitive")
 {
-    this->path = "models/";
+    this->maxPoints = maxPoints;
+    this->attributes = attributes;
+    this->Allocate();
+}
+
+GLPrimitive::GLPrimitive(const char* name, const char* typeName, GLuint attributes, long maxPoints) : GLModel(name, typeName)
+{
+    this->maxPoints = maxPoints;
     this->attributes = attributes;
     this->Allocate();
 }
@@ -30,17 +37,10 @@ GLPrimitive::~GLPrimitive()
 
 void GLPrimitive::Allocate()
 {
-    this->e_size = 0;
-    this->v_size = 0;
-
-    // Allocate based on primitive that is loaded in. 
     this->positions = std::shared_ptr<std::vector<glm::vec3>>(new std::vector<glm::vec3>);
     this->normals = std::shared_ptr<std::vector<glm::vec3>>(new std::vector<glm::vec3>);
     this->uvs = std::shared_ptr<std::vector<glm::vec2>>(new std::vector<glm::vec2>);
     this->faces = std::shared_ptr<std::vector<GLuint>>(new std::vector<GLuint>);
-    //this->materials = std::shared_ptr<std::vector<std::pair<aiString,Material>>>(new std::vector<std::pair<aiString,Material>>);
-    this->textures = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);
-
 }
 
 bool GLPrimitive::LoadSphere(int num_lats, int num_lons)
@@ -116,7 +116,7 @@ bool GLPrimitive::LoadCylinder()
     return true;
 }
 
-bool GLPrimitive::CreateVAO()
+bool GLPrimitive::Create()
 {
     //Create the VAO
     glGenVertexArrays(1, &(this->vao));
@@ -132,141 +132,81 @@ bool GLPrimitive::CreateVAO()
 
 void GLPrimitive::CreateVBOs()
 {
-    //Create VBOs 
-    GLBufferObject vbo_pos("vbopositions",
+    this->vbo_pos = GLBufferObject("vbopositions",
             sizeof(glm::vec3),
-            this->v_size,
+            maxPoints,
             GL_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
-    size_t offset = 0;
-    vbo_pos.LoadSubData(0, 0, (*positions));
-
+            GL_DYNAMIC_DRAW);
     if( this->attributes > V_INDEX)
     {
         glEnableVertexAttribArray(V_INDEX);
         glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
-    GLBufferObject vbo_norms("vbonormals",
+     this->vbo_norm = GLBufferObject("vbonormals",
             sizeof(glm::vec3),
-            this->v_size,
+            maxPoints,
             GL_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
-
-    vbo_norms.LoadSubData(offset, 1, (*normals));
-
+            GL_DYNAMIC_DRAW);
     if( this->attributes > NORM_INDEX)
     {
         glEnableVertexAttribArray(NORM_INDEX);
         glVertexAttribPointer( NORM_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
-    GLBufferObject vbo_uvs("vbotextures",
+    this->vbo_tex = GLBufferObject("vbotextures",
             sizeof(glm::vec2),
-            this->v_size,
+            maxPoints,
             GL_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
-
-    vbo_uvs.LoadSubData(offset, 2, (*uvs));
-
+            GL_DYNAMIC_DRAW);
     if( this->attributes > UV_INDEX)
     {
         glEnableVertexAttribArray(UV_INDEX);
         glVertexAttribPointer( UV_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
-    GLBufferObject vbo_elements("vboelements",
-            sizeof(GLuint),
-            this->e_size,
-            GL_ELEMENT_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
-    offset = 0;
-    vbo_elements.LoadSubData(offset, 0, (*this->faces) );
+    this->vbo_color = GLBufferObject("vbocolors",
+            sizeof(glm::vec3),
+            maxPoints,
+            GL_ARRAY_BUFFER,
+            GL_DYNAMIC_DRAW);
 
+    if( this->attributes > COLOR_INDEX)
+    {
+        glEnableVertexAttribArray(COLOR_INDEX);
+        glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+}
+
+void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform>, UBO)
+{
 }
 
 
-void GLPrimitive::Draw(std::shared_ptr<GLUniform> fragment, GLuint program)
-{/*
+void GLPrimitive::Draw(GLenum MODE)
+{
     GLint face_offset = 0;
     GLint vertex_offset = 0;
     glBindVertexArray(this->vao);
 
-    bool texture, color;
+    glDrawArrays(MODE,0,this->positions->size());
 
-    color = (fragment->getId() != UINT_MAX);
-
-    if(color)
-    {
-        glBindBuffer(GL_UNIFORM_BUFFER, fragment->getId());
-    }
-
-    //Draw Model 
-    for(size_t i=0; i< this->faces->size(); i++)
-    {   
-
-        texture = this->textures->at(this->mtlIndices.at(i)).first;
-        if(texture)
-            this->textures->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE0);
-        if(color)
-        {
-            glBufferSubData(GL_UNIFORM_BUFFER,
-                        0,
-                        sizeof(this->materials->at(this->mtlIndices.at(i)).second),
-                        &(this->materials->at(this->mtlIndices.at(i)).second) );
-        }
-
-        if( (color && !texture) || (!color && texture) )
-        {
-            glDrawElementsBaseVertex(GL_TRIANGLES, 
-                    this->faces->at(i).size(),
-                    GL_UNSIGNED_INT,
-                    (void*)(sizeof(GLuint) * face_offset),
-                    vertex_offset);
-        }
-
-        face_offset += this->faces->at(i).size();
-        vertex_offset += this->positions->at(i).size();
-    }
-
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindVertexArray(0);*/
+    glBindVertexArray(0);
 }
 
 size_t GLPrimitive::numFaces()
 {
-    return this->e_size;
+    return this->faces->size();
 }
 
 size_t GLPrimitive::numVertices()
 {
-    return this->v_size;
+    return this->positions->size();
 }
 
 size_t GLPrimitive::Size()
 {
     return this->faces->size();
-}
-
-void GLPrimitive::setMatrix(glm::mat4 m)
-{
-    this->matrix = m;
-}
-
-glm::mat4 GLPrimitive::Matrix()
-{
-    return this->matrix;
-}
-
-glm::vec4 GLPrimitive::Position()
-{
-    return glm::vec4(10.0f, 10.0f, 10.0f, 1.0f) * this->matrix;
-}
-
-std::string GLPrimitive::toString()
-{
-    return "";
 }
 
 

@@ -23,7 +23,7 @@ GLViewport::~GLViewport()
 }
 
 
-void GLViewport::initializeGL()
+void GLViewport::InitializeGL()
 {
      
     GLenum status = glewInit();
@@ -35,21 +35,13 @@ void GLViewport::initializeGL()
     }
 }
 
-void GLViewport::paintGL()
+void GLViewport::Paint()
 {
     glClearColor(1.0, 1.0, 1.0, 1.0);
      
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-
-void GLViewport::idleGL()
-{
-}
-
-void GLViewport::quit()
-{
-}
 
 void GLViewport::Event()
 {
@@ -104,14 +96,11 @@ void GLViewport::ViewContext()
         std::cout<<mi->first<<std::endl;
 }
 
-dataPtr GLViewport::getContext()
+dataPtr GLViewport::GetContext()
 {
     return this->context;
 }
 
-void GLViewport::pause()
-{
-}
 
 
 

@@ -19,7 +19,11 @@
 #include <assimp/postprocess.h>
 
 
-GLModel::GLModel(const char* filename, const char* name, const GLuint attributes) : GLNode(name)
+GLModel::GLModel(const char* name, const char* typeName) : GLNode(name, typeName)
+{
+}
+
+GLModel::GLModel(const char* filename, const char* name, const GLuint attributes) : GLNode(name, "GLModel")
 {
     this->filename = filename;
     size_t found = (this->filename).find_last_of("/");
@@ -39,27 +43,27 @@ void GLModel::Allocate()
 {
     this->e_size = 0;
     this->v_size = 0;
-    this->positions = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
-    this->normals = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
-    this->uvs = std::shared_ptr<std::vector<std::vector<glm::vec2>>>(new std::vector<std::vector<glm::vec2>>);
-    this->faces = std::shared_ptr<std::vector<std::vector<GLuint>>>(new std::vector<std::vector<GLuint>>);
+    this->_positions = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
+    this->_normals = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
+    this->_uvs = std::shared_ptr<std::vector<std::vector<glm::vec2>>>(new std::vector<std::vector<glm::vec2>>);
+    this->_faces = std::shared_ptr<std::vector<std::vector<GLuint>>>(new std::vector<std::vector<GLuint>>);
     this->materials = std::shared_ptr<std::vector<std::pair<aiString,Material>>>(new std::vector<std::pair<aiString,Material>>);
     this->textures = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);
     this->bumpmaps = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);
 
 }
 
-bool GLModel::CreateVAO()
+bool GLModel::Create()
 {
     //Clear
-    for(size_t i=0; i<this->positions->size(); i++)
+    for(size_t i=0; i<this->_positions->size(); i++)
     {
-        this->positions->at(i).clear();
-        this->normals->at(i).clear();
-        this->uvs->at(i).clear();
+        this->_positions->at(i).clear();
+        this->_normals->at(i).clear();
+        this->_uvs->at(i).clear();
     }
-    for(size_t i=0; i<this->faces->size(); i++)
-        this->faces->at(i).clear();
+    for(size_t i=0; i<this->_faces->size(); i++)
+        this->_faces->at(i).clear();
 
     Assimp::Importer Importer;
 
@@ -74,10 +78,10 @@ bool GLModel::CreateVAO()
             aiProcess_JoinIdenticalVertices);
     if (scene) 
     {
-        this->faces->resize(scene->mNumMeshes);
-        this->positions->resize(scene->mNumMeshes);
-        this->normals->resize(scene->mNumMeshes);
-        this->uvs->resize(scene->mNumMeshes);
+        this->_faces->resize(scene->mNumMeshes);
+        this->_positions->resize(scene->mNumMeshes);
+        this->_normals->resize(scene->mNumMeshes);
+        this->_uvs->resize(scene->mNumMeshes);
         this->AddMaterials(scene->mMaterials, scene->mNumMaterials);
         for(unsigned int i=0; i<scene->mNumMeshes; i++)
         {
@@ -104,13 +108,13 @@ bool GLModel::CreateVAO()
 bool GLModel::LoadVertexData()
 {
     //Clear
-    for(size_t i=0; i<this->positions->size(); i++)
+    for(size_t i=0; i<this->_positions->size(); i++)
     {
-        this->positions->at(i).clear();
-        this->normals->at(i).clear();
+        this->_positions->at(i).clear();
+        this->_normals->at(i).clear();
     }
-    for(size_t i=0; i<this->faces->size(); i++)
-        this->faces->at(i).clear();
+    for(size_t i=0; i<this->_faces->size(); i++)
+        this->_faces->at(i).clear();
 
     Assimp::Importer Importer;
 
@@ -121,8 +125,8 @@ bool GLModel::LoadVertexData()
             aiProcess_JoinIdenticalVertices);
     if (scene) 
     {
-        this->faces->resize(scene->mNumMeshes);
-        this->positions->resize(scene->mNumMeshes);
+        this->_faces->resize(scene->mNumMeshes);
+        this->_positions->resize(scene->mNumMeshes);
         for(unsigned int i=0; i<scene->mNumMeshes; i++)
         {
             const aiMesh* mesh = scene->mMeshes[i];
@@ -145,15 +149,15 @@ void GLModel::AddVertexData(const aiMesh* mesh, unsigned int index)
     this->e_size += mesh->mNumFaces * 3;
     this->v_size += mesh->mNumVertices;
 
-    this->positions->at(index).resize(mesh->mNumVertices);
-    this->faces->at(index).resize(mesh->mNumFaces * 3);
+    this->_positions->at(index).resize(mesh->mNumVertices);
+    this->_faces->at(index).resize(mesh->mNumFaces * 3);
 
     // Populate the vertex attribute vectors
     for (unsigned int i = 0 ; i < mesh->mNumVertices ; i++) 
     {
         const aiVector3D* pos = &(mesh->mVertices[i]);
 
-        this->positions->at(index).at(i) = glm::vec3(pos->x, pos->y, pos->z);
+        this->_positions->at(index).at(i) = glm::vec3(pos->x, pos->y, pos->z);
     }
 
     // Populate the index buffer
@@ -161,9 +165,9 @@ void GLModel::AddVertexData(const aiMesh* mesh, unsigned int index)
     {
         const aiFace* face = &(mesh->mFaces[i]);
         assert(face->mNumIndices == 3);
-        this->faces->at(index).at(3*i) = face->mIndices[0];
-        this->faces->at(index).at(3*i+1) = face->mIndices[1];
-        this->faces->at(index).at(3*i+2) = face->mIndices[2];
+        this->_faces->at(index).at(3*i) = face->mIndices[0];
+        this->_faces->at(index).at(3*i+1) = face->mIndices[1];
+        this->_faces->at(index).at(3*i+2) = face->mIndices[2];
     }
 }
 
@@ -174,10 +178,10 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
     this->e_size += mesh->mNumFaces * 3;
     this->v_size += mesh->mNumVertices;
 
-    this->positions->at(index).resize(mesh->mNumVertices);
-    this->normals->at(index).resize(mesh->mNumVertices);
-    this->uvs->at(index).resize(mesh->mNumVertices);
-    this->faces->at(index).resize(mesh->mNumFaces * 3);
+    this->_positions->at(index).resize(mesh->mNumVertices);
+    this->_normals->at(index).resize(mesh->mNumVertices);
+    this->_uvs->at(index).resize(mesh->mNumVertices);
+    this->_faces->at(index).resize(mesh->mNumFaces * 3);
 
     // Populate the vertex attribute vectors
     for (unsigned int i = 0 ; i < mesh->mNumVertices ; i++) 
@@ -187,9 +191,9 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
         const aiVector3D* uv = mesh->HasTextureCoords(0) ?
             &(mesh->mTextureCoords[0][i]) : &zero;
 
-        this->positions->at(index).at(i) = glm::vec3(pos->x, pos->y, pos->z);
-        this->normals->at(index).at(i) = glm::vec3(norm->x, norm->y, norm->z);
-        this->uvs->at(index).at(i) = glm::vec2(uv->x, uv->y);
+        this->_positions->at(index).at(i) = glm::vec3(pos->x, pos->y, pos->z);
+        this->_normals->at(index).at(i) = glm::vec3(norm->x, norm->y, norm->z);
+        this->_uvs->at(index).at(i) = glm::vec2(uv->x, uv->y);
     }
 
     // Populate the index buffer
@@ -197,9 +201,9 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
     {
         const aiFace* face = &(mesh->mFaces[i]);
         //assert(face->mNumIndices == 3);
-        this->faces->at(index).at(3*i) = face->mIndices[0];
-        this->faces->at(index).at(3*i+1) = face->mIndices[1];
-        this->faces->at(index).at(3*i+2) = face->mIndices[2];
+        this->_faces->at(index).at(3*i) = face->mIndices[0];
+        this->_faces->at(index).at(3*i+1) = face->mIndices[1];
+        this->_faces->at(index).at(3*i+2) = face->mIndices[2];
     }
 
 }
@@ -286,16 +290,16 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
 void GLModel::CreateVBOs()
 {
     //Create VBOs 
-    GLBufferObject vbo_pos("vbopositions",
+    GLBufferObject vbo_pos("vbo_positions",
             sizeof(glm::vec3),
             this->v_size,
             GL_ARRAY_BUFFER,
             GL_STATIC_DRAW);
     size_t offset = 0;
-    for(size_t i=0; i<this->positions->size(); i++)
+    for(size_t i=0; i<this->_positions->size(); i++)
     {
-        vbo_pos.LoadSubData(offset, 0, this->positions->at(i));
-        offset += this->positions->at(i).size();
+        vbo_pos.LoadSubData(offset, 0, this->_positions->at(i));
+        offset += this->_positions->at(i).size();
     }
     if( this->attributes > V_INDEX)
     {
@@ -304,16 +308,16 @@ void GLModel::CreateVBOs()
     }
 
 
-    GLBufferObject vbo_norms("vbonormals",
+    GLBufferObject vbo_norms("vbo_normals",
             sizeof(glm::vec3),
             this->v_size,
             GL_ARRAY_BUFFER,
             GL_STATIC_DRAW);
     offset = 0;
-    for(size_t i=0; i<this->positions->size(); i++)
+    for(size_t i=0; i<this->_positions->size(); i++)
     {
-        vbo_norms.LoadSubData(offset, 1, this->normals->at(i));
-        offset += this->positions->at(i).size();
+        vbo_norms.LoadSubData(offset, 1, this->_normals->at(i));
+        offset += this->_positions->at(i).size();
     }
     if( this->attributes > NORM_INDEX)
     {
@@ -328,10 +332,10 @@ void GLModel::CreateVBOs()
             GL_ARRAY_BUFFER,
             GL_STATIC_DRAW);
     offset = 0;
-    for(size_t i=0; i<this->positions->size(); i++)
+    for(size_t i=0; i<this->_positions->size(); i++)
     {
-        vbo_uvs.LoadSubData(offset, 2, this->uvs->at(i));
-        offset += this->positions->at(i).size();
+        vbo_uvs.LoadSubData(offset, 2, this->_uvs->at(i));
+        offset += this->_positions->at(i).size();
     }
 
     if( this->attributes > UV_INDEX)
@@ -346,61 +350,37 @@ void GLModel::CreateVBOs()
             GL_ELEMENT_ARRAY_BUFFER,
             GL_STATIC_DRAW);
     offset = 0;
-    for(size_t i=0; i<this->faces->size(); i++)
+    for(size_t i=0; i<this->_faces->size(); i++)
     {
-        vbo_elements.LoadSubData(offset, 0, this->faces->at(i));
-        offset += this->faces->at(i).size();
+        vbo_elements.LoadSubData(offset, 0, this->_faces->at(i));
+        offset += this->_faces->at(i).size();
     }
 }
 
 
-void GLModel::Draw(std::shared_ptr<GLUniform> fragment, GLuint program, GLenum MODE, RENDER type)
+void GLModel::Draw(GLenum MODE)
 {
     GLint face_offset = 0;
     GLint vertex_offset = 0;
     glBindVertexArray(this->vao);
-    bool texture, bump;
-    aiString color;
-
-    glBindBuffer(GL_UNIFORM_BUFFER, fragment->getId());
 
     //Draw Model 
-    for(size_t i=0; i< this->faces->size(); i++)
+    for(size_t i=0; i< this->_faces->size(); i++)
     {   
+        glDrawElementsBaseVertex(MODE, 
+                this->_faces->at(i).size(),
+                GL_UNSIGNED_INT,
+                (void*)(sizeof(GLuint) * face_offset),
+                vertex_offset);
 
-        texture = this->textures->at(this->mtlIndices.at(i)).first;
-        bump = this->bumpmaps->at(this->mtlIndices.at(i)).first;
-        color = this->materials->at(this->mtlIndices.at(i)).first;
-        if(type == RENDER::TEXTURE && texture)
-            this->textures->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE0);
-        if(type == RENDER::BUMP && bump)
-            this->bumpmaps->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE1);
-        if(type == RENDER::COLOR)
-        {
-            glBufferSubData(GL_UNIFORM_BUFFER,
-                        0,
-                        sizeof(this->materials->at(this->mtlIndices.at(i)).second),
-                        &(this->materials->at(this->mtlIndices.at(i)).second) );
-        }
-
-        {
-            glDrawElementsBaseVertex(MODE, 
-                    this->faces->at(i).size(),
-                    GL_UNSIGNED_INT,
-                    (void*)(sizeof(GLuint) * face_offset),
-                    vertex_offset);
-        }
-
-        face_offset += this->faces->at(i).size();
-        vertex_offset += this->positions->at(i).size();
+        face_offset += this->_faces->at(i).size();
+        vertex_offset += this->_positions->at(i).size();
     }
 
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
 }
 
-void GLModel::DrawToFBO(std::shared_ptr<GLFrame> frame, GLuint program)
+void GLModel::DrawToFBO(std::shared_ptr<GLFrame> frame)
 {
     GLint face_offset = 0;
     GLint vertex_offset = 0;
@@ -410,30 +390,57 @@ void GLModel::DrawToFBO(std::shared_ptr<GLFrame> frame, GLuint program)
 
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame->getId());
 
-    //Draw Model 
-    for(size_t i=0; i< this->faces->size(); i++)
+    //Draw Model
+    for(size_t i=0; i< this->_faces->size(); i++)
     {   
 
-        face_offset += this->faces->at(i).size();
-        vertex_offset += this->positions->at(i).size();
+        face_offset += this->_faces->at(i).size();
+        vertex_offset += this->_positions->at(i).size();
 
             glDrawElementsBaseVertex(GL_TRIANGLES, 
-                    this->faces->at(i).size(),
+                    this->_faces->at(i).size(),
                     GL_UNSIGNED_INT,
                     (void*)(sizeof(GLuint) * face_offset),
                     vertex_offset);
     }
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBindVertexArray(0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
 }
 
-void GLModel::setColor(glm::vec4 diffuse)
+void GLModel::LoadUBO(std::shared_ptr<GLUniform> ubo, GLModel::UBO rtype)
+{
+    bool texture, bump;
+
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo->getId());
+
+    for(size_t i=0; i< this->_faces->size(); i++)
+    {   
+
+        texture = this->textures->at(this->mtlIndices.at(i)).first;
+        bump = this->bumpmaps->at(this->mtlIndices.at(i)).first;
+        if(rtype == UBO::TEXTURE && texture)
+            this->textures->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE0);
+        if(rtype == UBO::BUMP && bump)
+            this->bumpmaps->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE1);
+        if(rtype == UBO::COLOR)
+        {
+            glBufferSubData(GL_UNIFORM_BUFFER,
+                        0,
+                        sizeof(this->materials->at(this->mtlIndices.at(i)).second),
+                        &(this->materials->at(this->mtlIndices.at(i)).second) );
+        }
+
+    }
+
+}
+
+void GLModel::SetColor(glm::vec4 diffuse)
 {
     this->materials->at(this->mtlIndices.at(0)).second.diffuse = diffuse;
 }
 
-glm::vec4 GLModel::getColor()
+glm::vec4 GLModel::GetColor()
 {
     return this->materials->at(this->mtlIndices.at(0)).second.diffuse;
 }
@@ -450,17 +457,17 @@ size_t GLModel::numVertices()
 
 size_t GLModel::Size()
 {
-    return this->faces->size();
+    return this->_faces->size();
 }
 
 const std::vector<glm::vec3>& GLModel::Positions(size_t index)
 {
-    return this->positions->at(index);
+    return this->_positions->at(index);
 }
 
 const std::vector<GLuint>& GLModel::Faces(size_t index)
 {
-    return this->faces->at(index);
+    return this->_faces->at(index);
 }
 
 void GLModel::setMatrix(glm::mat4 m)
@@ -477,6 +484,5 @@ glm::vec4 GLModel::Position()
 {
     return  glm::vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
 }
-
 
 

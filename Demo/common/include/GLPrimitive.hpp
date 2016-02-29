@@ -10,60 +10,44 @@
 #include <climits>
 #include <Magick++.h>
 
-#include "GLNode.hpp"
+#include "GLBufferObject.hpp"
+#include "GLModel.hpp"
 
-const GLuint V_INDEX = 0;
-const GLuint NORM_INDEX = 1;
-const GLuint UV_INDEX = 2;
-
-class GLUniform;
-class GLTexture;
-
-class GLPrimitive : public GLNode
+class GLPrimitive : public GLModel
 {
  public:
-    GLPrimitive(const char*, const GLuint);
+    GLPrimitive(const char*, GLuint, long);
+    GLPrimitive(const char*, const char*, GLuint, long);
     ~GLPrimitive();
 
-    bool CreateVAO();
-    glm::mat4 Matrix();
-    glm::vec4 Position();
-    void setMatrix(glm::mat4);
+    virtual bool Create();
+    virtual void LoadUBO(std::shared_ptr<GLUniform>, UBO);
     bool LoadSphere(int num_lats, int num_lons);
     bool LoadCylinder();
     //bool LoadCube();
 
-    void Draw(std::shared_ptr<GLUniform>, GLuint);
-    size_t numVertices();
-    size_t numFaces();
-    size_t Size();
+    virtual void Draw(GLenum);
+    virtual size_t numVertices();
+    virtual size_t numFaces();
+    virtual size_t Size();
 
- private:
+ protected:
     void Allocate();
     void CreateVBOs();
 
-    bool AddMaterials(const char*);
-    std::string toString();
-
-    std::string path;
-    std::string filename;
+	GLBufferObject vbo_pos;
+	GLBufferObject vbo_tex;
+	GLBufferObject vbo_norm;
+	GLBufferObject vbo_color;
 
     std::shared_ptr<std::vector<glm::vec3>> positions;
     std::shared_ptr<std::vector<glm::vec3>> normals;
     std::shared_ptr<std::vector<glm::vec2>> uvs;
     std::shared_ptr<std::vector<GLuint>> faces;
-    //std::shared_ptr<std::vector<std::pair<aiString, Material>>> materials;
-    std::shared_ptr<std::vector<std::pair<bool,GLTexture>>> textures;
-    std::vector<GLuint> mtlIndices;
 
-    size_t e_size;
-    size_t v_size;
-
-    glm::mat4 matrix;
-    GLuint vao;
-    GLuint vbo[4];
-    GLuint attributes;
-
+    long maxPoints;
+    
+    Material mat;
 };
 
 #endif 
