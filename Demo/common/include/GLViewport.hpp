@@ -1,10 +1,8 @@
 #ifndef GLVIEW_H
 #define GLVIEW_H
-#define GLM_FORCE_RADIANS
 
 #include "GLNode.hpp"
 
-#include <glm/glm.hpp>
 #include <memory>
 #include <chrono>
 

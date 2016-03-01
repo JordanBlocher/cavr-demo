@@ -2,8 +2,6 @@
 #define GLPrimitive_H
 
 #include <vector>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <cstring>
 #include <map>
 #include <assimp/scene.h>
@@ -13,7 +11,7 @@
 #include "GLBufferObject.hpp"
 #include "GLModel.hpp"
 
-class GLPrimitive : public GLModel
+class GLPrimitive : public GLMesh
 {
  public:
     GLPrimitive(const char*, GLuint, long);
@@ -21,8 +19,9 @@ class GLPrimitive : public GLModel
     ~GLPrimitive();
 
     virtual bool Create();
-    virtual void LoadUBO(std::shared_ptr<GLUniform>, UBO);
-    bool LoadSphere(int num_lats, int num_lons);
+    //virtual void LoadUBO(std::shared_ptr<GLUniform>, UBO);
+    bool LoadSphere(int num_lats, int num_longs);
+    bool LoadUVSphere(int nlats, int nlongs);
     bool LoadCylinder();
     //bool LoadCube();
 
@@ -32,18 +31,7 @@ class GLPrimitive : public GLModel
     virtual size_t Size();
 
  protected:
-    void Allocate();
     void CreateVBOs();
-
-	GLBufferObject vbo_pos;
-	GLBufferObject vbo_tex;
-	GLBufferObject vbo_norm;
-	GLBufferObject vbo_color;
-
-    std::shared_ptr<std::vector<glm::vec3>> positions;
-    std::shared_ptr<std::vector<glm::vec3>> normals;
-    std::shared_ptr<std::vector<glm::vec2>> uvs;
-    std::shared_ptr<std::vector<GLuint>> faces;
 
     long maxPoints;
     

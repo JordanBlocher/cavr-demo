@@ -1,5 +1,4 @@
 #define CHECKGLERROR if ( glGetError() != GL_NO_ERROR ) std::cout << __FILE__ <<":"<< __LINE__ << std::endl;
-#define GLM_FORCE_RADIANS
 
 #include "GLModel.hpp"
 #include "GLBufferObject.hpp"
@@ -19,11 +18,11 @@
 #include <assimp/postprocess.h>
 
 
-GLModel::GLModel(const char* name, const char* typeName) : GLNode(name, typeName)
+GLModel::GLModel(const char* name, const char* typeName) : GLMesh(name, typeName)
 {
 }
 
-GLModel::GLModel(const char* filename, const char* name, const GLuint attributes) : GLNode(name, "GLModel")
+GLModel::GLModel(const char* filename, const char* name, const GLuint attributes) : GLMesh(name, "GLModel")
 {
     this->filename = filename;
     size_t found = (this->filename).find_last_of("/");
@@ -32,6 +31,8 @@ GLModel::GLModel(const char* filename, const char* name, const GLuint attributes
     else
         this->path = this->filename.substr(0,found);
     this->attributes = attributes;
+
+    GLMesh::Allocate();
     this->Allocate();
 }
 
@@ -41,13 +42,6 @@ GLModel::~GLModel()
 
 void GLModel::Allocate()
 {
-    this->e_size = 0;
-    this->v_size = 0;
-    this->_positions = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
-    this->_colors = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
-    this->_normals = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
-    this->_uvs = std::shared_ptr<std::vector<std::vector<glm::vec2>>>(new std::vector<std::vector<glm::vec2>>);
-    this->_faces = std::shared_ptr<std::vector<std::vector<GLuint>>>(new std::vector<std::vector<GLuint>>);
     this->materials = std::shared_ptr<std::vector<std::pair<aiString,Material>>>(new std::vector<std::pair<aiString,Material>>);
     this->textures = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);
     this->bumpmaps = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);

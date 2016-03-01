@@ -6,17 +6,9 @@
 #include <GLProgram.hpp>
 #include <GLFrame.hpp>
 #include <GLModel.hpp>
-#include <GLMath.hpp>
 #include <GLUniform.hpp>
 
 #include <chrono>
-
-// Also does not belong here
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp> 
-
 
 class GLScene : public GLViewport
 {

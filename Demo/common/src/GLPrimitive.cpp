@@ -1,30 +1,23 @@
-#define CHECKGLERROR if ( glGetError() != GL_NO_ERROR ) std::cout << __FILE__ <<":"<< __LINE__ << std::endl;
 #include "GLPrimitive.hpp"
 #include "GLBufferObject.hpp"
 #include "GLUniform.hpp"
 #include "GLTexture.hpp"
 
 #include <fstream>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/bind.hpp>
 #include <csignal>
 #include <sstream>
 #include <assert.h>
 
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
 
 
-GLPrimitive::GLPrimitive(const char* name, GLuint attributes, long maxPoints) : GLModel(name, "GLPrimitive")
+GLPrimitive::GLPrimitive(const char* name, GLuint attributes, long maxPoints) : GLMesh(name, "GLPrimitive")
 {
     this->maxPoints = maxPoints;
     this->attributes = attributes;
     this->Allocate();
 }
 
-GLPrimitive::GLPrimitive(const char* name, const char* typeName, GLuint attributes, long maxPoints) : GLModel(name, typeName)
+GLPrimitive::GLPrimitive(const char* name, const char* typeName, GLuint attributes, long maxPoints) : GLMesh(name, typeName)
 {
     this->maxPoints = maxPoints;
     this->attributes = attributes;
@@ -35,12 +28,41 @@ GLPrimitive::~GLPrimitive()
 {
 }
 
-void GLPrimitive::Allocate()
+bool GLPrimitive::LoadUVSphere(int nlats, int nlongs)
 {
-    this->positions = std::shared_ptr<std::vector<glm::vec3>>(new std::vector<glm::vec3>);
-    this->normals = std::shared_ptr<std::vector<glm::vec3>>(new std::vector<glm::vec3>);
-    this->uvs = std::shared_ptr<std::vector<glm::vec2>>(new std::vector<glm::vec2>);
-    this->faces = std::shared_ptr<std::vector<GLuint>>(new std::vector<GLuint>);
+    nlongs = (nlongs - 1);
+    nlats = (nlats - 1);
+
+    double z, x, y, radius;
+    double longstep = 1.0 / nlongs;
+    double latstep = 1.0 / nlats;
+    int offset, previousOffset = 0;
+    int uvOffset = -1, uvPreviousOffset = -1;
+    Vec3 d;
+
+    for (int u = 0; u < nlats + 1; u++)
+    {
+        z = cos(M_PI * u * latstep);
+        radius = sqrt(1 - (z * z));
+        offset = positions->size();
+        uvOffset = uvs->size();
+
+        for (int v = 0; v < nlongs; v++)
+        {
+            x = radius * cos(v * longstep * M_PI * 2.0);
+            y = radius * sin(v * longstep * M_PI * 2.0);
+            d = glm::normalize(Vec3(x, y, z));
+            this->positions->push_back(Vec3(x, y, z));
+            this->normals->push_back(d);
+            this->uvs->push_back(Vec2(0.5 + (atan2(d.z, d.x) / (2 * M_PI)), 0.5 - 2 * (asin(d.y) / (2 * M_PI))));
+        }
+        if (u > 0)
+        {
+            this->AddTriangleStrip(previousOffset, offset, nlongs, true);
+        }
+        previousOffset = offset;
+        uvPreviousOffset = uvOffset;
+    }
 }
 
 bool GLPrimitive::LoadSphere(int num_lats, int num_lons)
@@ -65,10 +87,10 @@ bool GLPrimitive::LoadSphere(int num_lats, int num_lons)
             float cos_l = cos(left_rad);
             float sin_r = sin(right_rad);
             float cos_r = cos(right_rad);
-            glm::vec3 ll(bottom_xz * cos_l, bottom_y, bottom_xz * sin_l);
-            glm::vec3 lr(bottom_xz * cos_r, bottom_y, bottom_xz * sin_r);
-            glm::vec3 ul(top_xz * cos_l, top_y, top_xz * sin_l);
-            glm::vec3 ur(top_xz * cos_r, top_y, top_xz * sin_r);
+            Vec3 ll(bottom_xz * cos_l, bottom_y, bottom_xz * sin_l);
+            Vec3 lr(bottom_xz * cos_r, bottom_y, bottom_xz * sin_r);
+            Vec3 ul(top_xz * cos_l, top_y, top_xz * sin_l);
+            Vec3 ur(top_xz * cos_r, top_y, top_xz * sin_r);
 
 
 
@@ -81,15 +103,15 @@ bool GLPrimitive::LoadSphere(int num_lats, int num_lons)
             positions->push_back(ul);
 
             // normals
-            normals->push_back(glm::vec3(0,1,0));
-            normals->push_back(glm::vec3(0,1,0));
-            normals->push_back(glm::vec3(0,1,0));
+            normals->push_back(Vec3(0,1,0));
+            normals->push_back(Vec3(0,1,0));
+            normals->push_back(Vec3(0,1,0));
 
 
             // uvs -- too be filled
-            uvs->push_back(glm::vec2(0,0));
-            uvs->push_back(glm::vec2(0,0));
-            uvs->push_back(glm::vec2(0,0));
+            uvs->push_back(Vec2(0,0));
+            uvs->push_back(Vec2(0,0));
+            uvs->push_back(Vec2(0,0));
 
             // face two 
             positions->push_back(ul);
@@ -97,14 +119,14 @@ bool GLPrimitive::LoadSphere(int num_lats, int num_lons)
             positions->push_back(ur);
 
             // normals
-            normals->push_back(glm::vec3(0,1,0));
-            normals->push_back(glm::vec3(0,1,0));
-            normals->push_back(glm::vec3(0,1,0));
+            normals->push_back(Vec3(0,1,0));
+            normals->push_back(Vec3(0,1,0));
+            normals->push_back(Vec3(0,1,0));
 
             // uvs -- too be filled
-            uvs->push_back(glm::vec2(0,0));
-            uvs->push_back(glm::vec2(0,0));
-            uvs->push_back(glm::vec2(0,0));
+            uvs->push_back(Vec2(0,0));
+            uvs->push_back(Vec2(0,0));
+            uvs->push_back(Vec2(0,0));
         }
     }
     v_size = uvs->size();
@@ -133,7 +155,7 @@ bool GLPrimitive::Create()
 void GLPrimitive::CreateVBOs()
 {
     this->vbo_pos = GLBufferObject("vbopositions",
-            sizeof(glm::vec3),
+            sizeof(Vec3),
             maxPoints,
             GL_ARRAY_BUFFER,
             GL_DYNAMIC_DRAW);
@@ -144,7 +166,7 @@ void GLPrimitive::CreateVBOs()
     }
 
      this->vbo_norm = GLBufferObject("vbonormals",
-            sizeof(glm::vec3),
+            sizeof(Vec3),
             maxPoints,
             GL_ARRAY_BUFFER,
             GL_DYNAMIC_DRAW);
@@ -155,7 +177,7 @@ void GLPrimitive::CreateVBOs()
     }
 
     this->vbo_tex = GLBufferObject("vbotextures",
-            sizeof(glm::vec2),
+            sizeof(Vec2),
             maxPoints,
             GL_ARRAY_BUFFER,
             GL_DYNAMIC_DRAW);
@@ -166,7 +188,7 @@ void GLPrimitive::CreateVBOs()
     }
 
     this->vbo_color = GLBufferObject("vbocolors",
-            sizeof(glm::vec3),
+            sizeof(Vec3),
             maxPoints,
             GL_ARRAY_BUFFER,
             GL_DYNAMIC_DRAW);
@@ -178,9 +200,9 @@ void GLPrimitive::CreateVBOs()
     }
 }
 
-void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform>, UBO)
-{
-}
+//void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform>, UBO)
+//{
+//}
 
 
 void GLPrimitive::Draw(GLenum MODE)

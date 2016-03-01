@@ -1,11 +1,7 @@
 #ifndef GLCAMERA_H
 #define GLCAMERS_H
-#define GLM_FORCE_RADIANS
 
 #include "GLNode.hpp"
-
-#include <glm/glm.hpp>
-#include "glm/gtc/matrix_transform.hpp"
 
 class GLCamera : public GLNode
 {

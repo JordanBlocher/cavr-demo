@@ -1,12 +1,7 @@
-#define GLM_FORCE_RADIANS
 #include "GLCamera.hpp"
 
-#include <cmath>
 #include <cavr/cavr.h>
 #include <cavr/gfx/renderer.h>
-#include "glm/ext.hpp"
-#include <math.h>
-#include <GLMath.hpp>
 
 GLCamera::GLCamera(const char* name)
 {

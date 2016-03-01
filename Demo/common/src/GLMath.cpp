@@ -1,4 +1,3 @@
-#define GLM_FORCE_RADIANS
 #include "GLMath.hpp"
 
 glm::mat4 GLMath::mat4ftoGLM(cavr::math::mat4f mat4f)

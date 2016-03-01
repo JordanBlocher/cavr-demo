@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "GLStruct.hpp"
+#include "GLMath.hpp"
 
 class GLNode
 {

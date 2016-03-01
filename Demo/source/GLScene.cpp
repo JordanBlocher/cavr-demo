@@ -1,16 +1,10 @@
 #define CHECKGLERROR if ( glGetError() != GL_NO_ERROR ) cout << __LINE__ << endl;
-#define GLM_FORCE_RADIANS
 
 #include <GL/glew.h>
 
 #include <iostream>
 #include <chrono>
 #include <csignal>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp> //Makes passing matrices to shaders easier
-#include <glm/virtrev/xstream.hpp>
 
 #include <GLShader.hpp>
 #include <GLBufferObject.hpp>
