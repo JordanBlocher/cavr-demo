@@ -12,7 +12,7 @@ GLBufferObject::GLBufferObject(const char* name, GLsizeiptr dataSize, GLuint siz
     glGenBuffers(1, &this->buffer);
     glBindBuffer(type, this->buffer);
     glBufferData(type, dataSize*size, NULL, draw);
-    glBindBuffer(this->type, 0);
+    //glBindBuffer(this->type, 0);
 }
 
 GLBufferObject::~GLBufferObject()

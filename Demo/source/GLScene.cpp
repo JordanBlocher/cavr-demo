@@ -122,13 +122,14 @@ void GLScene::InitializeGL()
 
     // Init a spray
     shared_ptr<Spray> spray (new Spray());
-
+    cout << "NEW SPRAY" << endl;
     if(spray->Init())
     {
-        spray->AddPoints(glm::vec3(0,0,0),glm::vec3(0,0,1));
-        spray->AddPoints(glm::vec3(0,0,1),glm::vec3(0,0,1));
-        spray->AddPoints(glm::vec3(1,0,1),glm::vec3(0,0,1));
-        spray->AddPoints(glm::vec3(0,0,-1),glm::vec3(0,0,1));
+        cout << "NEW SPRAY INSIDE" << endl;
+        spray->AddPoints(glm::vec3(0,0,0),glm::vec3(1,1,1));
+        spray->AddPoints(glm::vec3(0,0,1),glm::vec3(1,1,1));
+        spray->AddPoints(glm::vec3(1,0,1),glm::vec3(1,1,1));
+        spray->AddPoints(glm::vec3(0,0,-1),glm::vec3(1,1,1));
         this->AddToContext(spray);
     }
 
@@ -144,9 +145,9 @@ void GLScene::Paint()
     shared_ptr<Spray> spray = this->Get<Spray>("spray");
     this->PaintHelper(spray, GL_TRIANGLES);
 
-    shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
-    dragon->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
-    //this->paintHelper(dragon, GL_TRIANGLES);
+    //shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
+    //dragon->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
+    //this->PaintHelper(dragon, GL_TRIANGLES);
 
 }
 

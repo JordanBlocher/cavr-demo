@@ -41,7 +41,7 @@ void GLBufferObject::LoadSubData(size_t offset, int index, const std::vector<T> 
     this->block = index;
     glBindBuffer(this->type, this->buffer);
     glBufferSubData(this->type, sizeof(T) * offset, sizeof(T) * vec.size(), vec.data());
-    glBindBuffer(this->type, 0);
+    //glBindBuffer(this->type, 0);
 }
 
 

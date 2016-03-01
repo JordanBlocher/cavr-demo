@@ -6,8 +6,6 @@
 Spray::Spray(const char* name, long max) : GLPrimitive(name, "spray", 4, 6*max)
 {
 	CurrentPoints = 0;
-	vShader = "shaders/defer.vert";
-	fShader = "shaders/defer.frag";
 }
 
 Spray::~Spray()
@@ -16,16 +14,18 @@ Spray::~Spray()
 
 bool Spray::Init()
 {
-    GLPrimitive::Create();
+    
     this->positions->resize(this->maxPoints);
     this->normals->resize(this->maxPoints);
     this->uvs->resize(this->maxPoints);
+    GLPrimitive::Create();
 }
 
 bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
 {
-	if (CurrentPoints * 6 < MaxPoints)
+	if (CurrentPoints * 6 < maxPoints)
 	{
+		cout << "ADD ONE" << endl;
 		PaintStruct temp;
 		temp.position = worldPoint;
 		temp.color = Color;
@@ -35,7 +35,7 @@ bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
 	}
 	if(Points.size() > 1 && !Points[Points.size()-2].Break)
 	{
-		
+		cout << "ADD TWO" << endl;
 
 		// Add the points at the current position in the buffer
 		vector<glm::vec3> pos = vector<glm::vec3>();
@@ -108,6 +108,7 @@ void Spray::Update()
 
 void Spray::Draw(GLenum drawmode)
 {
+	//cout << "DRAW" << endl;
     GLint face_offset = 0;
     GLint vertex_offset = 0;
     glBindVertexArray(vao);
