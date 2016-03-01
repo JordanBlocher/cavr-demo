@@ -38,17 +38,17 @@ bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
 		
 
 		// Add the points at the current position in the buffer
-		vector<glm::vec3> pos = vector<glm::vec3>();
-		std::vector<glm::vec3> colors = std::vector<glm::vec3>();
-		glm::vec3 one;
-		glm::vec3 two;
-		glm::vec3 three;
-		glm::vec3 four;
+		vector<Vec3> pos = vector<Vec3>();
+		std::vector<Vec3> colors = std::vector<Vec3>();
+		Vec3 one;
+		Vec3 two;
+		Vec3 three;
+		Vec3 four;
 
-		glm::vec3 oneColor;
-		glm::vec3 twoColor;
-		glm::vec3 threeColor;
-		glm::vec3 fourColor;
+		Vec3 oneColor;
+		Vec3 twoColor;
+		Vec3 threeColor;
+		Vec3 fourColor;
 
 		one = Points[Points.size() - 2].position;
 		two = Points[Points.size() - 1].position + vec3(0.0,1.0,0.0);

@@ -22,15 +22,15 @@ cavr::math::mat4f GLMath::GLMtomat4f(glm::mat4 mat4)
     return temp;
 }
 
-glm::vec3 GLMath::vec3ftoGLM(cavr::math::vec3f vec3f)
+Vec3 GLMath::vec3ftoGLM(cavr::math::vec3f vec3f)
 {
-    glm::vec3 temp = glm::vec3(1.0);
+    Vec3 temp = Vec3(1.0);
     temp.x = vec3f.x; temp.y = vec3f.y; 
     temp.z = vec3f.z; 
     return temp;
 }
 
-cavr::math::vec3f GLMath::GLMtovec3f(glm::vec4 vec4)
+cavr::math::vec3f GLMath::GLMtovec3f(Vec4 vec4)
 {
     cavr::math::vec3f temp;
     temp.x = vec4.x; temp.y = vec4.y; 

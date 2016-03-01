@@ -155,8 +155,8 @@ void GLModel::AddVertexData(const aiMesh* mesh, unsigned int index)
     {
         const aiVector3D* pos = &(mesh->mVertices[i]);
 
-        this->_positions->at(index).at(i) = glm::vec3(pos->x, pos->y, pos->z);
-        this->_colors->at(index).at(i) = glm::vec3(0.0f, 0.0f, 0.0f);
+        this->_positions->at(index).at(i) = Vec3(pos->x, pos->y, pos->z);
+        this->_colors->at(index).at(i) = Vec3(0.0f, 0.0f, 0.0f);
     }
 
     // Populate the index buffer
@@ -191,10 +191,10 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
         const aiVector3D* uv = mesh->HasTextureCoords(0) ?
             &(mesh->mTextureCoords[0][i]) : &zero;
 
-        this->_positions->at(index).at(i) = glm::vec3(pos->x, pos->y, pos->z);
-        this->_normals->at(index).at(i) = glm::vec3(norm->x, norm->y, norm->z);
-        this->_uvs->at(index).at(i) = glm::vec2(uv->x, uv->y);
-        this->_colors->at(index).at(i) = glm::vec3(0.0f, 0.0f, 0.0f);
+        this->_positions->at(index).at(i) = Vec3(pos->x, pos->y, pos->z);
+        this->_normals->at(index).at(i) = Vec3(norm->x, norm->y, norm->z);
+        this->_uvs->at(index).at(i) = Vec2(uv->x, uv->y);
+        this->_colors->at(index).at(i) = Vec3(0.0f, 0.0f, 0.0f);
     }
 
     // Populate the index buffer
@@ -236,9 +236,9 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
 
 
         Material mat;
-        mat.diffuse = glm::vec4(diffuse.r, diffuse.g, diffuse.b, 1.0f);
-        mat.ambient = glm::vec4(ambient.r, ambient.g, ambient.b, 1.0f);
-        mat.specular = glm::vec4(specular.r, specular.g, specular.b, 1.0f);
+        mat.diffuse = Vec4(diffuse.r, diffuse.g, diffuse.b, 1.0f);
+        mat.ambient = Vec4(ambient.r, ambient.g, ambient.b, 1.0f);
+        mat.specular = Vec4(specular.r, specular.g, specular.b, 1.0f);
         mat.shininess = shininess / 1.0f;
         mat.intensity = 1.0f + intensity;
         mat.diffuseBlend = diffuseBlend;
@@ -292,7 +292,7 @@ void GLModel::CreateVBOs()
 {
     //Create VBOs 
     GLBufferObject vbo_pos("vbo_positions",
-            sizeof(glm::vec3),
+            sizeof(Vec3),
             this->v_size,
             GL_ARRAY_BUFFER,
             GL_STATIC_DRAW);
@@ -309,7 +309,7 @@ void GLModel::CreateVBOs()
     }
 
     GLBufferObject vbo_norms("vbo_normals",
-            sizeof(glm::vec3),
+            sizeof(Vec3),
             this->v_size,
             GL_ARRAY_BUFFER,
             GL_STATIC_DRAW);
@@ -326,7 +326,7 @@ void GLModel::CreateVBOs()
     }
 
     GLBufferObject vbo_uvs("vbo_textures",
-            sizeof(glm::vec2),
+            sizeof(Vec2),
             this->v_size,
             GL_ARRAY_BUFFER,
             GL_STATIC_DRAW);
@@ -344,7 +344,7 @@ void GLModel::CreateVBOs()
     }
     
     GLBufferObject vbo_colors("vbo_colors",
-            sizeof(glm::vec3),
+            sizeof(Vec3),
             this->v_size,
             GL_ARRAY_BUFFER,
             GL_STATIC_DRAW);
@@ -453,12 +453,12 @@ void GLModel::LoadUBO(std::shared_ptr<GLUniform> ubo, GLModel::UBO rtype)
 
 }
 
-void GLModel::SetColor(glm::vec4 diffuse)
+void GLModel::SetColor(Vec4 diffuse)
 {
     this->materials->at(this->mtlIndices.at(0)).second.diffuse = diffuse;
 }
 
-glm::vec4 GLModel::GetColor()
+Vec4 GLModel::GetColor()
 {
     return this->materials->at(this->mtlIndices.at(0)).second.diffuse;
 }
@@ -478,7 +478,7 @@ size_t GLModel::Size()
     return this->_faces->size();
 }
 
-const std::vector<glm::vec3>& GLModel::Positions(size_t index)
+const std::vector<Vec3>& GLModel::Positions(size_t index)
 {
     return this->_positions->at(index);
 }
@@ -498,9 +498,9 @@ glm::mat4 GLModel::Matrix()
     return this->matrix;
 }
 
-glm::vec4 GLModel::Position()
+Vec4 GLModel::Position()
 {
-    return  glm::vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
+    return  Vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
 }
 
 

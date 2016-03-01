@@ -25,8 +25,8 @@ namespace GLMath
 
     glm::mat4 mat4ftoGLM(cavr::math::mat4f);
     cavr::math::mat4f GLMtomat4f(glm::mat4);
-    glm::vec3 vec3ftoGLM(cavr::math::vec3f);
-    cavr::math::vec3f GLMtovec3f(glm::vec4);
+    Vec3 vec3ftoGLM(cavr::math::vec3f);
+    cavr::math::vec3f GLMtovec3f(Vec4);
  
 }
 

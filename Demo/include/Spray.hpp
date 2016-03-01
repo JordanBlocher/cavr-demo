@@ -21,8 +21,8 @@ class Spray : public GLPrimitive
 
     struct PaintStruct
     {
-        glm::vec3 position;
-        glm::vec3 color;
+        Vec3 position;
+        Vec3 color;
         bool Break;
     };
 	Spray(const char* name = "spray", long maxPoints = MAX_POINTS);

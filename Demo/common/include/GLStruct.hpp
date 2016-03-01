@@ -1,6 +1,8 @@
 #ifndef GLSTRUCT_H
 #define GLSTRUCT_H
 
+#include "GLMath.hpp"
+
 #include <iostream>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
@@ -10,9 +12,9 @@
 
 struct Material
 {
-    glm::vec4 ambient;
-    glm::vec4 diffuse;
-    glm::vec4 specular;
+    Vec4 ambient;
+    Vec4 diffuse;
+    Vec4 specular;
     float shininess;
     float intensity;
     float diffuseBlend;
@@ -36,26 +38,26 @@ struct Player
 
 struct BaseLight
 {
-    glm::vec4 color;
+    Vec4 color;
     float ambientIntensity;
     float diffuseIntensity;
 };
 
 struct DirectionalLight
 {
-    glm::vec4 direction;
+    Vec4 direction;
     BaseLight base;
 };
 
 struct PointLight
 {
-    glm::vec4 position;
+    Vec4 position;
     BaseLight base;
 };
 
 struct SpotLight
 {
-    glm::vec4 direction;
+    Vec4 direction;
     PointLight point;
 };
 

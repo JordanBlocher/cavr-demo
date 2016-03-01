@@ -16,8 +16,8 @@ public:
     void updateCavrPosition();
     void updateView();
     void moveCamera(CamDirection);
-    glm::vec3 getCameraPosition();
-    void setAimTarget(glm::vec3 aimPos);
+    Vec3 getCameraPosition();
+    void setAimTarget(Vec3 aimPos);
     void setCameraOffset(float zenith, float azimuth);
 
     glm::mat4 Projection();
@@ -29,10 +29,10 @@ public:
     float radius, azimuth, polar;
     glm::mat4 projection;
     glm::mat4 view;
-    glm::vec3 aimTarget;
-    glm::vec3 eye_pos;
-    glm::vec3 near;
-    glm::vec3 far;
+    Vec3 aimTarget;
+    Vec3 eye_pos;
+    Vec3 near;
+    Vec3 far;
 
     float zenOffset;
     float aziOffset;

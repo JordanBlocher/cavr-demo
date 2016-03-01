@@ -33,14 +33,14 @@ class GLModel : public GLMesh
     virtual size_t numVertices();
     virtual size_t numFaces();
     virtual size_t Size();
-    virtual void SetColor(glm::vec4);
-    virtual glm::vec4 GetColor();
+    virtual void SetColor(Vec4);
+    virtual Vec4 GetColor();
 
     virtual void LoadUBO(std::shared_ptr<GLUniform>, UBO);
-    const std::vector<glm::vec3>& Positions(size_t);
+    const std::vector<Vec3>& Positions(size_t);
     const std::vector<GLuint>& Faces(size_t);
     glm::mat4 Matrix();
-    glm::vec4 Position();
+    Vec4 Position();
     void setMatrix(glm::mat4);
  
 

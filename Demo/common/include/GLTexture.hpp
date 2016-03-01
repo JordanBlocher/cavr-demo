@@ -17,7 +17,7 @@ class GLTexture : GLNode
     void Bind(GLenum);
 
     Material material;
-    glm::vec3 color;
+    Vec3 color;
 
 protected:
     Magick::Image* image;

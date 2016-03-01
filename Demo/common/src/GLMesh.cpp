@@ -19,9 +19,9 @@ void GLMesh::Allocate()
 {
     this->e_size = 0;
     this->v_size = 0;
-    this->_positions = sp2dvec3(new std::vector<std::vector<glm::vec3>>);
-    this->_colors = sp2dvec3(new std::vector<std::vector<glm::vec3>>);
-    this->_normals = sp2dvec3(new std::vector<std::vector<glm::vec3>>);
+    this->_positions = sp2dvec3(new std::vector<std::vector<Vec3>>);
+    this->_colors = sp2dvec3(new std::vector<std::vector<Vec3>>);
+    this->_normals = sp2dvec3(new std::vector<std::vector<Vec3>>);
     this->_uvs = sp2dvec2(new std::vector<std::vector<glm::ivec2>>);
     this->_faces = sp2dvec(new std::vector<std::vector<GLuint>>);
     this->_positions->resize(1);
@@ -29,9 +29,9 @@ void GLMesh::Allocate()
     this->_colors->resize(1);
     this->_uvs->resize(1);
     this->_faces->resize(1);
-    this->positions = std::make_shared<std::vector<glm::vec3>>(this->_positions->at(0));
-    this->normals = std::make_shared<std::vector<glm::vec3>>(this->_normals->at(0));
-    this->colors = std::make_shared<std::vector<glm::vec3>>(this->_colors->at(0));
+    this->positions = std::make_shared<std::vector<Vec3>>(this->_positions->at(0));
+    this->normals = std::make_shared<std::vector<Vec3>>(this->_normals->at(0));
+    this->colors = std::make_shared<std::vector<Vec3>>(this->_colors->at(0));
     this->uvs = std::make_shared<std::vector<glm::ivec2>>(this->_uvs->at(0));
     this->faces = std::make_shared<std::vector<GLuint>>(this->_faces->at(0));
 }

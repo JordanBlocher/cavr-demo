@@ -16,10 +16,10 @@ const GLuint NORM_INDEX = 1;
 const GLuint UV_INDEX = 2;
 const GLuint COLOR_INDEX = 3;
 
-typedef std::shared_ptr<std::vector<std::vector<glm::vec3>>> sp2dvec3;
+typedef std::shared_ptr<std::vector<std::vector<Vec3>>> sp2dvec3;
 typedef std::shared_ptr<std::vector<std::vector<glm::ivec2>>> sp2dvec2;
 typedef std::shared_ptr<std::vector<std::vector<GLuint>>> sp2dvec;
-typedef std::shared_ptr<std::vector<glm::vec3>> spvec3;
+typedef std::shared_ptr<std::vector<Vec3>> spvec3;
 typedef std::shared_ptr<std::vector<glm::ivec2>> spvec2;
 typedef std::shared_ptr<std::vector<GLuint>> spvec;
 
@@ -31,7 +31,7 @@ class GLMesh : public GLNode
     GLMesh(const char*, const char*);
     ~GLMesh();
 
-    const std::vector<glm::vec3>& Positions(size_t);
+    const std::vector<Vec3>& Positions(size_t);
     const std::vector<GLuint>& Faces(size_t);
 
     int AddCircle(int, double, double, double, Vec2, Vec2);

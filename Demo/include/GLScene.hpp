@@ -26,8 +26,8 @@ class GLScene : public GLViewport
     void LoadGlobalUBOs(Matrices);
 
     std::chrono::time_point<std::chrono::high_resolution_clock> time;
-    std::vector<std::pair<glm::vec4, glm::mat4>> strokes;
-    glm::vec4 color;
+    std::vector<std::pair<Vec4, glm::mat4>> strokes;
+    Vec4 color;
     bool painting;
     
     template <typename T> 

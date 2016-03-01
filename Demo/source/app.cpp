@@ -8,7 +8,6 @@
 #include <cavr/gl/vbo.h>
 #include <glog/logging.h>
 #include <math.h>
-#define GLM_FORCE_RADIANS
 #include <GLScene.hpp>
 
 // Using IrrKlang for this example

@@ -119,10 +119,10 @@ void GLScene::InitializeGL()
 
     if(spray->Init())
     {
-        spray->AddPoints(glm::vec3(0,0,0),glm::vec3(0,0,1));
-        spray->AddPoints(glm::vec3(0,0,1),glm::vec3(0,0,1));
-        spray->AddPoints(glm::vec3(1,0,1),glm::vec3(0,0,1));
-        spray->AddPoints(glm::vec3(0,0,-1),glm::vec3(0,0,1));
+        spray->AddPoints(Vec3(0,0,0),Vec3(0,0,1));
+        spray->AddPoints(Vec3(0,0,1),Vec3(0,0,1));
+        spray->AddPoints(Vec3(1,0,1),Vec3(0,0,1));
+        spray->AddPoints(Vec3(0,0,-1),Vec3(0,0,1));
         this->AddToContext(spray);
     }
 
@@ -139,7 +139,7 @@ void GLScene::Paint()
     //this->PaintHelper(spray, GL_TRIANGLES);
 
     shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
-    dragon->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
+    dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
     this->PaintHelper(dragon, GL_TRIANGLES);
 
 }
@@ -173,7 +173,7 @@ void GLScene::LoadGlobalUBOs(Matrices matrices)
     // Bind Eye Position
     shared_ptr<GLUniform> eye = this->Get<GLUniform>("Eye");
     glBindBuffer(GL_UNIFORM_BUFFER, eye->getId());
-    glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4), glm::value_ptr(glm::vec4(camera1->getCameraPosition(), 1.0f)));
+    glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(Vec4), glm::value_ptr(Vec4(camera1->getCameraPosition(), 1.0f)));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     
     // Bind Controls

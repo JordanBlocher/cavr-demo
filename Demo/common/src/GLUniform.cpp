@@ -57,11 +57,11 @@ bool GLUniform::CreateUBO(GLuint program, GLuint location, GLenum draw)
         glGetActiveUniformsiv(program, 1, &index, GL_UNIFORM_SIZE, &size);
 
         if(type == GL_FLOAT_VEC3)
-            uniformSize = sizeof(glm::vec3);
+            uniformSize = sizeof(Vec3);
         else if(type == GL_FLOAT_VEC2)
-             uniformSize = sizeof(glm::vec2);
+             uniformSize = sizeof(Vec2);
         else if(type == GL_FLOAT_VEC4)
-            uniformSize = sizeof(glm::vec4);
+            uniformSize = sizeof(Vec4);
         else if(type == GL_FLOAT_MAT4)
             uniformSize = sizeof(glm::mat4);
         else if(type == GL_FLOAT_MAT3)

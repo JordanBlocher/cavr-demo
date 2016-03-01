@@ -8,15 +8,15 @@ GLCamera::GLCamera(const char* name)
     this->name = name;
     this->projection = glm::mat4(1.0f);
     this->view = glm::mat4(1.0f);
-    this->eye_pos = glm::vec3(0.0f,0.0f, 0.0f);
+    this->eye_pos = Vec3(0.0f,0.0f, 0.0f);
 
-    this->near = glm::vec3(0.0f,0.0f,0.1f);
-    this->far = glm::vec3(0.0f,0.0f,10000.0f);
+    this->near = Vec3(0.0f,0.0f,0.1f);
+    this->far = Vec3(0.0f,0.0f,10000.0f);
 
     this->radius  = 9.0f;
     this->azimuth = M_PI/2.0;
     this->polar = M_PI/2.0;
-    this->aimTarget = glm::vec3(0.0f,0.0f,-10.0f);
+    this->aimTarget = Vec3(0.0f,0.0f,-10.0f);
 }
 
 GLCamera::~GLCamera()
@@ -92,14 +92,14 @@ void GLCamera::updateView()
     eyeY = radius * cos (polar);
     
     glm::mat4 view = (GLMath::mat4ftoGLM(cavr::gfx::getView()));
-    glm::vec3 forward = -glm::vec3(view[2].x,view[2].y,view[2].z);
-    glm::vec3 up = glm::vec3(view[1].x,view[1].y,view[1].z);
-    //glm::vec3 forward = GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getForward());
-    //glm::vec3 up = GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getUp());
-    setAimTarget(forward + glm::vec3(0,0,1000));
+    Vec3 forward = -Vec3(view[2].x,view[2].y,view[2].z);
+    Vec3 up = Vec3(view[1].x,view[1].y,view[1].z);
+    //Vec3 forward = GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getForward());
+    //Vec3 up = GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getUp());
+    setAimTarget(forward + Vec3(0,0,1000));
 
     this->view = (glm::lookAt(
-                    glm::vec3(eyeX, eyeY, eyeZ),  //eye pos
+                    Vec3(eyeX, eyeY, eyeZ),  //eye pos
                     this->aimTarget,    //focus point
                     up));  //up
 
@@ -115,7 +115,7 @@ void GLCamera::setCameraOffset(float zenith, float azimuth)
     this->updateView();
 }
 
-void GLCamera::setAimTarget(glm::vec3 aimPos)
+void GLCamera::setAimTarget(Vec3 aimPos)
 {
     this->aimTarget = aimPos;
 }
@@ -130,7 +130,7 @@ glm::mat4 GLCamera::View()
     return this->view;
 }
 
-glm::vec3 GLCamera::getCameraPosition()
+Vec3 GLCamera::getCameraPosition()
 {
     return this->eye_pos;
 }
