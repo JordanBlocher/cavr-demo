@@ -137,16 +137,16 @@ void GLScene::InitializeGL()
 void GLScene::Paint()
 {
     //Clear the screen
-    glClearColor(0.0,0.5,0.0,1.0);
+    glClearColor(0.0,0.0,0.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Choose Model
     shared_ptr<Spray> spray = this->Get<Spray>("spray");
-    this->PaintHelper(spray, GL_TRIANGLES);
+    //this->PaintHelper(spray, GL_TRIANGLES);
 
     shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
     dragon->setMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)));
-    //this->paintHelper(dragon, GL_TRIANGLES);
+    this->PaintHelper(dragon, GL_TRIANGLES);
 
 }
 

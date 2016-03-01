@@ -24,7 +24,7 @@ bool Spray::Init()
 
 bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
 {
-	if (CurrentPoints * 6 < MaxPoints)
+	if (CurrentPoints * 6 < this->maxPoints)
 	{
 		PaintStruct temp;
 		temp.position = worldPoint;

@@ -44,6 +44,7 @@ void GLModel::Allocate()
     this->e_size = 0;
     this->v_size = 0;
     this->_positions = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
+    this->_colors = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
     this->_normals = std::shared_ptr<std::vector<std::vector<glm::vec3>>>(new std::vector<std::vector<glm::vec3>>);
     this->_uvs = std::shared_ptr<std::vector<std::vector<glm::vec2>>>(new std::vector<std::vector<glm::vec2>>);
     this->_faces = std::shared_ptr<std::vector<std::vector<GLuint>>>(new std::vector<std::vector<GLuint>>);
@@ -61,6 +62,7 @@ bool GLModel::Create()
         this->_positions->at(i).clear();
         this->_normals->at(i).clear();
         this->_uvs->at(i).clear();
+        this->_colors->at(i).clear();
     }
     for(size_t i=0; i<this->_faces->size(); i++)
         this->_faces->at(i).clear();
@@ -80,6 +82,7 @@ bool GLModel::Create()
     {
         this->_faces->resize(scene->mNumMeshes);
         this->_positions->resize(scene->mNumMeshes);
+        this->_colors->resize(scene->mNumMeshes);
         this->_normals->resize(scene->mNumMeshes);
         this->_uvs->resize(scene->mNumMeshes);
         this->AddMaterials(scene->mMaterials, scene->mNumMaterials);
@@ -150,6 +153,7 @@ void GLModel::AddVertexData(const aiMesh* mesh, unsigned int index)
     this->v_size += mesh->mNumVertices;
 
     this->_positions->at(index).resize(mesh->mNumVertices);
+    this->_colors->at(index).resize(mesh->mNumVertices);
     this->_faces->at(index).resize(mesh->mNumFaces * 3);
 
     // Populate the vertex attribute vectors
@@ -158,6 +162,7 @@ void GLModel::AddVertexData(const aiMesh* mesh, unsigned int index)
         const aiVector3D* pos = &(mesh->mVertices[i]);
 
         this->_positions->at(index).at(i) = glm::vec3(pos->x, pos->y, pos->z);
+        this->_colors->at(index).at(i) = glm::vec3(0.0f, 0.0f, 0.0f);
     }
 
     // Populate the index buffer
@@ -179,6 +184,7 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
     this->v_size += mesh->mNumVertices;
 
     this->_positions->at(index).resize(mesh->mNumVertices);
+    this->_colors->at(index).resize(mesh->mNumVertices);
     this->_normals->at(index).resize(mesh->mNumVertices);
     this->_uvs->at(index).resize(mesh->mNumVertices);
     this->_faces->at(index).resize(mesh->mNumFaces * 3);
@@ -194,6 +200,7 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
         this->_positions->at(index).at(i) = glm::vec3(pos->x, pos->y, pos->z);
         this->_normals->at(index).at(i) = glm::vec3(norm->x, norm->y, norm->z);
         this->_uvs->at(index).at(i) = glm::vec2(uv->x, uv->y);
+        this->_colors->at(index).at(i) = glm::vec3(0.0f, 0.0f, 0.0f);
     }
 
     // Populate the index buffer
@@ -307,7 +314,6 @@ void GLModel::CreateVBOs()
         glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
-
     GLBufferObject vbo_norms("vbo_normals",
             sizeof(glm::vec3),
             this->v_size,
@@ -325,8 +331,7 @@ void GLModel::CreateVBOs()
         glVertexAttribPointer( NORM_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
-
-    GLBufferObject vbo_uvs("vbotextures",
+    GLBufferObject vbo_uvs("vbo_textures",
             sizeof(glm::vec2),
             this->v_size,
             GL_ARRAY_BUFFER,
@@ -343,8 +348,26 @@ void GLModel::CreateVBOs()
         glEnableVertexAttribArray(UV_INDEX);
         glVertexAttribPointer( UV_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
     }
+    
+    GLBufferObject vbo_colors("vbo_colors",
+            sizeof(glm::vec3),
+            this->v_size,
+            GL_ARRAY_BUFFER,
+            GL_STATIC_DRAW);
+    offset = 0;
+    for(size_t i=0; i<this->_positions->size(); i++)
+    {
+        vbo_uvs.LoadSubData(offset, 2, this->_colors->at(i));
+        offset += this->_positions->at(i).size();
+    }
 
-    GLBufferObject vbo_elements("vboelements",
+    if( this->attributes > COLOR_INDEX)
+    {
+        glEnableVertexAttribArray(COLOR_INDEX);
+        glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+
+    GLBufferObject vbo_elements("vbo_elements",
             sizeof(GLuint),
             this->e_size,
             GL_ELEMENT_ARRAY_BUFFER,
@@ -432,6 +455,7 @@ void GLModel::LoadUBO(std::shared_ptr<GLUniform> ubo, GLModel::UBO rtype)
         }
 
     }
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 }
 
@@ -484,5 +508,6 @@ glm::vec4 GLModel::Position()
 {
     return  glm::vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
 }
+
 
 

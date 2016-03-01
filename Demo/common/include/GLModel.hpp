@@ -64,6 +64,7 @@ class GLModel : public GLNode
     std::string filename;
 
     std::shared_ptr<std::vector<std::vector<glm::vec3>>> _positions;
+    std::shared_ptr<std::vector<std::vector<glm::vec3>>> _colors;
     std::shared_ptr<std::vector<std::vector<glm::vec3>>> _normals;
     std::shared_ptr<std::vector<std::vector<glm::vec2>>> _uvs;
     std::shared_ptr<std::vector<std::vector<GLuint>>> _faces;
@@ -77,7 +78,7 @@ class GLModel : public GLNode
 
     glm::mat4 matrix;
     GLuint vao;
-    GLuint vbo[4];
+    GLuint vbo[5];
     GLuint attributes;
 
 };

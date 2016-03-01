@@ -37,7 +37,6 @@ class Spray : public GLPrimitive
 
 private:
 	int CurrentPoints;
-	int MaxPoints;
 
 	string fShader;
 	string vShader;
