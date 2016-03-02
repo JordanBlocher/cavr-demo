@@ -121,6 +121,16 @@ void update()
         CAM_DIRECTION = GLCamera::CamDirection::Backward;
     else
         CAM_DIRECTION = GLCamera::CamDirection::Nop;
+
+    // Get the emulated sixdof and update its position
+    auto headPosition = cavr::input::getSixDOF("glass")->getPosition();
+    auto emulated = cavr::input:: getSixDOF("emulated");
+    auto emulatedMatrix = emulated->getMatrix();
+
+    // I really wish there was a set position
+    emulatedMatrix[3].xyz = headPosition;
+    emulated->setState(emulatedMatrix);
+    
 }
 
 int main(int argc, char** argv) 
@@ -158,12 +168,19 @@ int main(int argc, char** argv)
   //input_map.button_map["pick"] = "vrpn[WiiMote0[3]]";
 
   input_map.sixdof_map["glass"] = "vrpn[TallGlasses[0]]";
+  input_map.sixdof_map["emulated"] = "emulated";
+
   
   if (!cavr::System::init(argc, argv, &input_map)) {
     LOG(ERROR) << "Failed to initialize cavr.";
     return -1;
   }
+  auto emulated = cavr::input:: getSixDOF("glass");
+  auto emulatedMatrix = emulated->getMatrix();
 
+  // I really wish there was a set position
+  emulatedMatrix[3].xyz = cavr::math::vec3f(0,1,0);
+  emulated->setState(emulatedMatrix);
   LOG(INFO) << "Successfully initialized cavr.";
   LOG(INFO) << "Callbacks set.";
   LOG(INFO) << "Starting simulation.";

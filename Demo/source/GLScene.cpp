@@ -117,13 +117,14 @@ void GLScene::InitializeGL()
 
     // Init a spray
     shared_ptr<Spray> spray (new Spray());
-
+    cout << "NEW SPRAY" << endl;
     if(spray->Init())
     {
-        spray->AddPoints(Vec3(0,0,0),Vec3(0,0,1));
-        spray->AddPoints(Vec3(0,0,1),Vec3(0,0,1));
-        spray->AddPoints(Vec3(1,0,1),Vec3(0,0,1));
-        spray->AddPoints(Vec3(0,0,-1),Vec3(0,0,1));
+        cout << "NEW SPRAY INSIDE" << endl;
+        spray->AddPoints(glm::vec3(0,0,0),glm::vec3(1,1,1));
+        spray->AddPoints(glm::vec3(0,0,1),glm::vec3(1,1,1));
+        spray->AddPoints(glm::vec3(1,0,1),glm::vec3(1,1,1));
+        spray->AddPoints(glm::vec3(0,0,-1),glm::vec3(1,1,1));
         this->AddToContext(spray);
     }
 
@@ -149,6 +150,7 @@ void GLScene::Paint()
     dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
     //this->PaintHelper(dragon, GL_TRIANGLES);
     dragon->LoadUBO(texuniform, UBO::TEXTURE);
+    this->PaintHelper(spray, GL_TRIANGLES);
 
     shared_ptr<GLPrimitive> plane = this->Get<GLPrimitive>("plane");
     plane->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));

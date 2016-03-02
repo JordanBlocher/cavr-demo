@@ -254,7 +254,6 @@ void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform>, UBO)
 {
 }
 
-
 void GLPrimitive::Draw(GLenum MODE)
 {
     LoadVAO();

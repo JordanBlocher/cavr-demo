@@ -37,8 +37,5 @@ class Spray : public GLPrimitive
 
 private:
 	int CurrentPoints;
-
-	string fShader;
-	string vShader;
 	vector<PaintStruct> Points;
 };

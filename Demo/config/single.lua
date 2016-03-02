@@ -3,20 +3,21 @@ sim_window = {
   view = {
     simulator_view = true;
   };
-fullscreen = true;
+fullscreen = false;
 };
 
+-- Use a emulated a sixdof
 perspective_window = {
   view = {
     eyes = {
-      eye = cavr.sixdof("vrpn[TallGlass[0]]");
+      eye = cavr.sixdof("emulated");
       --left_eye = cavr.sixdof("vrpn[TallGlass[[0]]");
       --right_eye = cavr.sixdof("vrpn[TallGlass[[0]]");
       --stereo ="mono";
     };
-    lower_left = cavr.sixdof("vrpn[TallGlass[0]]") * cavr.translate(-1, -1, -1);
-    lower_right = cavr.sixdof("vrpn[TallGlass[0]]") * cavr.translate(1, -1, -1);
-    upper_left = cavr.sixdof("vrpn[TallGlass[0]]") * cavr.translate(-1, 1, -1);
+    lower_left = cavr.sixdof("emulated") * cavr.translate(-1, -1, -1);
+    lower_right = cavr.sixdof("emulated") * cavr.translate(1, -1, -1);
+    upper_left = cavr.sixdof("emulated") * cavr.translate(-1, 1, -1);
   };
   fullscreen = true;
 };

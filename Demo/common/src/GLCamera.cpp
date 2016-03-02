@@ -105,7 +105,7 @@ void GLCamera::updateView()
 
     //std::cout<<"polar "<<polar<<" azimuth "<<azimuth<<" radius "<<radius<<'\n';
     //std::cout<< "eye pos "<<eyeX<<" "<< eyeY<< " " <<eyeZ <<'\n';
-    
+    this->view = view*this->view; 
 }
 
 void GLCamera::setCameraOffset(float zenith, float azimuth)
