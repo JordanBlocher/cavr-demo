@@ -287,92 +287,6 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
     }
 }
 
-void GLModel::CreateVBOs()
-{
-    //Create VBOs 
-    GLBufferObject vbo_pos("vbo_positions",
-            sizeof(Vec3),
-            this->v_size,
-            GL_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
-    size_t offset = 0;
-    for(size_t i=0; i<this->_positions->size(); i++)
-    {
-        vbo_pos.LoadSubData(offset, 0, this->_positions->at(i));
-        offset += this->_positions->at(i).size();
-    }
-    if( this->attributes > V_INDEX)
-    {
-        glEnableVertexAttribArray(V_INDEX);
-        glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-
-    GLBufferObject vbo_norms("vbo_normals",
-            sizeof(Vec3),
-            this->v_size,
-            GL_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
-    offset = 0;
-    for(size_t i=0; i<this->_positions->size(); i++)
-    {
-        vbo_norms.LoadSubData(offset, 1, this->_normals->at(i));
-        offset += this->_positions->at(i).size();
-    }
-    if( this->attributes > NORM_INDEX)
-    {
-        glEnableVertexAttribArray(NORM_INDEX);
-        glVertexAttribPointer( NORM_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-
-    GLBufferObject vbo_uvs("vbo_textures",
-            sizeof(Vec2),
-            this->v_size,
-            GL_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
-    offset = 0;
-    for(size_t i=0; i<this->_positions->size(); i++)
-    {
-        vbo_uvs.LoadSubData(offset, 2, this->_uvs->at(i));
-        offset += this->_positions->at(i).size();
-    }
-
-    if( this->attributes > UV_INDEX)
-    {
-        glEnableVertexAttribArray(UV_INDEX);
-        glVertexAttribPointer( UV_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-    
-    GLBufferObject vbo_colors("vbo_colors",
-            sizeof(Vec3),
-            this->v_size,
-            GL_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
-    offset = 0;
-    for(size_t i=0; i<this->_positions->size(); i++)
-    {
-        vbo_uvs.LoadSubData(offset, 2, this->_colors->at(i));
-        offset += this->_positions->at(i).size();
-    }
-
-    if( this->attributes > COLOR_INDEX)
-    {
-        glEnableVertexAttribArray(COLOR_INDEX);
-        glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-
-    GLBufferObject vbo_elements("vbo_elements",
-            sizeof(GLuint),
-            this->e_size,
-            GL_ELEMENT_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
-    offset = 0;
-    for(size_t i=0; i<this->_faces->size(); i++)
-    {
-        vbo_elements.LoadSubData(offset, 0, this->_faces->at(i));
-        offset += this->_faces->at(i).size();
-    }
-}
-
 
 void GLModel::Draw(GLenum MODE)
 {
@@ -453,41 +367,6 @@ class GLUniform;
 
 }
 
-void GLModel::SetColor(Vec4 diffuse)
-{
-    this->materials->at(this->mtlIndices.at(0)).second.diffuse = diffuse;
-}
-
-Vec4 GLModel::GetColor()
-{
-    return this->materials->at(this->mtlIndices.at(0)).second.diffuse;
-}
-
-size_t GLModel::numFaces()
-{
-    return this->e_size;
-}
-
-size_t GLModel::numVertices()
-{
-    return this->v_size;
-}
-
-size_t GLModel::Size()
-{
-    return this->_faces->size();
-}
-
-const std::vector<Vec3>& GLModel::Positions(size_t index)
-{
-    return this->_positions->at(index);
-}
-
-const std::vector<GLuint>& GLModel::Faces(size_t index)
-{
-    return this->_faces->at(index);
-}
-
 void GLModel::setMatrix(glm::mat4 m)
 {
     this->matrix = m;
@@ -503,5 +382,12 @@ Vec4 GLModel::Position()
     return  Vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
 }
 
+void GLModel::SetColor(Vec4 diffuse)
+{
+    this->materials->at(this->mtlIndices.at(0)).second.diffuse = diffuse;
+}
 
-
+Vec4 GLModel::GetColor()
+{
+    return this->materials->at(this->mtlIndices.at(0)).second.diffuse;
+}

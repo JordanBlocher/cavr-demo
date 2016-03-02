@@ -28,9 +28,7 @@ class GLModel : public GLMesh
     virtual void Draw(GLenum);
     virtual void DrawToFBO(std::shared_ptr<GLFrame>);
 
-    virtual size_t numVertices();
-    virtual size_t numFaces();
-    virtual size_t Size();
+
     virtual void SetColor(Vec4);
     virtual Vec4 GetColor();
 
@@ -44,7 +42,6 @@ class GLModel : public GLMesh
 
  protected:
     virtual void Allocate();
-    virtual void CreateVBOs();
     void AddAttributeData(const aiMesh*, unsigned int);
     void AddVertexData(const aiMesh*, unsigned int);
     void AddMaterials(aiMaterial**, unsigned int);

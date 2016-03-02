@@ -14,11 +14,11 @@ Spray::~Spray()
 
 bool Spray::Init()
 {
-    
     this->positions->resize(this->maxPoints);
     this->normals->resize(this->maxPoints);
+    this->colors->resize(this->maxPoints);
     this->uvs->resize(this->maxPoints);
-    GLPrimitive::Create();
+    GLMesh::Create();
 }
 
 bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
@@ -37,9 +37,7 @@ bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
 	{
 		cout << "ADD TWO" << endl;
 
-		// Add the points at the current position in the buffer
-		vector<Vec3> pos = vector<Vec3>();
-		std::vector<Vec3> colors = std::vector<Vec3>();
+		// Add the points at the current positionsition in the buffer
 		Vec3 one;
 		Vec3 two;
 		Vec3 three;
@@ -59,28 +57,24 @@ bool Spray::AddPoints(vec3 worldPoint,vec3 Color)
 		threeColor = Points[Points.size() - 1].color;
 		fourColor = Points[Points.size() - 2].color;
 
+		positions->push_back(one);
+		positions->push_back(three);
+		positions->push_back(two);
 
+		colors->push_back(oneColor);
+		colors->push_back(threeColor);
+		colors->push_back(twoColor);
 
+		positions->push_back(one);
+		positions->push_back(two);
+		positions->push_back(four); 
 
+		colors->push_back(oneColor);
+		colors->push_back(twoColor);
+		colors->push_back(fourColor); 
 
-		pos.push_back(one);
-		pos.push_back(three);
-		pos.push_back(two);
-
-		colors.push_back(oneColor);
-		colors.push_back(threeColor);
-		colors.push_back(twoColor);
-
-		pos.push_back(one);
-		pos.push_back(two);
-		pos.push_back(four); 
-
-		colors.push_back(oneColor);
-		colors.push_back(twoColor);
-		colors.push_back(fourColor); 
-
-		vbo_pos.LoadSubData((CurrentPoints-2)*6, 0, (pos) );
-		vbo_color.LoadSubData((CurrentPoints-2)*6, 3, (colors) );
+		vbo_pos.LoadSubData((CurrentPoints-2)*6, 0, (*positions) );
+		vbo_color.LoadSubData((CurrentPoints-2)*6, 3, (*colors) );
 
 		return true;
 	}
@@ -113,7 +107,8 @@ void Spray::Draw(GLenum drawmode)
     GLint vertex_offset = 0;
     glBindVertexArray(vao);
 
-    glDrawArrays(drawmode,0,CurrentPoints*6);
+    //glDrawArrays(drawmode,0,CurrentPoints*6);
+    glDrawArrays(drawmode, 0, positions->size());
 
     glBindVertexArray(0);
 }

@@ -3,6 +3,9 @@
 
 GLMesh::GLMesh(const char* name) : GLNode(name)
 {
+    this->index = 0;
+    this->e_size = 0;
+    this->v_size = 0;
     this->Allocate();
 }
 
@@ -34,6 +37,23 @@ void GLMesh::Allocate()
     this->colors = std::make_shared<std::vector<Vec3>>(this->_colors->at(0));
     this->uvs = std::make_shared<std::vector<glm::ivec2>>(this->_uvs->at(0));
     this->faces = std::make_shared<std::vector<GLuint>>(this->_faces->at(0));
+}
+
+void GLMesh::AddMesh()
+{
+    this->index += 1;
+    this->e_size += this->faces->size()*3;
+    this->v_size += this->positions->size();
+    this->_positions->resize(this->_positions->size() + 1);
+    this->_normals->resize(this->_normals->size() + 1);
+    this->_colors->resize(this->_colors->size() + 1);
+    this->_uvs->resize(this->_uvs->size() + 1);
+    this->_faces->resize(this->_faces->size() + 1);
+    this->positions = std::make_shared<std::vector<Vec3>>(this->_positions->at(index));
+    this->normals = std::make_shared<std::vector<Vec3>>(this->_normals->at(index));
+    this->colors = std::make_shared<std::vector<Vec3>>(this->_colors->at(index));
+    this->uvs = std::make_shared<std::vector<glm::ivec2>>(this->_uvs->at(index));
+    this->faces = std::make_shared<std::vector<GLuint>>(this->_faces->at(index));
 }
 
 void GLMesh::AddTriangle(Vec3 v0, Vec3 v1, Vec3 v2)
@@ -147,4 +167,130 @@ Vec2 GLMesh::InterpolateV(Vec2 start, Vec2 stop, int counter, int total)
 {
     return Vec2(start.x, (stop.y - start.y) * counter / total + start.y);
 }
+
+bool GLMesh::Create()
+{
+    //Create the VAO
+    glGenVertexArrays(1, &(this->vao));
+    glBindVertexArray(this->vao);
+
+    this->CreateVBOs();
+
+    //Unbind the VAO
+    glBindVertexArray(0);
+
+    return true; 
+}
+
+void GLMesh::CreateVBOs()
+{
+    //Create VBOs 
+    GLBufferObject vbo_pos("vbo_positions",
+            sizeof(Vec3),
+            this->v_size,
+            GL_ARRAY_BUFFER,
+            GL_STATIC_DRAW);
+    size_t offset = 0;
+    for(size_t i=0; i<this->_positions->size(); i++)
+    {
+        vbo_pos.LoadSubData(offset, 0, this->_positions->at(i));
+        offset += this->_positions->at(i).size();
+    }
+    if( this->attributes > V_INDEX)
+    {
+        glEnableVertexAttribArray(V_INDEX);
+        glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+
+    GLBufferObject vbo_norms("vbo_normals",
+            sizeof(Vec3),
+            this->v_size,
+            GL_ARRAY_BUFFER,
+            GL_STATIC_DRAW);
+    offset = 0;
+    for(size_t i=0; i<this->_positions->size(); i++)
+    {
+        vbo_norms.LoadSubData(offset, 1, this->_normals->at(i));
+        offset += this->_positions->at(i).size();
+    }
+    if( this->attributes > NORM_INDEX)
+    {
+        glEnableVertexAttribArray(NORM_INDEX);
+        glVertexAttribPointer( NORM_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+
+    GLBufferObject vbo_uvs("vbo_textures",
+            sizeof(Vec2),
+            this->v_size,
+            GL_ARRAY_BUFFER,
+            GL_STATIC_DRAW);
+    offset = 0;
+    for(size_t i=0; i<this->_positions->size(); i++)
+    {
+        vbo_uvs.LoadSubData(offset, 2, this->_uvs->at(i));
+        offset += this->_positions->at(i).size();
+    }
+
+    if( this->attributes > UV_INDEX)
+    {
+        glEnableVertexAttribArray(UV_INDEX);
+        glVertexAttribPointer( UV_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+    
+    GLBufferObject vbo_colors("vbo_colors",
+            sizeof(Vec3),
+            this->v_size,
+            GL_ARRAY_BUFFER,
+            GL_STATIC_DRAW);
+    offset = 0;
+    for(size_t i=0; i<this->_positions->size(); i++)
+    {
+        vbo_uvs.LoadSubData(offset, 3, this->_colors->at(i));
+        offset += this->_positions->at(i).size();
+    }
+
+    if( this->attributes > COLOR_INDEX)
+    {
+        glEnableVertexAttribArray(COLOR_INDEX);
+        glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    }
+
+    GLBufferObject vbo_elements("vbo_elements",
+            sizeof(GLuint),
+            this->e_size,
+            GL_ELEMENT_ARRAY_BUFFER,
+            GL_STATIC_DRAW);
+    offset = 0;
+    for(size_t i=0; i<this->_faces->size(); i++)
+    {
+        vbo_elements.LoadSubData(offset, 0, this->_faces->at(i));
+        offset += this->_faces->at(i).size();
+    }
+}
+
+size_t GLMesh::numFaces()
+{
+    return this->e_size;
+}
+
+size_t GLMesh::numVertices()
+{
+    return this->v_size;
+}
+
+size_t GLMesh::Size()
+{
+    return this->_faces->size();
+}
+
+const std::vector<Vec3>& GLMesh::Positions(size_t index)
+{
+    return this->_positions->at(index);
+}
+
+const std::vector<GLuint>& GLMesh::Faces(size_t index)
+{
+    return this->_faces->at(index);
+}
+
 

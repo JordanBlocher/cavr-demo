@@ -16,9 +16,6 @@ class GLTexture : GLNode
     bool Load();
     void Bind(GLenum);
 
-    Material material;
-    Vec3 color;
-
 protected:
     Magick::Image* image;
     Magick::Blob blob;

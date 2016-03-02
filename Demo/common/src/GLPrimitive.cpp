@@ -14,6 +14,9 @@ GLPrimitive::GLPrimitive(const char* name, GLuint attributes, long maxPoints) : 
 {
     this->maxPoints = maxPoints;
     this->attributes = attributes;
+    this->index = 0;
+    
+    GLMesh::Allocate();
     this->Allocate();
 }
 
@@ -21,11 +24,20 @@ GLPrimitive::GLPrimitive(const char* name, const char* typeName, GLuint attribut
 {
     this->maxPoints = maxPoints;
     this->attributes = attributes;
+    this->index = 0;
+    
+    GLMesh::Allocate();
     this->Allocate();
 }
 
 GLPrimitive::~GLPrimitive()
 {
+}
+
+void GLPrimitive::Allocate()
+{
+    this->materials = std::shared_ptr<std::vector<Material>>(new std::vector<Material>);
+    this->textures = std::shared_ptr<std::vector<GLTexture>>(new std::vector<GLTexture>);
 }
 
 bool GLPrimitive::AddUVSphere(int nlats, int nlongs)
@@ -63,6 +75,8 @@ bool GLPrimitive::AddUVSphere(int nlats, int nlongs)
         previousOffset = offset;
         uvPreviousOffset = uvOffset;
     }
+
+    AddMesh();
 }
 
 
@@ -75,6 +89,8 @@ bool GLPrimitive::AddCircle(double radius, double zlocation, double znormal, int
     this->normals->push_back(Vec3(0, 0, znormal));
 
     AddTriangleFan(offset, offset + npoints, npoints, fliporder);
+
+    AddMesh();
 }
 
 void GLPrimitive::AddPlane(double width, double height, double znormal, int textureRepeats)
@@ -105,13 +121,14 @@ void GLPrimitive::AddPlane(double width, double height, double znormal, int text
     this->faces->push_back(currentVertex + 0);
     this->faces->push_back(currentVertex + 2);
     this->faces->push_back(currentVertex + 1);
+
+    AddMesh();
 }
 
 bool GLPrimitive::AddSphere(int num_lats, int num_lons)
 {
     // A Thanks to Roger Hoang
     int face_ind = 0;
-
     float rads_per_lat = M_PI / float(num_lats);
     float rads_per_lon = 2.0 * M_PI / float(num_lons);
     for (int lat = 0; lat < num_lats; ++lat) 
@@ -171,7 +188,8 @@ bool GLPrimitive::AddSphere(int num_lats, int num_lons)
             uvs->push_back(Vec2(0,0));
         }
     }
-    v_size = uvs->size();
+    
+    AddMesh();
     return true;
 }
 
@@ -180,120 +198,68 @@ bool GLPrimitive::AddCylinder()
     return true;
 }
 
-bool GLPrimitive::Create()
+void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
 {
-    //Create the VAO
-    glGenVertexArrays(1, &(this->vao));
-    glBindVertexArray(this->vao);
+    bool texture, bump;
 
-    this->CreateVBOs();
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo->getId());
 
-    //Unbind the VAO
-    glBindVertexArray(0);
+    for(size_t i=0; i< this->_faces->size(); i++)
+    {   
 
-    return true;
-}
+        //bump = this->bumpmap;
+        if(rtype == UBO::TEXTURE && this->textures->size() > 0)
+            this->textures->at(0).Bind(GL_TEXTURE0);
+        //if(rtype == UBO::BUMP && bump)
+         //   this->bumpmap.Bind(GL_TEXTURE1);
+        if(rtype == UBO::COLOR && this->materials->size() > 0)
+        {
+            glBufferSubData(GL_UNIFORM_BUFFER,
+                        0,
+                        sizeof(this->materials->at(0)),
+                        &(this->materials->at(0)) );
+        }
 
-void GLPrimitive::CreateVBOs()
-{
-    this->vbo_pos = GLBufferObject("vbopositions",
-            sizeof(Vec3),
-            maxPoints,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
-    if( this->attributes > V_INDEX)
-    {
-        glEnableVertexAttribArray(V_INDEX);
-        glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
-
-     this->vbo_norm = GLBufferObject("vbonormals",
-            sizeof(Vec3),
-            maxPoints,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
-    if( this->attributes > NORM_INDEX)
-    {
-        glEnableVertexAttribArray(NORM_INDEX);
-        glVertexAttribPointer( NORM_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-
-    this->vbo_tex = GLBufferObject("vbotextures",
-            sizeof(Vec2),
-            maxPoints,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
-    if( this->attributes > UV_INDEX)
-    {
-        glEnableVertexAttribArray(UV_INDEX);
-        glVertexAttribPointer( UV_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-
-    this->vbo_color = GLBufferObject("vbocolors",
-            sizeof(Vec3),
-            maxPoints,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
-
-    if( this->attributes > COLOR_INDEX)
-    {
-        glEnableVertexAttribArray(COLOR_INDEX);
-        glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-
-
-    this->vbo_elements = GLBufferObject("vboelements",
-            sizeof(GLuint),
-            maxPoints,
-            GL_ELEMENT_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
-
-}
-
-void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform>, UBO)
-{
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void GLPrimitive::Draw(GLenum MODE)
 {
-    LoadVAO();
     GLint face_offset = 0;
     GLint vertex_offset = 0;
     glBindVertexArray(this->vao);
-        
-    /*
-    glDrawElements(MODE, 
-            this->faces->size(),
-            GL_UNSIGNED_INT,
-            (void*)(sizeof(GLuint) * face_offset));
-            */
-    glDrawArrays(MODE,0,this->positions->size());
+
+    //Draw Model 
+    //for(size_t i=0; i< this->_faces->size(); i++)
+    for(size_t i=0; i< this->_positions->size(); i++)
+    {   
+        /*
+        glDrawElementsBaseVertex(MODE, 
+                this->_faces->at(i).size(),
+                GL_UNSIGNED_INT,
+                (void*)(sizeof(GLuint) * face_offset),
+                vertex_offset);
+                */
+
+        glDrawArrays(MODE, vertex_offset,this->_positions->size());
+
+        face_offset += this->_faces->at(i).size();
+        vertex_offset += this->_positions->at(i).size();
+    }
 
     glBindVertexArray(0);
 }
 
-void GLPrimitive::LoadVAO()
+
+void GLPrimitive::AddTexture(std::shared_ptr<GLTexture> tex)
 {
-    vbo_pos.LoadSubData(0, 0, *(this->positions.get()));
-    vbo_norm.LoadSubData(0, 1, *(this->normals.get()));
-    vbo_color.LoadSubData(0, 2, *(this->colors.get()));
-    vbo_tex.LoadSubData(0, 3, *(this->uvs.get()));
-    vbo_elements.LoadSubData(0, 0, *(this->faces.get()));
+   this->textures->push_back(*tex); 
 }
 
-size_t GLPrimitive::numFaces()
+void GLPrimitive::AddMaterial(Material mat)
 {
-    return this->faces->size();
-}
-
-size_t GLPrimitive::numVertices()
-{
-    return this->positions->size();
-}
-
-size_t GLPrimitive::Size()
-{
-    return this->faces->size();
+    this->materials->at(index) = mat;
 }
 
 void GLPrimitive::setMatrix(glm::mat4 m)
@@ -308,7 +274,17 @@ glm::mat4 GLPrimitive::Matrix()
 
 Vec4 GLPrimitive::Position()
 {
-    return  Vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
+    return Vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
 }
 
+void GLPrimitive::SetColor(Vec3 diffuse)
+{
+    this->colors->clear();
+    for (int i=0; i<this->positions->size(); i++)
+        this->colors->push_back(diffuse);
+}
 
+Vec3 GLPrimitive::GetColor()
+{
+    return this->colors->at(0);
+}

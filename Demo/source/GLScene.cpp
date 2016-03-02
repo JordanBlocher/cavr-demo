@@ -128,10 +128,17 @@ void GLScene::InitializeGL()
         this->AddToContext(spray);
     }
 
-    shared_ptr<GLPrimitive> plane(new GLPrimitive("plane", 5, 10000));
-    plane->AddPlane(1000, 1000, 1, 1);
-    plane->AddUVSphere(20, 20);
-    this->AddToContext(plane);
+    shared_ptr<GLTexture> tex(new GLTexture("gold", GL_TEXTURE_2D, "models/gold.jpg"));
+    tex->Load();
+    shared_ptr<GLPrimitive> primitive(new GLPrimitive("primitive", 6, 10000));
+    primitive->AddPlane(1000, 1000, 1, 1);
+    primitive->SetColor(Vec3(0,0,1));
+    primitive->AddUVSphere(20, 20);
+    primitive->AddTexture(tex);
+    primitive->SetColor(Vec3(1,0,0));
+    primitive->Create();
+    this->AddToContext(primitive);
+
     
 }
 
@@ -145,16 +152,12 @@ void GLScene::Paint()
     shared_ptr<Spray> spray = this->Get<Spray>("spray");
     //this->PaintHelper(spray, GL_TRIANGLES);
     
-    shared_ptr<GLUniform> texuniform = this->Get<GLUniform>("Texture");
     shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
     dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
-    //this->PaintHelper(dragon, GL_TRIANGLES);
-    dragon->LoadUBO(texuniform, UBO::TEXTURE);
-    this->PaintHelper(spray, GL_TRIANGLES);
+    this->PaintHelper(dragon, GL_TRIANGLES);
 
-    shared_ptr<GLPrimitive> plane = this->Get<GLPrimitive>("plane");
-    plane->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
-    this->PaintHelper(plane, GL_TRIANGLES);
+    shared_ptr<GLPrimitive> primitive = this->Get<GLPrimitive>("primitive");
+    this->PaintHelper(primitive, GL_TRIANGLES);
 }
 
 void GLScene::LoadGlobalUBOs(Matrices matrices)
