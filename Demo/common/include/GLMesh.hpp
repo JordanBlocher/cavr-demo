@@ -34,7 +34,7 @@ class GLMesh : public GLNode
     const std::vector<Vec3>& Positions(size_t);
     const std::vector<GLuint>& Faces(size_t);
 
-    int AddCircle(int, double, double, double, Vec2, Vec2);
+    int AddCircle(int, double, double, double, Vec2 uv0=Vec2(0), Vec2 uv1=Vec2(1));
     void AddTriangleStrip(int, int, int, bool);
     void AddTriangleSurface(int, int, int, bool, bool);
     void AddTriangleFan(int, int, int, bool);

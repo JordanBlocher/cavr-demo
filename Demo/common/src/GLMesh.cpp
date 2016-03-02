@@ -50,16 +50,18 @@ void GLMesh::AddTriangle(Vec3 v0, Vec3 v1, Vec3 v2, Vec3 normal, int cnt)
     this->positions->push_back(v0);
     this->positions->push_back(v1);
     this->positions->push_back(v2);
+    this->uvs->push_back(Vec2(0,0));
+    this->uvs->push_back(Vec2(1,1));
+    this->uvs->push_back(Vec2(1,0));
     this->normals->push_back(normal);
     this->normals->push_back(normal);
     this->normals->push_back(normal);
     this->faces->push_back(cnt);
     this->faces->push_back(cnt+1);
     this->faces->push_back(cnt+2);
-
 }
 
-int GLMesh::AddCircle(int nvertices, double radius, double zcoord, double znormal = 0.0, Vec2 uvStart = Vec2(0.0f), Vec2 uvEnd = Vec2(1.0f))
+int GLMesh::AddCircle(int nvertices, double radius, double zcoord, double znormal, Vec2 uvStart, Vec2 uvEnd)
 {
     int ret = this->positions->size();
     for (int a = 0; a < nvertices; a++)

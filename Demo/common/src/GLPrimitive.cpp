@@ -65,6 +65,48 @@ bool GLPrimitive::LoadUVSphere(int nlats, int nlongs)
     }
 }
 
+
+bool GLPrimitive::LoadCircle(double radius, double zlocation, double znormal, int npoints, bool fliporder)
+{
+    npoints = (npoints - 1);
+
+    int offset = AddCircle(npoints, radius, zlocation, znormal);
+    this->positions->push_back(Vec3(0, 0, zlocation));
+    this->normals->push_back(Vec3(0, 0, znormal));
+
+    AddTriangleFan(offset, offset + npoints, npoints, fliporder);
+}
+
+void GLPrimitive::LoadPlane(double width, double height, double znormal, int textureRepeats)
+{
+    width *= 0.5;
+    height *= 0.5;
+    int currentVertex = this->positions->size();
+
+    this->positions->push_back(Vec3(-width, height, 0));
+    this->normals->push_back(Vec3(0, 0, znormal));
+    this->uvs->push_back(Vec2(0, textureRepeats));
+ 
+    this->positions->push_back(Vec3(width, height, 0));
+    this->normals->push_back(Vec3(0, 0, znormal));
+    this->uvs->push_back(Vec2(textureRepeats, textureRepeats));
+    
+    this->positions->push_back(Vec3(width, -height, 0));
+    this->normals->push_back(Vec3(0, 0, znormal));
+    this->uvs->push_back(Vec2(textureRepeats, 0));
+    
+    this->positions->push_back(Vec3(-width, -height, 0));
+    this->normals->push_back(Vec3(0, 0, znormal));
+    this->uvs->push_back(Vec2(0, 0));
+    
+    this->faces->push_back(currentVertex + 2);
+    this->faces->push_back(currentVertex + 0);
+    this->faces->push_back(currentVertex + 3);
+    this->faces->push_back(currentVertex + 0);
+    this->faces->push_back(currentVertex + 2);
+    this->faces->push_back(currentVertex + 1);
+}
+
 bool GLPrimitive::LoadSphere(int num_lats, int num_lons)
 {
     // A Thanks to Roger Hoang

@@ -20,8 +20,10 @@ class GLPrimitive : public GLMesh
 
     virtual bool Create();
     //virtual void LoadUBO(std::shared_ptr<GLUniform>, UBO);
-    bool LoadSphere(int num_lats, int num_longs);
-    bool LoadUVSphere(int nlats, int nlongs);
+    bool LoadSphere(int, int);
+    bool LoadUVSphere(int, int);
+    bool LoadCircle(double, double, double, int, bool);
+    void LoadPlane(double, double, double, int);
     bool LoadCylinder();
     //bool LoadCube();
 
