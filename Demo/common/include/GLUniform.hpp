@@ -2,12 +2,12 @@
 #define GLUNIFORM_H
 
 #include "GLNode.hpp"
-#include "GLBufferObject.hpp"
-#include "GLStruct.hpp"
 
 #include <vector>
 #include <map>
 #include <GL/glew.h>
+
+enum class UBO {COLOR, TEXTURE, BUMP};
 
 class GLUniform : public GLNode
 {
@@ -25,8 +25,6 @@ class GLUniform : public GLNode
     std::map<std::string,Uniform> uniforms;
     GLuint block;
     GLuint location;
-
-
 };
 
 #endif 

@@ -8,18 +8,16 @@
 #include <climits>
 #include <Magick++.h>
 
-#include "GLNode.hpp"
 #include "GLFrame.hpp"
 #include "GLMesh.hpp"
+#include "GLUniform.hpp"
 
-class GLUniform;
 class GLTexture;
 
 class GLModel : public GLMesh
 {
  
  public:
-    enum class UBO {COLOR, TEXTURE, BUMP};
     GLModel(const char*, const char*, const GLuint);
     GLModel(const char*, const char*);
     ~GLModel();

@@ -58,6 +58,7 @@ class GLMesh : public GLNode
 	GLBufferObject vbo_tex;
 	GLBufferObject vbo_norm;
 	GLBufferObject vbo_color;
+	GLBufferObject vbo_elements;
 
     spvec3 positions;
     spvec3 colors;

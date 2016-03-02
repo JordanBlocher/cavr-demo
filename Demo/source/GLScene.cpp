@@ -11,6 +11,7 @@
 #include <GLEmissive.hpp>
 #include <Spray.hpp>
 #include <GLScene.hpp>
+#include <GLPrimitive.hpp>
 #include <cavr/cavr.h>
 #include <cavr/gfx/renderer.h>
 #include <cavr/gfx/ray.h>
@@ -59,7 +60,7 @@ void GLScene::InitializeGL()
     //Add Shaders
     program->AddShader(vertex); 
     program->AddShader(fragment); 
-    program->SetAttributeIndex("v_position", 0);
+    program->SetAttributeIndex("/v_position", 0);
     program->SetAttributeIndex("v_normal", 1);
     program->SetAttributeIndex("v_uv", 2);
 
@@ -126,6 +127,11 @@ void GLScene::InitializeGL()
         this->AddToContext(spray);
     }
 
+    shared_ptr<GLPrimitive> plane(new GLPrimitive("plane", 5, 10000));
+    plane->AddPlane(1000, 1000, 1, 1);
+    plane->AddUVSphere(20, 20);
+    this->AddToContext(plane);
+    
 }
 
 void GLScene::Paint()
@@ -137,11 +143,16 @@ void GLScene::Paint()
     //Choose Model
     shared_ptr<Spray> spray = this->Get<Spray>("spray");
     //this->PaintHelper(spray, GL_TRIANGLES);
-
+    
+    shared_ptr<GLUniform> texuniform = this->Get<GLUniform>("Texture");
     shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
     dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
-    this->PaintHelper(dragon, GL_TRIANGLES);
+    //this->PaintHelper(dragon, GL_TRIANGLES);
+    dragon->LoadUBO(texuniform, UBO::TEXTURE);
 
+    shared_ptr<GLPrimitive> plane = this->Get<GLPrimitive>("plane");
+    plane->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
+    this->PaintHelper(plane, GL_TRIANGLES);
 }
 
 void GLScene::LoadGlobalUBOs(Matrices matrices)

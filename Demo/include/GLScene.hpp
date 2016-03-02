@@ -6,7 +6,6 @@
 #include <GLProgram.hpp>
 #include <GLFrame.hpp>
 #include <GLModel.hpp>
-#include <GLUniform.hpp>
 
 #include <chrono>
 
@@ -46,11 +45,11 @@ void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)
 {
     // Bind Colors
     shared_ptr<GLUniform> coloruniform = this->Get<GLUniform>("GColors");
-    model->LoadUBO(coloruniform, GLModel::UBO::COLOR);
+    model->LoadUBO(coloruniform, UBO::COLOR);
 
     // Bind Textures
     shared_ptr<GLUniform> texuniform = this->Get<GLUniform>("Texture");
-    model->LoadUBO(texuniform, GLModel::UBO::TEXTURE);
+    model->LoadUBO(texuniform, UBO::TEXTURE);
     
     // Calculate MVP
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");

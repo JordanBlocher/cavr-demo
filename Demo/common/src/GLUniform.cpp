@@ -1,5 +1,5 @@
-#include "GLUniform.hpp"
 #include "GLBufferObject.hpp"
+#include "GLUniform.hpp"
 
 #include <iomanip>
 

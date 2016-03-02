@@ -2,7 +2,6 @@
 
 #include "GLModel.hpp"
 #include "GLBufferObject.hpp"
-#include "GLUniform.hpp"
 #include "GLTexture.hpp"
 
 #include <fstream>
@@ -425,7 +424,7 @@ void GLModel::DrawToFBO(std::shared_ptr<GLFrame> frame)
 
 }
 
-void GLModel::LoadUBO(std::shared_ptr<GLUniform> ubo, GLModel::UBO rtype)
+void GLModel::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
 {
     bool texture, bump;
 
@@ -436,6 +435,7 @@ void GLModel::LoadUBO(std::shared_ptr<GLUniform> ubo, GLModel::UBO rtype)
 
         texture = this->textures->at(this->mtlIndices.at(i)).first;
         bump = this->bumpmaps->at(this->mtlIndices.at(i)).first;
+class GLUniform;
         if(rtype == UBO::TEXTURE && texture)
             this->textures->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE0);
         if(rtype == UBO::BUMP && bump)

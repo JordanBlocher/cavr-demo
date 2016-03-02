@@ -28,7 +28,7 @@ GLPrimitive::~GLPrimitive()
 {
 }
 
-bool GLPrimitive::LoadUVSphere(int nlats, int nlongs)
+bool GLPrimitive::AddUVSphere(int nlats, int nlongs)
 {
     nlongs = (nlongs - 1);
     nlats = (nlats - 1);
@@ -66,18 +66,18 @@ bool GLPrimitive::LoadUVSphere(int nlats, int nlongs)
 }
 
 
-bool GLPrimitive::LoadCircle(double radius, double zlocation, double znormal, int npoints, bool fliporder)
+bool GLPrimitive::AddCircle(double radius, double zlocation, double znormal, int npoints, bool fliporder)
 {
     npoints = (npoints - 1);
 
-    int offset = AddCircle(npoints, radius, zlocation, znormal);
+    int offset = AddCircle(npoints, radius, zlocation, znormal, false);
     this->positions->push_back(Vec3(0, 0, zlocation));
     this->normals->push_back(Vec3(0, 0, znormal));
 
     AddTriangleFan(offset, offset + npoints, npoints, fliporder);
 }
 
-void GLPrimitive::LoadPlane(double width, double height, double znormal, int textureRepeats)
+void GLPrimitive::AddPlane(double width, double height, double znormal, int textureRepeats)
 {
     width *= 0.5;
     height *= 0.5;
@@ -107,7 +107,7 @@ void GLPrimitive::LoadPlane(double width, double height, double znormal, int tex
     this->faces->push_back(currentVertex + 1);
 }
 
-bool GLPrimitive::LoadSphere(int num_lats, int num_lons)
+bool GLPrimitive::AddSphere(int num_lats, int num_lons)
 {
     // A Thanks to Roger Hoang
     int face_ind = 0;
@@ -175,7 +175,7 @@ bool GLPrimitive::LoadSphere(int num_lats, int num_lons)
     return true;
 }
 
-bool GLPrimitive::LoadCylinder()
+bool GLPrimitive::AddCylinder()
 {
     return true;
 }
@@ -240,22 +240,46 @@ void GLPrimitive::CreateVBOs()
         glEnableVertexAttribArray(COLOR_INDEX);
         glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
+
+
+    this->vbo_elements = GLBufferObject("vboelements",
+            sizeof(GLuint),
+            maxPoints,
+            GL_ELEMENT_ARRAY_BUFFER,
+            GL_DYNAMIC_DRAW);
+
 }
 
-//void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform>, UBO)
-//{
-//}
+void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform>, UBO)
+{
+}
 
 
 void GLPrimitive::Draw(GLenum MODE)
 {
+    LoadVAO();
     GLint face_offset = 0;
     GLint vertex_offset = 0;
     glBindVertexArray(this->vao);
-
+        
+    /*
+    glDrawElements(MODE, 
+            this->faces->size(),
+            GL_UNSIGNED_INT,
+            (void*)(sizeof(GLuint) * face_offset));
+            */
     glDrawArrays(MODE,0,this->positions->size());
 
     glBindVertexArray(0);
+}
+
+void GLPrimitive::LoadVAO()
+{
+    vbo_pos.LoadSubData(0, 0, *(this->positions.get()));
+    vbo_norm.LoadSubData(0, 1, *(this->normals.get()));
+    vbo_color.LoadSubData(0, 2, *(this->colors.get()));
+    vbo_tex.LoadSubData(0, 3, *(this->uvs.get()));
+    vbo_elements.LoadSubData(0, 0, *(this->faces.get()));
 }
 
 size_t GLPrimitive::numFaces()
@@ -271,6 +295,21 @@ size_t GLPrimitive::numVertices()
 size_t GLPrimitive::Size()
 {
     return this->faces->size();
+}
+
+void GLPrimitive::setMatrix(glm::mat4 m)
+{
+    this->matrix = m;
+}
+
+glm::mat4 GLPrimitive::Matrix()
+{
+    return this->matrix;
+}
+
+Vec4 GLPrimitive::Position()
+{
+    return  Vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
 }
 
 
