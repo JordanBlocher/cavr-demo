@@ -9,7 +9,7 @@
 #include <GLShader.hpp>
 #include <GLBufferObject.hpp>
 #include <GLEmissive.hpp>
-#include <Spray.hpp>
+#include <GLRibbon.hpp>
 #include <GLScene.hpp>
 #include <GLPrimitive.hpp>
 #include <cavr/cavr.h>
@@ -115,17 +115,17 @@ void GLScene::InitializeGL()
     program->SetUBO(eye_uniform);
     program->SetUBO(control_uniform);
 
-    // Init a spray
-    shared_ptr<Spray> spray (new Spray());
-    cout << "NEW SPRAY" << endl;
-    if(spray->Init())
+    // Init a GLRibbon
+    shared_ptr<GLRibbon> GLRibbons (new GLRibbon());
+    cout << "NEW GLRibbon" << endl;
+    if(GLRibbons->Init())
     {
-        cout << "NEW SPRAY INSIDE" << endl;
-        spray->AddPoints(glm::vec3(0,0,0),glm::vec3(1,1,1));
-        spray->AddPoints(glm::vec3(0,0,1),glm::vec3(1,1,1));
-        spray->AddPoints(glm::vec3(1,0,1),glm::vec3(1,1,1));
-        spray->AddPoints(glm::vec3(0,0,-1),glm::vec3(1,1,1));
-        this->AddToContext(spray);
+        cout << "NEW GLRibbon INSIDE" << endl;
+        GLRibbons->AddPoints(glm::vec3(0,0,0),glm::vec3(1,1,1));
+        GLRibbons->AddPoints(glm::vec3(0,0,1),glm::vec3(1,1,1));
+        GLRibbons->AddPoints(glm::vec3(1,0,1),glm::vec3(1,1,1));
+        GLRibbons->AddPoints(glm::vec3(0,0,-1),glm::vec3(1,1,1));
+        this->AddToContext(GLRibbons);
     }
 
     shared_ptr<GLTexture> tex(new GLTexture("gold", GL_TEXTURE_2D, "models/gold.jpg"));
@@ -149,15 +149,15 @@ void GLScene::Paint()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Choose Model
-    shared_ptr<Spray> spray = this->Get<Spray>("spray");
-    //this->PaintHelper(spray, GL_TRIANGLES);
+    shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
+    this->PaintHelper(GLRibbons, GL_TRIANGLES);
     
     shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
     dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
-    this->PaintHelper(dragon, GL_TRIANGLES);
+    //this->PaintHelper(dragon, GL_TRIANGLES);
 
     shared_ptr<GLPrimitive> primitive = this->Get<GLPrimitive>("primitive");
-    this->PaintHelper(primitive, GL_TRIANGLES);
+    //this->PaintHelper(primitive, GL_TRIANGLES);
 }
 
 void GLScene::LoadGlobalUBOs(Matrices matrices)
