@@ -73,9 +73,6 @@ void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)
 
     model->Draw(MODE);
 
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    glBindBuffer(GL_TEXTURE0, 0);
-    glBindBuffer(GL_TEXTURE1, 0);
     glUseProgram(0);
 
 }

@@ -115,7 +115,6 @@ void GLScene::InitializeGL()
     program->SetUBO(control_uniform);
 
     // Init a GLRibbon
-    /*
     shared_ptr<GLRibbon> GLRibbons (new GLRibbon());
     cout << "NEW GLRibbon" << endl;
     if(GLRibbons->Init())
@@ -128,6 +127,7 @@ void GLScene::InitializeGL()
         this->AddToContext(GLRibbons);
     }
 
+    /*
     shared_ptr<GLTexture> tex(new GLTexture("gold", GL_TEXTURE_2D, "models/gold.jpg"));
     tex->Load();
     shared_ptr<GLPrimitive> primitive(new GLPrimitive("primitive", 6, 10000));
@@ -156,8 +156,8 @@ void GLScene::Paint()
     dragon->shader.material = 0;
     this->PaintHelper(dragon, GL_TRIANGLES);
     
-    //shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
-    /////this->PaintHelper(GLRibbons, GL_TRIANGLES);
+    shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
+    this->PaintHelper(GLRibbons, GL_TRIANGLES);
    
     //shared_ptr<GLPrimitive> primitive = this->Get<GLPrimitive>("primitive");
     //this->PaintHelper(primitive, GL_TRIANGLES);

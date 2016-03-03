@@ -304,6 +304,7 @@ void GLModel::Draw(GLenum MODE)
     bool texture, bump;
 
     glBindVertexArray(this->vao);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     //Draw Model 
     for(size_t i=0; i< this->_faces->size(); i++)

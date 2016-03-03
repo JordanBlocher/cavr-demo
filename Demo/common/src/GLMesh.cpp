@@ -44,11 +44,11 @@ void GLMesh::AddMesh()
     this->index += 1;
     this->e_size += this->faces->size()*3;
     this->v_size += this->positions->size();
-    this->_positions->resize(this->_positions->size() + 1 + 1);
-    this->_normals->resize(this->_normals->size() + 1 + 1);
-    this->_colors->resize(this->_colors->size() + 1 + 1);
-    this->_uvs->resize(this->_uvs->size() + 1 + 1);
-    this->_faces->resize(this->_faces->size() + 1 + 1);
+    this->_positions->push_back(*this->positions);
+    this->_normals->push_back(*this->normals);
+    this->_colors->push_back(*this->colors);
+    this->_uvs->push_back(*this->uvs);
+    this->_faces->push_back(*this->faces);
     this->positions = std::make_shared<std::vector<Vec3>>(this->_positions->at(index));
     this->normals = std::make_shared<std::vector<Vec3>>(this->_normals->at(index));
     this->colors = std::make_shared<std::vector<Vec3>>(this->_colors->at(index));
