@@ -146,6 +146,8 @@ void main(void)
     vec4 totalLight = vec4(0, 0, 0, 0);
     vec4 ambient = vec4(0, 0, 0, 0); 
     vec4 ambientcolor = vec4(0, 0, 0, 0); 
+    vec4 v_color = vec4(f_color, 0.7);
+    f_out = vec4(0, 1, 0, 1);
    
     bool texture = shader.texture;
     ambientcolor = colors.ambient;
@@ -170,11 +172,11 @@ void main(void)
     totalLight += LightSpt(light.spot[3], normal);
     totalLight += LightSpt(light.spot[4], normal);
     totalLight += LightSpt(light.spot[5], normal);
-
-    f_out = totalLight;
     
+    f_out = totalLight;
+
     if(!texture && !shader.material)
-        f_out = vec4(f_color, 0.5);
+        f_out = v_color;
 
 }
 
