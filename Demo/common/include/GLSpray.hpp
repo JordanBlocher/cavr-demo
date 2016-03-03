@@ -5,6 +5,8 @@ class GLSpray
 public:
 	GLSpray();
 	void AddSpray();
+	// Colors and textures need to be encapsulated here.
+	void SelectSpray();
 	void Clear();
 
 private:

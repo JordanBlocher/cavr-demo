@@ -77,7 +77,7 @@ bool GLUniform::CreateUBO(GLuint program, GLuint location, GLenum draw)
             padding += 3*sizeof(float);
         }
         else if(type == GL_BOOL)
-            uniformSize = sizeof(bool);
+            uniformSize = 4*sizeof(bool);
         else
             uniformSize = 0.0f;
 

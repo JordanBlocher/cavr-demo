@@ -348,6 +348,7 @@ void GLModel::Draw(GLenum MODE)
 
 void GLModel::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
 {
+
     glBindBuffer(GL_UNIFORM_BUFFER, ubo->getId());
     if (rtype == UBO::CONTROL)
     {

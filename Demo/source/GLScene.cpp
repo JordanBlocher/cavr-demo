@@ -60,7 +60,7 @@ void GLScene::InitializeGL()
     //Add Shaders
     program->AddShader(vertex); 
     program->AddShader(fragment); 
-    program->SetAttributeIndex("/v_position", 0);
+    program->SetAttributeIndex("v_position", 0);
     program->SetAttributeIndex("v_normal", 1);
     program->SetAttributeIndex("v_uv", 2);
 
@@ -121,16 +121,19 @@ void GLScene::InitializeGL()
     {
         cout << "NEW GLRibbon INSIDE" << endl;
         GLRibbons->AddPoints(glm::vec3(0,0,0),glm::vec3(1,1,1));
-        GLRibbons->AddPoints(glm::vec3(0,0,1),glm::vec3(1,1,1));
-        GLRibbons->AddPoints(glm::vec3(1,0,1),glm::vec3(1,1,1));
-        GLRibbons->AddPoints(glm::vec3(0,0,-1),glm::vec3(1,1,1));
+        GLRibbons->AddPoints(glm::vec3(0,0,1),glm::vec3(1,0,0));
+        GLRibbons->AddPoints(glm::vec3(1,0,1),glm::vec3(0,0,1));
+        GLRibbons->AddPoints(glm::vec3(0,0,-1),glm::vec3(0,1,0));
+
         this->AddToContext(GLRibbons);
     }
 
-    /*
+    
     shared_ptr<GLTexture> tex(new GLTexture("gold", GL_TEXTURE_2D, "models/gold.jpg"));
     tex->Load();
-    shared_ptr<GLPrimitive> primitive(new GLPrimitive("primitive", 6, 10000));
+    //GLRibbons->AddTexture(tex);
+    GLRibbons->AddMaterial(Material());
+    /*shared_ptr<GLPrimitive> primitive(new GLPrimitive("primitive", 6, 10000));
     primitive->AddPlane(1000, 1000, 1, 1);
     primitive->SetColor(Vec3(0,0,1));
     //primitive->AddUVSphere(20, 20);
@@ -153,10 +156,13 @@ void GLScene::Paint()
     shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
     dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
     dragon->shader.texture = 1;
-    dragon->shader.material = 0;
+    dragon->shader.material = 1;
     this->PaintHelper(dragon, GL_TRIANGLES);
     
     shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
+    GLRibbons->shader.texture = 0;
+    GLRibbons->shader.material = 0;
+    GLRibbons->shader.bump = 0;
     this->PaintHelper(GLRibbons, GL_TRIANGLES);
    
     //shared_ptr<GLPrimitive> primitive = this->Get<GLPrimitive>("primitive");

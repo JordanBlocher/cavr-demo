@@ -29,6 +29,7 @@ bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
 
 	PaintStruct temp;
 	temp.position = worldPoint;
+    temp.color = Color;
 	temp.Break = false;
 	Points.push_back(temp);
 

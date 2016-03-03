@@ -64,6 +64,7 @@ layout(std140, binding=5) uniform Shader
     bool material;
 }shader;
 
+
 uniform sampler2D diffuseTexture;
 uniform sampler2D bumpMap;
 
@@ -150,6 +151,8 @@ void main(void)
     f_out = vec4(0, 1, 0, 1);
    
     bool texture = shader.texture;
+    bool bump = shader.bump;
+    bool material = shader.material;
     ambientcolor = colors.ambient;
     vec4 tex = texture2D(diffuseTexture, f_uv.xy);
 
@@ -172,12 +175,11 @@ void main(void)
     totalLight += LightSpt(light.spot[3], normal);
     totalLight += LightSpt(light.spot[4], normal);
     totalLight += LightSpt(light.spot[5], normal);
-    
+
     f_out = totalLight;
 
     if(!texture && !shader.material)
         f_out = v_color;
-
 }
 
  

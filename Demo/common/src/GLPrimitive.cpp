@@ -203,13 +203,14 @@ void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
     bool texture, bump;
 
     glBindBuffer(GL_UNIFORM_BUFFER, ubo->getId());
-
+    Shader test;
+    
     if (rtype == UBO::CONTROL)
     {
         glBufferSubData( GL_UNIFORM_BUFFER, 
                         0, 
-                        sizeof(this->shader), 
-                         &this->shader);
+                        sizeof(Shader), 
+                         &shader);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
         return;
     }
@@ -250,7 +251,7 @@ void GLPrimitive::AddTexture(std::shared_ptr<GLTexture> tex)
 
 void GLPrimitive::AddMaterial(Material mat)
 {
-    this->materials->at(index) = mat;
+    this->materials->push_back(mat);
 }
 
 void GLPrimitive::setMatrix(glm::mat4 m)

@@ -62,7 +62,7 @@ void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)
     // Bind Shader Controls
     shared_ptr<GLUniform> controluniform = this->Get<GLUniform>("Shader");
     model->LoadUBO(controluniform, UBO::CONTROL);
-    //std::cout<<"UNIFORM "<< glGetUniformLocation(program->getId(),"Shader")<<std::endl; 
+    //std::cout<<"UNIFORM "<< controluniform->getId() <<std::endl; 
     
     // Bind Colors
     if (model->shader.material)
