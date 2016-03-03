@@ -43,14 +43,11 @@ int sgn(T val)
 template <typename T> 
 void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)
 {
-    // Bind Colors
-    shared_ptr<GLUniform> coloruniform = this->Get<GLUniform>("GColors");
-    model->LoadUBO(coloruniform, UBO::COLOR);
 
-    // Bind Textures
-    shared_ptr<GLUniform> texuniform = this->Get<GLUniform>("Texture");
-    model->LoadUBO(texuniform, UBO::TEXTURE);
-    
+    // Run Program
+    shared_ptr<GLProgram> program = this->Get<GLProgram>("program");
+    glUseProgram(program->getId());
+
     // Calculate MVP
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
     glm::mat4 vp = camera1->Projection() * camera1->View() *GLMath::mat4ftoGLM(cavr::gfx::getView());
@@ -59,12 +56,21 @@ void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)
     matrices.mvMatrix = model->Matrix(); 
     matrices.normalMatrix = glm::transpose(glm::inverse(model->Matrix()));
 
-    // Load the other UBOs
+    // Load Global UBOs
     LoadGlobalUBOs(matrices);
 
-    // Run Program
-    shared_ptr<GLProgram> program = this->Get<GLProgram>("program");
-    glUseProgram(program->getId());
+    // Bind Shader Controls
+    shared_ptr<GLUniform> controluniform = this->Get<GLUniform>("Shader");
+    model->LoadUBO(controluniform, UBO::CONTROL);
+    //std::cout<<"UNIFORM "<< glGetUniformLocation(program->getId(),"Shader")<<std::endl; 
+    
+    // Bind Colors
+    if (model->shader.material)
+        model->materialUBO = this->Get<GLUniform>("GColors");
+    // Bind Textures
+    if (model->shader.texture)
+        model->textureUBO = this->Get<GLUniform>("Texture");
+
     model->Draw(MODE);
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);

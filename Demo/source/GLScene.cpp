@@ -21,7 +21,7 @@
 #define SENSOR_DISTANCE 0.01f
 #define FOCAL_DISTANCE 100.0f
 
-const GLuint NUM_ATTRIBUTES = 3;
+const GLuint NUM_ATTRIBUTES = 4;
 
 using namespace std;
 
@@ -72,7 +72,6 @@ void GLScene::InitializeGL()
     cout<<"Matrix UBO"<<endl;
     shared_ptr<GLUniform> vertex_uniform(new GLUniform("GMatrices"));
     vertex_uniform->CreateUBO(program->getId(), 1, GL_STATIC_DRAW);
-    const char* colors[] = {"blue", "red", "black", "white", "yellow", "green"};
     this->AddToContext(vertex_uniform);
     
     cout<<"Color UBO"<<endl;
@@ -92,7 +91,7 @@ void GLScene::InitializeGL()
     this->AddToContext(eye_uniform);
 
     cout<<"Control UBO"<<endl;
-    shared_ptr<GLUniform> control_uniform(new GLUniform("Control"));
+    shared_ptr<GLUniform> control_uniform(new GLUniform("Shader"));
     control_uniform->CreateUBO(program->getId(), 5, GL_STREAM_DRAW);
     this->AddToContext(control_uniform);
 
@@ -116,6 +115,7 @@ void GLScene::InitializeGL()
     program->SetUBO(control_uniform);
 
     // Init a GLRibbon
+    /*
     shared_ptr<GLRibbon> GLRibbons (new GLRibbon());
     cout << "NEW GLRibbon" << endl;
     if(GLRibbons->Init())
@@ -133,12 +133,12 @@ void GLScene::InitializeGL()
     shared_ptr<GLPrimitive> primitive(new GLPrimitive("primitive", 6, 10000));
     primitive->AddPlane(1000, 1000, 1, 1);
     primitive->SetColor(Vec3(0,0,1));
-    primitive->AddUVSphere(20, 20);
-    primitive->AddTexture(tex);
-    primitive->SetColor(Vec3(1,0,0));
+    //primitive->AddUVSphere(20, 20);
+    //primitive->AddTexture(tex);
+    //primitive->SetColor(Vec3(1,0,0));
     primitive->Create();
     this->AddToContext(primitive);
-
+*/
     
 }
 
@@ -149,14 +149,17 @@ void GLScene::Paint()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Choose Model
-    shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
-    this->PaintHelper(GLRibbons, GL_TRIANGLES);
-    
+ 
     shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
     dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
-    //this->PaintHelper(dragon, GL_TRIANGLES);
-
-    shared_ptr<GLPrimitive> primitive = this->Get<GLPrimitive>("primitive");
+    dragon->shader.texture = 1;
+    dragon->shader.material = 0;
+    this->PaintHelper(dragon, GL_TRIANGLES);
+    
+    //shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
+    /////this->PaintHelper(GLRibbons, GL_TRIANGLES);
+   
+    //shared_ptr<GLPrimitive> primitive = this->Get<GLPrimitive>("primitive");
     //this->PaintHelper(primitive, GL_TRIANGLES);
 }
 
@@ -172,6 +175,7 @@ void GLScene::LoadGlobalUBOs(Matrices matrices)
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     // Bind Lights
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
     shared_ptr<GLUniform> luniform = this->Get<GLUniform>("GLights");
     shared_ptr<GLEmissive> emissive = this->Get<GLEmissive>("lights");
     glBindBuffer(GL_UNIFORM_BUFFER, luniform->getId());
@@ -192,14 +196,6 @@ void GLScene::LoadGlobalUBOs(Matrices matrices)
     glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(Vec4), glm::value_ptr(Vec4(camera1->getCameraPosition(), 1.0f)));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     
-    // Bind Controls
-    shared_ptr<GLUniform> control = this->Get<GLUniform>("Control");
-    int texture = true, bump = false;
-    glBindBuffer(GL_UNIFORM_BUFFER, control->getId());
-    glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(int), &texture);
-    glBufferSubData( GL_UNIFORM_BUFFER, sizeof(int), sizeof(int), &bump);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
 }
 
 void GLScene::MoveCamera(GLCamera::CamDirection direction)

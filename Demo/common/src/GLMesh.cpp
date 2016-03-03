@@ -44,15 +44,15 @@ void GLMesh::AddMesh()
     this->index += 1;
     this->e_size += this->faces->size()*3;
     this->v_size += this->positions->size();
-    this->_positions->resize(this->_positions->size() + 1);
-    this->_normals->resize(this->_normals->size() + 1);
-    this->_colors->resize(this->_colors->size() + 1);
-    this->_uvs->resize(this->_uvs->size() + 1);
-    this->_faces->resize(this->_faces->size() + 1);
+    this->_positions->resize(this->_positions->size() + 1 + 1);
+    this->_normals->resize(this->_normals->size() + 1 + 1);
+    this->_colors->resize(this->_colors->size() + 1 + 1);
+    this->_uvs->resize(this->_uvs->size() + 1 + 1);
+    this->_faces->resize(this->_faces->size() + 1 + 1);
     this->positions = std::make_shared<std::vector<Vec3>>(this->_positions->at(index));
     this->normals = std::make_shared<std::vector<Vec3>>(this->_normals->at(index));
     this->colors = std::make_shared<std::vector<Vec3>>(this->_colors->at(index));
-    this->uvs = std::make_shared<std::vector<glm::ivec2>>(this->_uvs->at(index));
+    this->uvs = std::make_shared<std::vector<Vec2>>(this->_uvs->at(index));
     this->faces = std::make_shared<std::vector<GLuint>>(this->_faces->at(index));
 }
 
@@ -185,7 +185,7 @@ bool GLMesh::Create()
 void GLMesh::CreateVBOs()
 {
     //Create VBOs 
-    GLBufferObject vbo_pos("vbo_positions",
+    vbo_pos = GLBufferObject("vbo_positions",
             sizeof(Vec3),
             this->v_size,
             GL_ARRAY_BUFFER,
@@ -202,7 +202,7 @@ void GLMesh::CreateVBOs()
         glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
-    GLBufferObject vbo_norms("vbo_normals",
+    vbo_norm = GLBufferObject("vbo_normals",
             sizeof(Vec3),
             this->v_size,
             GL_ARRAY_BUFFER,
@@ -210,7 +210,7 @@ void GLMesh::CreateVBOs()
     offset = 0;
     for(size_t i=0; i<this->_positions->size(); i++)
     {
-        vbo_norms.LoadSubData(offset, 1, this->_normals->at(i));
+        vbo_norm.LoadSubData(offset, 1, this->_normals->at(i));
         offset += this->_positions->at(i).size();
     }
     if( this->attributes > NORM_INDEX)
@@ -219,7 +219,7 @@ void GLMesh::CreateVBOs()
         glVertexAttribPointer( NORM_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
-    GLBufferObject vbo_uvs("vbo_textures",
+    vbo_tex = GLBufferObject("vbo_textures",
             sizeof(Vec2),
             this->v_size,
             GL_ARRAY_BUFFER,
@@ -227,7 +227,7 @@ void GLMesh::CreateVBOs()
     offset = 0;
     for(size_t i=0; i<this->_positions->size(); i++)
     {
-        vbo_uvs.LoadSubData(offset, 2, this->_uvs->at(i));
+        vbo_tex.LoadSubData(offset, 2, this->_uvs->at(i));
         offset += this->_positions->at(i).size();
     }
 
@@ -237,7 +237,7 @@ void GLMesh::CreateVBOs()
         glVertexAttribPointer( UV_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
     }
     
-    GLBufferObject vbo_colors("vbo_colors",
+    vbo_color = GLBufferObject("vbo_colors",
             sizeof(Vec3),
             this->v_size,
             GL_ARRAY_BUFFER,
@@ -245,7 +245,7 @@ void GLMesh::CreateVBOs()
     offset = 0;
     for(size_t i=0; i<this->_positions->size(); i++)
     {
-        vbo_uvs.LoadSubData(offset, 3, this->_colors->at(i));
+        vbo_color.LoadSubData(offset, 3, this->_colors->at(i));
         offset += this->_positions->at(i).size();
     }
 
@@ -255,7 +255,7 @@ void GLMesh::CreateVBOs()
         glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
-    GLBufferObject vbo_elements("vbo_elements",
+    vbo_elements = GLBufferObject("vbo_elements",
             sizeof(GLuint),
             this->e_size,
             GL_ELEMENT_ARRAY_BUFFER,

@@ -39,7 +39,12 @@ class GLPrimitive : public GLMesh
     glm::mat4 Matrix();
     Vec4 Position();
     void setMatrix(glm::mat4);
- 
+
+    Shader shader;
+    std::shared_ptr<GLUniform> materialUBO;
+    std::shared_ptr<GLUniform> textureUBO;
+    std::shared_ptr<GLUniform> bumpUBO;
+
  protected:
     virtual void Allocate();
 

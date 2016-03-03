@@ -7,7 +7,7 @@
 #include <map>
 #include <GL/glew.h>
 
-enum class UBO {COLOR, TEXTURE, BUMP};
+enum class UBO {COLOR, TEXTURE, BUMP, CONTROL};
 
 class GLUniform : public GLNode
 {

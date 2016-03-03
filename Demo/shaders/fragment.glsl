@@ -57,58 +57,54 @@ layout(std140, binding=4) uniform Eye
     vec4 position;
 }eye;
 
-layout(std140, binding=5) uniform Control
+layout(std140, binding=5) uniform Shader
 {
-    int texture;
-    int bump;
-}control;
+    bool texture;
+    bool bump;
+    bool material;
+}shader;
 
 uniform sampler2D diffuseTexture;
 uniform sampler2D bumpMap;
 
 vec4 LightBasic(BaseLight source, vec4 direction, vec3 normal)
 {
+
+    vec4 ambientcolor = colors.ambient; 
     vec4 ambient = vec4(0, 0, 0, 0); 
+    vec4 diffusecolor = colors.diffuse;
     vec4 diffuse = vec4(0, 0, 0, 0);
+    vec4 specularcolor = colors.specular;
     vec4 specular = vec4(0, 0, 0, 0);
 
-    if (control.texture == 0)
+    bool texture = shader.texture;
+        
+    float diffuseFactor = dot(normal, -direction.xyz);
+    vec3 v_toEye = normalize(eye.position.xyz - f_position);
+    vec3 l_reflect = normalize(reflect(direction.xyz, normal));
+    float specularFactor = dot(v_toEye, l_reflect);
+    vec4 tex = texture2D(diffuseTexture, f_uv.xy);
+
+    if (texture)
     {
-        vec4 tex = texture2D(diffuseTexture, f_uv.xy);
-        ambient = source.color * mix(colors.ambient, tex, 0.5) * source.ambientIntensity; 
-        float diffuseFactor = dot(normal, -direction.xyz);
-        if (diffuseFactor > 0) 
-        {
-            diffuse = source.color * mix(colors.diffuse, tex, colors.diffuseBlend/1.0) * source.diffuseIntensity * diffuseFactor;
-            vec3 v_toEye = normalize(eye.position.xyz - f_position);
-            vec3 l_reflect = normalize(reflect(direction.xyz, normal));
-            float specularFactor = dot(v_toEye, l_reflect);
-            specularFactor = pow(specularFactor, colors.shininess);
-            if(specularFactor > 0)
-            {
-                specular = source.color * mix(colors.specular, tex, 0.5) * colors.intensity * specularFactor;
-            }
-        }
+        ambientcolor = mix(colors.ambient, tex, 0.5); 
+        diffusecolor = mix(colors.diffuse, tex, colors.diffuseBlend/1.0);
+        specularcolor = mix(colors.specular, tex, 0.5);
     }
-    else
+
+    ambient = source.color * ambientcolor * source.ambientIntensity; 
+    if (diffuseFactor > 0) 
     {
-        ambient = source.color * colors.ambient * source.ambientIntensity; 
-        float diffuseFactor = dot(normal, -direction.xyz);
-        if (diffuseFactor > 0) 
+        diffuse = source.color * diffusecolor * source.diffuseIntensity * diffuseFactor;
+        specularFactor = pow(specularFactor, colors.shininess);
+        if(specularFactor > 0)
         {
-            diffuse = source.color * colors.diffuse * source.diffuseIntensity * diffuseFactor;
-            vec3 v_toEye = normalize(eye.position.xyz - f_position);
-            vec3 l_reflect = normalize(reflect(direction.xyz, normal));
-            float specularFactor = dot(v_toEye, l_reflect);
-            specularFactor = pow(specularFactor, colors.shininess);
-            if(specularFactor > 0)
-            {
-                specular = source.color * colors.specular * colors.intensity * specularFactor;
-            }
+            specular = source.color * specularcolor * colors.intensity * specularFactor;
         }
     }
 
-    return (ambient + diffuse + specular + vec4(f_color, 0));
+
+    return (ambient + diffuse + specular);
 }
 
 vec4 LightDir(vec3 normal)
@@ -149,16 +145,20 @@ void main(void)
     vec3 normal = normalize(f_normal);
     vec4 totalLight = vec4(0, 0, 0, 0);
     vec4 ambient = vec4(0, 0, 0, 0); 
+    vec4 ambientcolor = vec4(0, 0, 0, 0); 
+   
+    bool texture = shader.texture;
+    ambientcolor = colors.ambient;
+    vec4 tex = texture2D(diffuseTexture, f_uv.xy);
 
-    if(control.texture == 1)
+    if(texture)
     {
-        vec4 tex = texture2D(diffuseTexture, f_uv.xy);
-        ambient = light.basic.base.color * mix(colors.ambient, tex, 0.5) * light.basic.base.ambientIntensity; 
+        ambient = light.basic.base.color * mix(ambientcolor, tex, 0.5) * light.basic.base.ambientIntensity; 
     }
-    else
+    else if(shader.material)
     {
         float blend = colors.diffuseBlend;
-        ambient = light.basic.base.color * colors.ambient * light.basic.base.ambientIntensity * ((blend + 1.0) / (blend + 1.00000000001));  
+        ambient = light.basic.base.color * ambientcolor * light.basic.base.ambientIntensity * ((blend + 1.0) / (blend + 1.00000000001));  
     }
 
     totalLight += ambient; 
@@ -171,7 +171,10 @@ void main(void)
     totalLight += LightSpt(light.spot[4], normal);
     totalLight += LightSpt(light.spot[5], normal);
 
-    f_out = vec4(1,0,0,1) + totalLight;
+    f_out = totalLight;
+    
+    if(!texture && !shader.material)
+        f_out = vec4(f_color, 0.5);
 
 }
 

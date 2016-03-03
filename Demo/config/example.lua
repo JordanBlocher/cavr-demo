@@ -112,7 +112,7 @@ others2 = {
 
 
 machines = {
-  self=self;
+  self=localhost;
   --self2 = others;
   --self3 = others2;
 };

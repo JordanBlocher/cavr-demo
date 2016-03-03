@@ -99,28 +99,28 @@ void GLPrimitive::AddPlane(double width, double height, double znormal, int text
     height *= 0.5;
     int currentVertex = this->positions->size();
 
-    this->positions->push_back(Vec3(-width, height, 0));
+    this->positions->push_back(Vec3(-width, -height, 0));
     this->normals->push_back(Vec3(0, 0, znormal));
     this->uvs->push_back(Vec2(0, textureRepeats));
  
-    this->positions->push_back(Vec3(width, height, 0));
+    this->positions->push_back(Vec3(width, -height, 0));
     this->normals->push_back(Vec3(0, 0, znormal));
     this->uvs->push_back(Vec2(textureRepeats, textureRepeats));
     
-    this->positions->push_back(Vec3(width, -height, 0));
+    this->positions->push_back(Vec3(width, height, 0));
     this->normals->push_back(Vec3(0, 0, znormal));
     this->uvs->push_back(Vec2(textureRepeats, 0));
     
-    this->positions->push_back(Vec3(-width, -height, 0));
+    this->positions->push_back(Vec3(-width, height, 0));
     this->normals->push_back(Vec3(0, 0, znormal));
     this->uvs->push_back(Vec2(0, 0));
     
-    this->faces->push_back(currentVertex + 2);
     this->faces->push_back(currentVertex + 0);
+    this->faces->push_back(currentVertex + 1);
+    this->faces->push_back(currentVertex + 2);
+    this->faces->push_back(currentVertex + 2);
     this->faces->push_back(currentVertex + 3);
     this->faces->push_back(currentVertex + 0);
-    this->faces->push_back(currentVertex + 2);
-    this->faces->push_back(currentVertex + 1);
 
     AddMesh();
 }
@@ -204,23 +204,16 @@ void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
 
     glBindBuffer(GL_UNIFORM_BUFFER, ubo->getId());
 
-    for(size_t i=0; i< this->_faces->size(); i++)
-    {   
-
-        //bump = this->bumpmap;
-        if(rtype == UBO::TEXTURE && this->textures->size() > 0)
-            this->textures->at(0).Bind(GL_TEXTURE0);
-        //if(rtype == UBO::BUMP && bump)
-         //   this->bumpmap.Bind(GL_TEXTURE1);
-        if(rtype == UBO::COLOR && this->materials->size() > 0)
-        {
-            glBufferSubData(GL_UNIFORM_BUFFER,
-                        0,
-                        sizeof(this->materials->at(0)),
-                        &(this->materials->at(0)) );
-        }
-
+    if (rtype == UBO::CONTROL)
+    {
+        glBufferSubData( GL_UNIFORM_BUFFER, 
+                        0, 
+                        sizeof(this->shader), 
+                         &this->shader);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        return;
     }
+
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -231,18 +224,16 @@ void GLPrimitive::Draw(GLenum MODE)
     glBindVertexArray(this->vao);
 
     //Draw Model 
-    //for(size_t i=0; i< this->_faces->size(); i++)
-    for(size_t i=0; i< this->_positions->size(); i++)
+    for(size_t i=0; i< this->_faces->size(); i++)
+    //for(size_t i=0; i< this->_positions->size(); i++)
     {   
-        /*
         glDrawElementsBaseVertex(MODE, 
                 this->_faces->at(i).size(),
                 GL_UNSIGNED_INT,
                 (void*)(sizeof(GLuint) * face_offset),
                 vertex_offset);
-                */
 
-        glDrawArrays(MODE, vertex_offset,this->_positions->size());
+        //glDrawArrays(MODE, vertex_offset,this->_positions->size());
 
         face_offset += this->_faces->at(i).size();
         vertex_offset += this->_positions->at(i).size();

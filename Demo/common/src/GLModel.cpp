@@ -123,6 +123,7 @@ bool GLModel::LoadVertexData()
     {
         this->_faces->resize(scene->mNumMeshes);
         this->_positions->resize(scene->mNumMeshes);
+        this->_colors->resize(scene->mNumMeshes);
         for(unsigned int i=0; i<scene->mNumMeshes; i++)
         {
             const aiMesh* mesh = scene->mMeshes[i];
@@ -155,7 +156,7 @@ void GLModel::AddVertexData(const aiMesh* mesh, unsigned int index)
         const aiVector3D* pos = &(mesh->mVertices[i]);
 
         this->_positions->at(index).at(i) = Vec3(pos->x, pos->y, pos->z);
-        this->_colors->at(index).at(i) = Vec3(0.0f, 0.0f, 0.0f);
+        this->_colors->at(index).at(i) = Vec3(1.0f, 1.0f, 1.0f);
     }
 
     // Populate the index buffer
@@ -193,7 +194,7 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
         this->_positions->at(index).at(i) = Vec3(pos->x, pos->y, pos->z);
         this->_normals->at(index).at(i) = Vec3(norm->x, norm->y, norm->z);
         this->_uvs->at(index).at(i) = Vec2(uv->x, uv->y);
-        this->_colors->at(index).at(i) = Vec3(0.0f, 0.0f, 0.0f);
+        this->_colors->at(index).at(i) = Vec3(1.0f, 1.0f, 1.0f);
     }
 
     // Populate the index buffer
@@ -287,84 +288,74 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
     }
 }
 
+void GLModel::DrawElements(size_t i, GLint face_offset, GLint vertex_offset, GLenum MODE)
+{
+    glDrawElementsBaseVertex(MODE, 
+        this->_faces->at(i).size(),
+        GL_UNSIGNED_INT,
+        (void*)(sizeof(GLuint) * face_offset),
+        vertex_offset);
+}
 
 void GLModel::Draw(GLenum MODE)
 {
     GLint face_offset = 0;
     GLint vertex_offset = 0;
+    bool texture, bump;
+
     glBindVertexArray(this->vao);
 
     //Draw Model 
     for(size_t i=0; i< this->_faces->size(); i++)
     {   
-        glDrawElementsBaseVertex(MODE, 
-                this->_faces->at(i).size(),
-                GL_UNSIGNED_INT,
-                (void*)(sizeof(GLuint) * face_offset),
-                vertex_offset);
-
-        face_offset += this->_faces->at(i).size();
-        vertex_offset += this->_positions->at(i).size();
-    }
-
-    glBindVertexArray(0);
-}
-
-void GLModel::DrawToFBO(std::shared_ptr<GLFrame> frame)
-{
-    GLint face_offset = 0;
-    GLint vertex_offset = 0;
-    glBindVertexArray(this->vao);
-
-    bool texture, color;
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frame->getId());
-
-    //Draw Model
-    for(size_t i=0; i< this->_faces->size(); i++)
-    {   
-
-        face_offset += this->_faces->at(i).size();
-        vertex_offset += this->_positions->at(i).size();
-
-            glDrawElementsBaseVertex(GL_TRIANGLES, 
-                    this->_faces->at(i).size(),
-                    GL_UNSIGNED_INT,
-                    (void*)(sizeof(GLuint) * face_offset),
-                    vertex_offset);
-    }
-    glBindVertexArray(0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-}
-
-void GLModel::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
-{
-    bool texture, bump;
-
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo->getId());
-
-    for(size_t i=0; i< this->_faces->size(); i++)
-    {   
-
         texture = this->textures->at(this->mtlIndices.at(i)).first;
         bump = this->bumpmaps->at(this->mtlIndices.at(i)).first;
-class GLUniform;
-        if(rtype == UBO::TEXTURE && texture)
-            this->textures->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE0);
-        if(rtype == UBO::BUMP && bump)
-            this->bumpmaps->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE1);
-        if(rtype == UBO::COLOR)
+        if (this->shader.texture && texture)
         {
+            glBindBuffer(GL_UNIFORM_BUFFER, this->textureUBO->getId());
+            this->textures->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE0);
+            DrawElements(i, face_offset, vertex_offset, MODE);
+        }
+        if (this->shader.bump && bump)
+        {
+            glBindBuffer(GL_UNIFORM_BUFFER, this->bumpUBO->getId());
+            this->bumpmaps->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE1);
+            DrawElements(i, face_offset, vertex_offset, MODE);
+        }
+        if (this->shader.material)
+        {
+            glBindBuffer(GL_UNIFORM_BUFFER, this->materialUBO->getId());
             glBufferSubData(GL_UNIFORM_BUFFER,
                         0,
                         sizeof(this->materials->at(this->mtlIndices.at(i)).second),
                         &(this->materials->at(this->mtlIndices.at(i)).second) );
+            DrawElements(i, face_offset, vertex_offset, MODE);
         }
+        else
+            DrawElements(i, face_offset, vertex_offset, MODE);
 
+
+        face_offset += this->_faces->at(i).size();
+        vertex_offset += this->_positions->at(i).size();
+    }
+
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBindBuffer(GL_TEXTURE_2D, 0);
+    glBindVertexArray(0);
+}
+
+
+void GLModel::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
+{
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo->getId());
+    if (rtype == UBO::CONTROL)
+    {
+        glBufferSubData( GL_UNIFORM_BUFFER, 
+                        0, 
+                        sizeof(this->shader), 
+                         &this->shader);
     }
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
 }
 
 void GLModel::setMatrix(glm::mat4 m)

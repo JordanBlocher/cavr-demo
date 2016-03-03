@@ -18,12 +18,12 @@ bool GLRibbon::Init()
     this->normals->resize(this->maxPoints);
     this->colors->resize(this->maxPoints);
     this->uvs->resize(this->maxPoints);
-
+/*
     this->_positions->push_back(*this->positions);
     this->_normals->push_back(*this->normals);
     this->_colors->push_back(*this->colors);
     this->_uvs->push_back(*this->uvs);
-
+*/
 
 	this->v_size += this->positions->size();    
 	//GLMesh::AddMesh();

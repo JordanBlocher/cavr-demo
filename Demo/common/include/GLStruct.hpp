@@ -76,5 +76,13 @@ struct Lights
 
 };
 
+struct Shader
+{
+    Shader():texture(0), bump(0), material(0) {}
+    bool texture;
+    bool bump;
+    bool material;
+};
+
 #endif
 

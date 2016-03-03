@@ -24,12 +24,9 @@ class GLModel : public GLMesh
 
     virtual bool Create();
     virtual bool LoadVertexData();
-
     virtual void Draw(GLenum);
-    virtual void DrawToFBO(std::shared_ptr<GLFrame>);
-
-
     virtual void SetColor(Vec4);
+    virtual void DrawElements(size_t, GLint, GLint, GLenum);
     virtual Vec4 GetColor();
 
     virtual void LoadUBO(std::shared_ptr<GLUniform>, UBO);
@@ -38,7 +35,11 @@ class GLModel : public GLMesh
     glm::mat4 Matrix();
     Vec4 Position();
     void setMatrix(glm::mat4);
- 
+    
+    Shader shader;
+    std::shared_ptr<GLUniform> materialUBO;
+    std::shared_ptr<GLUniform> textureUBO;
+    std::shared_ptr<GLUniform> bumpUBO;
 
  protected:
     virtual void Allocate();
@@ -57,6 +58,8 @@ class GLModel : public GLMesh
 
     std::string path;
     std::string filename;
+
+
 };
 
 #endif 
