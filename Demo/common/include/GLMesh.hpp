@@ -47,7 +47,7 @@ class GLMesh : public GLNode
 
  protected:
     
-    void AddMesh();
+    virtual void AddMesh();
     void AddTriangle(Vec3, Vec3, Vec3);
     void AddQuad(Vec3 upperLeft, Vec3 upperRight, Vec3 lowerLeft, Vec3 lowerRight);
     void AddTriangle(Vec3, Vec3, Vec3, Vec3, int);
