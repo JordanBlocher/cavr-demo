@@ -25,7 +25,7 @@ void GLMesh::Allocate()
     this->_positions = sp2dvec3(new std::vector<std::vector<Vec3>>);
     this->_colors = sp2dvec3(new std::vector<std::vector<Vec3>>);
     this->_normals = sp2dvec3(new std::vector<std::vector<Vec3>>);
-    this->_uvs = sp2dvec2(new std::vector<std::vector<glm::ivec2>>);
+    this->_uvs = sp2dvec2(new std::vector<std::vector<Vec2>>);
     this->_faces = sp2dvec(new std::vector<std::vector<GLuint>>);
     this->_positions->resize(1);
     this->_normals->resize(1);
@@ -35,7 +35,7 @@ void GLMesh::Allocate()
     this->positions = std::make_shared<std::vector<Vec3>>(this->_positions->at(0));
     this->normals = std::make_shared<std::vector<Vec3>>(this->_normals->at(0));
     this->colors = std::make_shared<std::vector<Vec3>>(this->_colors->at(0));
-    this->uvs = std::make_shared<std::vector<glm::ivec2>>(this->_uvs->at(0));
+    this->uvs = std::make_shared<std::vector<Vec2>>(this->_uvs->at(0));
     this->faces = std::make_shared<std::vector<GLuint>>(this->_faces->at(0));
 }
 
@@ -57,6 +57,15 @@ void GLMesh::AddMesh()
 }
 
 void GLMesh::AddTriangle(Vec3 v0, Vec3 v1, Vec3 v2)
+{
+    Vec3 d0 = glm::normalize(v1 - v0);
+    Vec3 d1 = glm::normalize(v2 - v0);
+    Vec3 normal = glm::cross(d0, d1);
+    int cnt = this->positions->size();
+    AddTriangle(v0, v1, v2, normal, cnt);
+}
+
+void GLMesh::AddQuad(Vec3 v0, Vec3 v1, Vec3 v2)
 {
     Vec3 d0 = glm::normalize(v1 - v0);
     Vec3 d1 = glm::normalize(v2 - v0);

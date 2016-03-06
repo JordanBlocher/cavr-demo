@@ -63,6 +63,8 @@ bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
 		positions.push_back(three);
 		positions.push_back(two);
 
+        this->AddTriangle(one, three, two);
+
 		colors.push_back(oneColor);
 		colors.push_back(threeColor);
 		colors.push_back(twoColor);
@@ -70,13 +72,17 @@ bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
 		positions.push_back(one);
 		positions.push_back(two);
 		positions.push_back(four); 
+        
+        this->AddTriangle(one, two, four);
 
 		colors.push_back(oneColor);
 		colors.push_back(twoColor);
 		colors.push_back(fourColor); 
 
-		vbo_pos.LoadSubData((Points.size()-2)*6, 0, (positions) );
+		vbo_pos.LoadSubData((Points.size()-2)*6, 0, std::vector<Vec3>(positions.end() - 6, positions.end()));
 		vbo_color.LoadSubData((Points.size()-2)*6, 3, (colors) );
+		//vbo_tex.LoadSubData((Points.size()-2)*6, 2, (uvs) );
+		//vbo_normal.LoadSubData((Points.size()-2)*6, 1, (normals) );
 
 		return true;
 	}

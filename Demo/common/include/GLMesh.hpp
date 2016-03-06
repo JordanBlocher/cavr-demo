@@ -17,10 +17,10 @@ const GLuint UV_INDEX = 2;
 const GLuint COLOR_INDEX = 3;
 
 typedef std::shared_ptr<std::vector<std::vector<Vec3>>> sp2dvec3;
-typedef std::shared_ptr<std::vector<std::vector<glm::ivec2>>> sp2dvec2;
+typedef std::shared_ptr<std::vector<std::vector<Vec2>>> sp2dvec2;
 typedef std::shared_ptr<std::vector<std::vector<GLuint>>> sp2dvec;
 typedef std::shared_ptr<std::vector<Vec3>> spvec3;
-typedef std::shared_ptr<std::vector<glm::ivec2>> spvec2;
+typedef std::shared_ptr<std::vector<Vec2>> spvec2;
 typedef std::shared_ptr<std::vector<GLuint>> spvec;
 
 class GLMesh : public GLNode
@@ -49,6 +49,7 @@ class GLMesh : public GLNode
     
     void AddMesh();
     void AddTriangle(Vec3, Vec3, Vec3);
+    void AddQuad(Vec3, Vec3, Vec3);
     void AddTriangle(Vec3, Vec3, Vec3, Vec3, int);
     Vec2 InterpolateU(Vec2, Vec2, int, int);
     Vec2 InterpolateV(Vec2, Vec2, int, int);
