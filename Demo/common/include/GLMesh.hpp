@@ -49,7 +49,7 @@ class GLMesh : public GLNode
     
     void AddMesh();
     void AddTriangle(Vec3, Vec3, Vec3);
-    void AddQuad(Vec3, Vec3, Vec3);
+    void AddQuad(Vec3 upperLeft, Vec3 upperRight, Vec3 lowerLeft, Vec3 lowerRight);
     void AddTriangle(Vec3, Vec3, Vec3, Vec3, int);
     Vec2 InterpolateU(Vec2, Vec2, int, int);
     Vec2 InterpolateV(Vec2, Vec2, int, int);

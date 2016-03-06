@@ -2,7 +2,7 @@
 
 #include "GLTexture.hpp"
 
-GLRibbon::GLRibbon(const char* name, long max) : GLPrimitive(name, "GLRibbon", 4, 6*max)
+GLRibbon::GLRibbon(const char* name, long max) : GLPrimitive(name, "GLRibbon", 4, 3*max)
 {
 
 }
@@ -13,13 +13,7 @@ GLRibbon::~GLRibbon()
 
 bool GLRibbon::Init()
 {
-
-    this->positions->resize(this->maxPoints);
-    this->normals->resize(this->maxPoints);
-    this->colors->resize(this->maxPoints);
-    this->uvs->resize(this->maxPoints);
-
-	this->v_size += this->positions->size();    
+	this->v_size += this->maxPoints;    
     
     Create();
 }
@@ -57,30 +51,21 @@ bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
 		threeColor = Points[Points.size() - 1].color;
 		fourColor = Points[Points.size() - 2].color;
 
-		std::vector<glm::vec3> positions;
-		std::vector<glm::vec3> colors;
-		positions.push_back(one);
-		positions.push_back(three);
-		positions.push_back(two);
+        // Set vertex colors
+		colors->push_back(fourColor);
+		colors->push_back(threeColor);
+		colors->push_back(twoColor);
+        colors->push_back(fourColor);
+        colors->push_back(oneColor);
+        colors->push_back(threeColor); 
 
-        this->AddTriangle(one, three, two);
+        AddQuad(four, two, one, three);
 
-		colors.push_back(oneColor);
-		colors.push_back(threeColor);
-		colors.push_back(twoColor);
-
-		positions.push_back(one);
-		positions.push_back(two);
-		positions.push_back(four); 
-        
-        this->AddTriangle(one, two, four);
-
-		colors.push_back(oneColor);
-		colors.push_back(twoColor);
-		colors.push_back(fourColor); 
-
-		vbo_pos.LoadSubData((Points.size()-2)*6, 0, std::vector<Vec3>(positions.end() - 6, positions.end()));
-		vbo_color.LoadSubData((Points.size()-2)*6, 3, (colors) );
+		vbo_pos.LoadSubData((Points.size()-2)*6, 0, std::vector<Vec3>(positions->end() - 6, positions->end()));
+		vbo_color.LoadSubData((Points.size()-2)*6, 3, std::vector<Vec3>(colors->end() - 6, colors->end()));
+        vbo_tex.LoadSubData((Points.size()-2)*6, 2, std::vector<Vec2>(uvs->end() - 6, uvs->end()) );
+        vbo_norm.LoadSubData((Points.size()-2)*6, 1, std::vector<Vec3>(normals->end() - 6, normals->end()) );
+        AddMesh();
 		//vbo_tex.LoadSubData((Points.size()-2)*6, 2, (uvs) );
 		//vbo_normal.LoadSubData((Points.size()-2)*6, 1, (normals) );
 

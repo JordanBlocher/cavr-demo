@@ -65,13 +65,54 @@ void GLMesh::AddTriangle(Vec3 v0, Vec3 v1, Vec3 v2)
     AddTriangle(v0, v1, v2, normal, cnt);
 }
 
-void GLMesh::AddQuad(Vec3 v0, Vec3 v1, Vec3 v2)
+void GLMesh::AddQuad(Vec3 upperLeft, Vec3 upperRight, Vec3 lowerLeft, Vec3 lowerRight)
 {
-    Vec3 d0 = glm::normalize(v1 - v0);
-    Vec3 d1 = glm::normalize(v2 - v0);
-    Vec3 normal = glm::cross(d0, d1);
+    // Triangle One
+    this->positions->push_back(upperLeft);
+    this->positions->push_back(lowerRight);
+    this->positions->push_back(upperRight);
+
+    Vec3 d0 = glm::normalize(lowerRight-upperRight);
+    Vec3 d1 = glm::normalize(upperLeft-upperRight);
+
+    Vec3 normal = glm::cross(d0,d1);
+    this->normals->push_back(normal);
+    this->normals->push_back(normal);
+    this->normals->push_back(normal);
+
+    this->uvs->push_back(glm::vec2(0,0));
+    this->uvs->push_back(glm::vec2(1,1));
+    this->uvs->push_back(glm::vec2(1,0));
+
     int cnt = this->positions->size();
-    AddTriangle(v0, v1, v2, normal, cnt);
+    this->faces->push_back(cnt);
+    this->faces->push_back(cnt+1);
+    this->faces->push_back(cnt+2);
+
+    // Triangle Two
+    this->positions->push_back(upperLeft);
+    this->positions->push_back(lowerLeft);
+    this->positions->push_back(lowerRight);
+
+    d0 = glm::normalize(upperLeft-lowerLeft);
+    d1 = glm::normalize(lowerRight-lowerLeft);
+
+    normal = glm::cross(d0,d1);
+    //this->normals->push_back(this->normals->end(),normal,3);
+
+    this->uvs->push_back(glm::vec2(0,0));
+    this->uvs->push_back(glm::vec2(0,1));
+    this->uvs->push_back(glm::vec2(1,1));
+
+    this->normals->push_back(normal);
+    this->normals->push_back(normal);
+    this->normals->push_back(normal);
+
+    cnt = this->positions->size();
+    this->faces->push_back(cnt);
+    this->faces->push_back(cnt+1);
+    this->faces->push_back(cnt+2);
+
 }
 
 void GLMesh::AddTriangle(Vec3 v0, Vec3 v1, Vec3 v2, Vec3 normal, int cnt)
