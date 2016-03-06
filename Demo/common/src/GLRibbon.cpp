@@ -66,8 +66,6 @@ bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
         vbo_tex.LoadSubData((Points.size()-2)*6, 2, std::vector<Vec2>(uvs->end() - 6, uvs->end()) );
         vbo_norm.LoadSubData((Points.size()-2)*6, 1, std::vector<Vec3>(normals->end() - 6, normals->end()) );
         AddMesh();
-		//vbo_tex.LoadSubData((Points.size()-2)*6, 2, (uvs) );
-		//vbo_normal.LoadSubData((Points.size()-2)*6, 1, (normals) );
 
 		return true;
 	}
@@ -83,6 +81,15 @@ void GLRibbon::AddBreak()
 
 void GLRibbon::ClearPoints()
 {
+    Points.clear();
+    
+    vector<Vec3> clear3 = vector<vec3> (maxPoints,Vec3);
+    vector<Vec2> clear2 = vector<vec2> (maxPoints,Vec2);
+
+    vbo_pos.LoadSubData(clear3.size(), 0, clear3);
+    vbo_color.LoadSubData(clear3.size(), 3, clear3);
+    vbo_norm.LoadSubData(clear3.size(),1, clear3);
+    vbo_tex.LoadSubData(clear2.size(),2,clear2);
 
 }
 

@@ -45,5 +45,3 @@ GLenum GLBufferObject::Type() const
 {
     return this->type;
 }
-
-
