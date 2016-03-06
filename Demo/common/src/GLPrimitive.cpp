@@ -16,7 +16,6 @@ GLPrimitive::GLPrimitive(const char* name, GLuint attributes, long maxPoints) : 
     this->attributes = attributes;
     this->index = 0;
     
-    GLMesh::Allocate();
     this->Allocate();
 }
 
@@ -26,7 +25,6 @@ GLPrimitive::GLPrimitive(const char* name, const char* typeName, GLuint attribut
     this->attributes = attributes;
     this->index = 0;
     
-    GLMesh::Allocate();
     this->Allocate();
 }
 
@@ -38,6 +36,21 @@ void GLPrimitive::Allocate()
 {
     this->materials = std::shared_ptr<std::vector<Material>>(new std::vector<Material>);
     this->textures = std::shared_ptr<std::vector<GLTexture>>(new std::vector<GLTexture>);
+    this->shaders = std::shared_ptr<std::vector<Shader>>(new std::vector<Shader>);
+    this->shaders->resize(1);
+    GLMesh::Allocate();
+}
+
+void GLPrimitive::AddMesh()
+{
+    GLMesh::AddMesh();
+    Shader shader;
+    shader.material = -1;
+    shader.texture = -1;
+    shader.bump = -1;
+    this->shaders->push_back(shader);
+    this->shader = this->shaders->at(index);
+    std::cout<<"SHADER SIZE "<<this->shaders->size()<<endl;
 }
 
 bool GLPrimitive::AddUVSphere(int nlats, int nlongs)
@@ -151,8 +164,6 @@ bool GLPrimitive::AddSphere(int num_lats, int num_lons)
             Vec3 ul(top_xz * cos_l, top_y, top_xz * sin_l);
             Vec3 ur(top_xz * cos_r, top_y, top_xz * sin_r);
 
-
-
             faces->push_back(face_ind);
             faces->push_back(face_ind++);
 
@@ -207,6 +218,12 @@ void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
     
     if (rtype == UBO::CONTROL)
     {
+        int textureIdx = this->shader.texture;
+        int materialIdx = this->shader.material;
+        Shader shader;
+        shader.material = materialIdx == -1 ? 0 : 1;
+        shader.texture = textureIdx == -1 ? 0 : 1;
+        shader.bump = 0;
         glBufferSubData( GL_UNIFORM_BUFFER, 
                         0, 
                         sizeof(Shader), 
@@ -218,28 +235,65 @@ void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+void GLPrimitive::DrawElements(size_t i, GLint face_offset, GLint vertex_offset, GLenum MODE)
+{
+    glDrawElementsBaseVertex(MODE, 
+        this->_faces->at(i).size(),
+        GL_UNSIGNED_INT,
+        (void*)(sizeof(GLuint) * face_offset),
+        vertex_offset);
+}
+
 void GLPrimitive::Draw(GLenum MODE)
 {
     GLint face_offset = 0;
     GLint vertex_offset = 0;
+
     glBindVertexArray(this->vao);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     //Draw Model 
     for(size_t i=0; i< this->_faces->size(); i++)
-    //for(size_t i=0; i< this->_positions->size(); i++)
-    {   
-        glDrawElementsBaseVertex(MODE, 
-                this->_faces->at(i).size(),
-                GL_UNSIGNED_INT,
-                (void*)(sizeof(GLuint) * face_offset),
-                vertex_offset);
-
-        //glDrawArrays(MODE, vertex_offset,this->_positions->size());
+    {      
+        if(_positions->at(i).size() == 0 )
+            continue;
+        int textureIdx = this->shaders->at(i).texture;
+        int materialIdx = this->shaders->at(i).material;
+        if (textureIdx != -1)
+        {
+            glBindBuffer(GL_UNIFORM_BUFFER, this->textureUBO->getId());
+            this->textures->at(textureIdx).Bind(GL_TEXTURE0);
+            DrawElements(i, face_offset, vertex_offset, MODE);
+        }
+        if (materialIdx != -1)
+        {
+            glBindBuffer(GL_UNIFORM_BUFFER, this->materialUBO->getId());
+            glBufferSubData(GL_UNIFORM_BUFFER,
+                        0,
+                        sizeof(this->materials->at(materialIdx)),
+                        &(this->materials->at(materialIdx)) );
+            DrawElements(i, face_offset, vertex_offset, MODE);
+        }
+        Shader shader;
+        shader.material = materialIdx == -1 ? 0 : 1;
+        shader.texture = textureIdx == -1 ? 0 : 1;
+        shader.bump = 0;
+        glBufferSubData( GL_UNIFORM_BUFFER, 
+                        0, 
+                        sizeof(Shader), 
+                         &shader);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        if(textureIdx == -1 && materialIdx == -1)
+        {
+            DrawElements(i, face_offset, vertex_offset, MODE);
+        }
 
         face_offset += this->_faces->at(i).size();
         vertex_offset += this->_positions->at(i).size();
     }
 
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBindBuffer(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
 }
 
@@ -247,11 +301,13 @@ void GLPrimitive::Draw(GLenum MODE)
 void GLPrimitive::AddTexture(std::shared_ptr<GLTexture> tex)
 {
    this->textures->push_back(*tex); 
+   this->shaders->at(index).texture = this->textures->size()-1;
 }
 
 void GLPrimitive::AddMaterial(Material mat)
 {
     this->materials->push_back(mat);
+    this->shaders->at(index).material = this->materials->size()-1;
 }
 
 void GLPrimitive::setMatrix(glm::mat4 m)

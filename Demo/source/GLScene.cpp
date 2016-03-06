@@ -129,10 +129,10 @@ void GLScene::InitializeGL()
     }
 
     
-    shared_ptr<GLTexture> tex(new GLTexture("gold", GL_TEXTURE_2D, "models/gold.jpg"));
+    shared_ptr<GLTexture> tex(new GLTexture("gold", GL_TEXTURE_2D, "models/pebbles.jpg"));
     tex->Load();
-    //GLRibbons->AddTexture(tex);
-    GLRibbons->AddMaterial(Material());
+    GLRibbons->AddTexture(tex);
+    //GLRibbons->AddMaterial(Material());
     /*shared_ptr<GLPrimitive> primitive(new GLPrimitive("primitive", 6, 10000));
     primitive->AddPlane(1000, 1000, 1, 1);
     primitive->SetColor(Vec3(0,0,1));
@@ -156,13 +156,9 @@ void GLScene::Paint()
     shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
     dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
     dragon->shader.texture = 1;
-    dragon->shader.material = 0;
     this->PaintHelper(dragon, GL_TRIANGLES);
     
     shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
-    GLRibbons->shader.texture = 0;
-    GLRibbons->shader.material = 0;
-    GLRibbons->shader.bump = 0;
     this->PaintHelper(GLRibbons, GL_TRIANGLES);
    
     //shared_ptr<GLPrimitive> primitive = this->Get<GLPrimitive>("primitive");

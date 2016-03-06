@@ -22,11 +22,13 @@ class GLPrimitive : public GLMesh
     ~GLPrimitive();
     
     virtual void LoadUBO(std::shared_ptr<GLUniform>, UBO);
+    virtual void DrawElements(size_t, GLint, GLint, GLenum);
     bool AddSphere(int, int);
     bool AddUVSphere(int, int);
     bool AddCircle(double, double, double, int, bool);
     void AddPlane(double, double, double, int);
     bool AddCylinder();
+    void AddMesh();
     //bool AddCube();
     //
     void AddTexture(std::shared_ptr<GLTexture>);
@@ -40,10 +42,10 @@ class GLPrimitive : public GLMesh
     Vec4 Position();
     void setMatrix(glm::mat4);
 
-    Shader shader;
     std::shared_ptr<GLUniform> materialUBO;
     std::shared_ptr<GLUniform> textureUBO;
     std::shared_ptr<GLUniform> bumpUBO;
+    Shader shader;
 
  protected:
     virtual void Allocate();
@@ -53,6 +55,7 @@ class GLPrimitive : public GLMesh
 
     std::shared_ptr<std::vector<GLTexture>> textures;
     std::shared_ptr<std::vector<Material>> materials;
+    std::shared_ptr<std::vector<Shader>> shaders;
 
 };
 

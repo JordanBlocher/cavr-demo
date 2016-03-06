@@ -31,6 +31,7 @@ class GLRibbon : public GLPrimitive
 
     virtual bool Create();
     virtual void CreateVBOs();
+    virtual void DrawElements(size_t, GLint, GLint, GLenum);
 	bool AddPoints(vec3 worldPoint,vec3 Color);
 	void ClearPoints();
 	bool Init();
