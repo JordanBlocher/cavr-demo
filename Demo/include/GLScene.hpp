@@ -30,6 +30,8 @@ class GLScene : public GLViewport
     Vec4 color;
     bool painting;
     
+    bool Break;
+
     template <typename T> 
     void PaintHelper(shared_ptr<T>, GLenum);
 

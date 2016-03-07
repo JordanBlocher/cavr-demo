@@ -52,7 +52,7 @@ void GLPrimitive::AddMesh()
     this->shader->material = -1;
     this->shader->texture = -1;
     this->shader->bump = -1;
-    cout<<"Adding mesh... at idx= "<<index<<endl;
+    //cout<<"Adding mesh... at idx= "<<index<<endl;
 }
 
 bool GLPrimitive::AddUVSphere(int nlats, int nlongs)

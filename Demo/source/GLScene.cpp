@@ -37,7 +37,7 @@ void GLScene::InitializeGL()
 {
     GLViewport::InitializeGL();
 
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
     // Create camera
@@ -175,20 +175,21 @@ void GLScene::Event()
       GLRibbons->ClearPoints();
     }
 
-    if(cavr::input::getButton("paint")->delta() != cavr::input::Button::Open)
+    if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Held)
     {
       auto wand = cavr::input:: getSixDOF("wand");
       shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
 
-      auto paintPos = GLMath::vec3ftoGLM(-wand->getForward()) + camera1->getCameraPosition();
+      auto paintPos = GLMath::vec3ftoGLM(-wand->getForward()) + camera1->getCameraPosition() + GLMath::vec3ftoGLM(-wand->getPosition()) ;
       //cout << glm::to_string(paintPos) << endl; 
       GLRibbons->AddPoints(paintPos,glm::vec3(1,1,1));
     }
-    else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Released)
+    else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !Break)
     {
-        cout << "RELEASED" << endl;
         GLRibbons->AddBreak();
     }
+
+    Break = cavr::input::getButton("paint")->delta() == cavr::input::Button::Open;
 
 }
 

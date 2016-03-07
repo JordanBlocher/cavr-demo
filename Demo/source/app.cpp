@@ -19,7 +19,7 @@ using namespace irrklang;
 static GLCamera::CamDirection CAM_DIRECTION;
 static bool PAINT;
 
-#define DEBUG 
+//#define DEBUG 
 
 #pragma comment(lib, "irrKlang.lib")
 // IrrKlang
@@ -109,9 +109,10 @@ void frame()
 
 void render() 
 {
+
     static GLScene *cd;
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
 
     // get the context data
     //shared_ptr<GLScene> cd = (shared_ptr<GLScene>)cavr::System::getContextData();
@@ -186,18 +187,21 @@ int main(int argc, char** argv)
   input_map.button_map["backward"] = "keyboard[k]";
   input_map.button_map["paint"] = "keyboard[p]";
   input_map.button_map["exit"] = "keyboard[Escape]";
+  input_map.button_map["clear"] = "keyboard[b]";
 #else
   input_map.button_map["up"] = "vrpn[WiiMote0[10]]";
   input_map.button_map["down"] = "vrpn[WWiiMote0[9]]";
   input_map.button_map["left"] = "vrpn[WWiiMote0[7]]";
   input_map.button_map["right"] = "vrpn[WWiiMote0[8]]";
   input_map.button_map["forward"] = "vrpn[WWiiMote0[4]]";
-  input_map.button_map["backward"] = "vrpn[WWiiMote0[3]]";
+  //input_map.button_map["backward"] = "vrpn[WWiiMote0[3]]";
   input_map.button_map["exit"] = "vrpn[WiiMote0[0]]";
+  input_map.button_map["paint"] = "vrpn[WiiMote0[4]]";
+  input_map.button_map["clear"] = "vrpn[WiiMote0[16]]";
 #endif
 
 
-  input_map.button_map["clear"] = "keyboard[b]";
+  
 
   input_map.button_map["forwardEnable"] = "vrpn[WiiMote0[17]]";// 16 and 17 are Z and c, respectively
   input_map.analog_map["x_vec"] = "vrpn[WiiMote0[21]]"; // analog sticks of the nunchaku
