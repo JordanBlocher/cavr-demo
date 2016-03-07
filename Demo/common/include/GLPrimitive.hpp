@@ -33,6 +33,8 @@ class GLPrimitive : public GLMesh
     //
     void AddTexture(std::shared_ptr<GLTexture>);
     void AddMaterial(Material mat);
+    void AssignTexture(int, int);
+    void AssignMaterial(int, int);
     void SetColor(Vec3);
     Vec3 GetColor();
 

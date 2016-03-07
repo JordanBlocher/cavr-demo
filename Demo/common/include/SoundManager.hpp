@@ -16,8 +16,9 @@ class SoundManager : public GLNode
 		void finished();
 
 	private:
-        //irrklang::ISoundEngine* engine;
-        //irrklang::ISound* music; 
+        irrklang::ISoundEngine* engine;
+        irrklang::ISound* bgmusic; 
+        irrklang::ISound* fxmusic; 
         std::vector<const char*> bgm;
         std::vector<const char*> fx;
 };

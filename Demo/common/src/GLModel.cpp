@@ -44,6 +44,7 @@ void GLModel::Allocate()
     this->materials = std::shared_ptr<std::vector<std::pair<aiString,Material>>>(new std::vector<std::pair<aiString,Material>>);
     this->textures = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);
     this->bumpmaps = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);
+    this->shader = std::shared_ptr<Shader>(new Shader());
 
 }
 
@@ -348,7 +349,6 @@ void GLModel::Draw(GLenum MODE)
 
 void GLModel::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
 {
-
     glBindBuffer(GL_UNIFORM_BUFFER, ubo->getId());
     if (rtype == UBO::CONTROL)
     {

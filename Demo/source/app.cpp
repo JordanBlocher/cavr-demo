@@ -19,7 +19,7 @@ using namespace irrklang;
 static GLCamera::CamDirection CAM_DIRECTION;
 static bool PAINT;
 
-//#define DEBUG 
+#define DEBUG 
 
 #pragma comment(lib, "irrKlang.lib")
 // IrrKlang

@@ -20,10 +20,6 @@ protected:
     Magick::Image* image;
     Magick::Blob blob;
     std::string file;
-
-    Magick::Image* bumpImage;
-    Magick::Blob bumpBlob;
-    std::string bumpFile;
 };
 
 #endif 

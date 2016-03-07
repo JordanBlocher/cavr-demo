@@ -180,7 +180,6 @@ void main(void)
 
     if(!texture && !shader.material)
         f_out = v_color;
-    //f_out = vec4(normal,1.0);
 }
 
  

@@ -35,7 +35,6 @@ class GLRibbon : public GLPrimitive
 	bool AddPoints(vec3 worldPoint,vec3 Color);
 	void ClearPoints();
 	bool Init();
-	void Draw(GLenum);
 	void AddBreak();
 
 private:

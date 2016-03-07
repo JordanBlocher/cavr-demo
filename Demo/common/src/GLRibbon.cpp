@@ -59,15 +59,17 @@ bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
         colors->push_back(threeColor); 
 
         AddQuad(four, two, one, three);
+
         cout << positions->size() << endl;
 		vbo_pos.LoadSubData((Points.size()-2)*6, 0, std::vector<Vec3>(positions->end() - 6, positions->end()));
 		vbo_color.LoadSubData((Points.size()-2)*6, 3, std::vector<Vec3>(colors->end() - 6, colors->end()));
         vbo_tex.LoadSubData((Points.size()-2)*6, 2, std::vector<Vec2>(uvs->end() - 6, uvs->end()) );
         vbo_norm.LoadSubData((Points.size()-2)*6, 1, std::vector<Vec3>(normals->end() - 6, normals->end()) );
         vbo_elements.LoadSubData((Points.size()-2)*6, 1, std::vector<Vec3>(faces->end() - 6, faces->end()) );
-        AddMesh();
 
         cout << Points.size() << endl;
+
+        AddMesh();
 		return true;
 	}
 	return false;
@@ -94,19 +96,9 @@ void GLRibbon::ClearPoints()
 
 }
 
-void GLRibbon::Draw(GLenum drawmode)
-{
-    //cout << "HERE" << std::endl;
-    glBindVertexArray(vao);
-    //GLPrimitive::Draw(drawmode);
-    glDrawArrays(drawmode, 0, maxPoints);
-    glBindVertexArray(vao);
-}
-
 void GLRibbon::DrawElements(size_t i, GLint face_offset, GLint vertex_offset, GLenum MODE)
 {
-    cout << vertex_offset << endl;
-    glDrawArrays(MODE, 0, Points.size() * 3);
+    glDrawArrays(MODE, vertex_offset, _positions->at(i).size());
 }
 
 bool GLRibbon::Create()

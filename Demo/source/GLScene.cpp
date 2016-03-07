@@ -12,6 +12,7 @@
 #include <GLRibbon.hpp>
 #include <GLScene.hpp>
 #include <GLPrimitive.hpp>
+#include <SoundManager.hpp>
 #include <cavr/cavr.h>
 #include <cavr/gfx/renderer.h>
 #include <cavr/gfx/ray.h>
@@ -45,9 +46,9 @@ void GLScene::InitializeGL()
     this->AddToContext(camera);
 
     // Create sound manager
-    //shared_ptr<SoundManager> soundMan(new SoundManager("soundMan"));
-    //soundMan->playBgm(0);
-    //this->AddToContext(soundMan);
+    shared_ptr<SoundManager> soundMan(new SoundManager("soundMan"));
+    soundMan->playBgm(0);
+    this->AddToContext(soundMan);
 
        /****** Deep GPU Stuff ******/
     //Shaders
@@ -129,9 +130,15 @@ void GLScene::InitializeGL()
     }
 
     
-    shared_ptr<GLTexture> tex(new GLTexture("gold", GL_TEXTURE_2D, "models/pebbles.jpg"));
+    shared_ptr<GLTexture> tex(new GLTexture("pebbles", GL_TEXTURE_2D, "models/pebbles.jpg"));
     tex->Load();
     GLRibbons->AddTexture(tex);
+    shared_ptr<GLTexture> tex2(new GLTexture("leaves", GL_TEXTURE_2D, "models/leaves.jpg"));
+    tex2->Load();
+    GLRibbons->AddTexture(tex2);
+    GLRibbons->AssignTexture(0, 1);
+    GLRibbons->AssignTexture(1, 0);
+    GLRibbons->AssignTexture(2, 1);
     //GLRibbons->AddMaterial(Material());
     /*shared_ptr<GLPrimitive> primitive(new GLPrimitive("primitive", 6, 10000));
     primitive->AddPlane(1000, 1000, 1, 1);
@@ -153,10 +160,10 @@ void GLScene::Paint()
 
     //Choose Model
  
-    //shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
-    //dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
-    //dragon->shader->texture = 1;
-    //this->PaintHelper(dragon, GL_TRIANGLES);
+    shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
+    dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
+    dragon->shader->texture = 1;
+    this->PaintHelper(dragon, GL_TRIANGLES);
     
     shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
     this->PaintHelper(GLRibbons, GL_TRIANGLES);

@@ -253,15 +253,22 @@ void GLPrimitive::Draw(GLenum MODE)
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     //Draw Model 
-    //cout<<"DRAWING "<<_faces->size()<<" "<<_positions->size()<<" "<<shaders->size()<<endl;
     for(size_t i=0; i< this->_faces->size(); i++)
     {      
-        //cout<<"In face "<<i<<" : "<<_positions->at(i).size()<< " : "<<_faces->at(i).size()<<endl;
         if(_positions->at(i).size() == 0)
             continue;
         int textureIdx = this->shaders->at(i).texture;
         int materialIdx = this->shaders->at(i).material;
-        //std::cout<<"SHADER: "<<materialIdx<<" "<<textureIdx<<endl;
+        Shader tmp;
+        tmp.material = materialIdx < 0 ? 0 : 1;
+        tmp.texture = textureIdx < 0 ? 0 : 1;
+        tmp.bump = 0;
+        glBindBuffer(GL_UNIFORM_BUFFER, this->controlUBO);
+        glBufferSubData( GL_UNIFORM_BUFFER, 
+                        0, 
+                        sizeof(Shader), 
+                         &tmp);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
         if (textureIdx != -1)
         {
             glBindBuffer(GL_UNIFORM_BUFFER, this->textureUBO);
@@ -277,16 +284,6 @@ void GLPrimitive::Draw(GLenum MODE)
                         &(this->materials->at(materialIdx)) );
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
-        Shader tmp;
-        tmp.material = materialIdx < 0 ? 0 : 1;
-        tmp.texture = textureIdx < 0 ? 0 : 1;
-        tmp.bump = 0;
-        glBindBuffer(GL_UNIFORM_BUFFER, this->controlUBO);
-        glBufferSubData( GL_UNIFORM_BUFFER, 
-                        0, 
-                        sizeof(Shader), 
-                         &tmp);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
         if(textureIdx == -1 && materialIdx == -1)
         {
             DrawElements(i, face_offset, vertex_offset, MODE);
@@ -305,14 +302,31 @@ void GLPrimitive::Draw(GLenum MODE)
 void GLPrimitive::AddTexture(std::shared_ptr<GLTexture> tex)
 {
    this->textures->push_back(*tex); 
-   this->shaders->at(index-1).texture = this->textures->size()-1;
-   std::cout<<"Adding texture "<<this->textures->size()-1<< " to idx "<<index-1<<endl;
+}
+
+void GLPrimitive::AssignTexture(int i, int j)
+{
+    if(j > this->textures->size() - 1)
+    {
+        cout<< "Texture not found\n";
+        return;
+    }
+   this->shaders->at(i).texture = j;
 }
 
 void GLPrimitive::AddMaterial(Material mat)
 {
     this->materials->push_back(mat);
-    this->shaders->at(index-1).material = this->materials->size()-1;
+}
+
+void GLPrimitive::AssignMaterial(int i, int j)
+{
+    if(j > this->materials->size() - 1)
+    {
+        cout<< "Material not found\n";
+        return;
+    }
+    this->shaders->at(i).material = j;
 }
 
 void GLPrimitive::setMatrix(glm::mat4 m)
