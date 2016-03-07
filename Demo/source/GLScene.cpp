@@ -40,9 +40,7 @@ void GLScene::InitializeGL()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    // Create camera
-    std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
-    this->AddToContext(camera);
+
 
     // Create sound manager
     shared_ptr<SoundManager> soundMan(new SoundManager("soundMan"));
@@ -159,10 +157,10 @@ void GLScene::Paint()
 
     //Choose Model
  
-    shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
-    dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
-    dragon->shader->texture = 1;
-    this->PaintHelper(dragon, GL_TRIANGLES);
+    //shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
+    //dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
+    //dragon->shader->texture = 1;
+    //this->PaintHelper(dragon, GL_TRIANGLES);
     
     shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
     this->PaintHelper(GLRibbons, GL_TRIANGLES);
@@ -189,7 +187,7 @@ void GLScene::Event()
       auto wand = cavr::input:: getSixDOF("wand");
       shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
 
-      auto paintPos = GLMath::vec3ftoGLM(-wand->getForward()) + camera1->getCameraPosition() + GLMath::vec3ftoGLM(-wand->getPosition()) ;
+      auto paintPos = GLMath::vec3ftoGLM(-2 *wand->getForward()) + camera1->getCameraPosition() + GLMath::vec3ftoGLM(wand->getPosition()) ;
       //cout << glm::to_string(paintPos) << endl; 
       GLRibbons->AddPoints(paintPos,glm::vec3(1,1,1));
     }

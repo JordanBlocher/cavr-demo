@@ -54,7 +54,7 @@ void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)
 
     // Calculate MVP
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
-    glm::mat4 vp = camera1->Projection() * camera1->View() *GLMath::mat4ftoGLM(cavr::gfx::getView());
+    glm::mat4 vp = camera1->Projection() * camera1->View() ;
     Matrices matrices;
     matrices.mvpMatrix = vp * model->Matrix();
     matrices.mvMatrix = model->Matrix(); 

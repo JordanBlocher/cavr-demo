@@ -102,7 +102,7 @@ localhost = {
 
 
 
-hpcvis11 = {
+hpcvis9 = {
   hostname = "hpcvis9";
   ssh = "hpcvis9.cse.unr.edu";
   address = "hpcvis9.cse.unr.edu";--"tcp://" .. "hpcvis7" .. ":8888";
@@ -129,6 +129,6 @@ projector = {
 
 machines = {
   self=projector;
-  hpcvis11;
+  --hpcvis9;
   --self3 = others2;
 };

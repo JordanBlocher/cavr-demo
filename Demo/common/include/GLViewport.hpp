@@ -31,14 +31,15 @@ class GLViewport
     std::shared_ptr<T> Get(const char*) const;
 
     void ViewContext();
-
+    bool AddToContext(const std::shared_ptr<GLNode>);
+    
  protected: 
     virtual void InitializeGL();
     virtual void Paint();
     virtual void Event();
 
     bool AddProgram(std::shared_ptr<GLProgram>);
-    bool AddToContext(const std::shared_ptr<GLNode>);
+    
     bool RemoveFromContext(const char*);
     void SetScene(const std::shared_ptr<GLNode>);
     bool Contains(const char*);
