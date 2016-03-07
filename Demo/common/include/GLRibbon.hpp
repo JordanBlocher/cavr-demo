@@ -36,6 +36,7 @@ class GLRibbon : public GLPrimitive
 	void ClearPoints();
 	bool Init();
 	void AddBreak();
+    Vec3 Tail();
 
 private:
 	vector<PaintStruct> Points;

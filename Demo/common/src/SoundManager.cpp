@@ -11,18 +11,26 @@ SoundManager::SoundManager(const char* name)
 
 }
 
-
-void SoundManager::playBgm(int bgmNum)
+void SoundManager::PlayBgm(int bgmNum, bool looped, bool paused)
 {
-    this->bgmusic = this->engine->play3D(this->bgm[bgmNum], irrklang::vec3df(0,1,0), true, false, true);
+    this->bgmusic = this->engine->play2D(this->bgm[bgmNum], looped, paused, true);
 }
 
-void SoundManager::playFX(int fxNum)
+void SoundManager::PlayFX(int fxNum, Vec3 pos)
 {
-    this->fxmusic = this->engine->play2D(this->fx[fxNum], true, false, true);
+    this->fxmusic = this->engine->play3D(this->fx[fxNum], irrklang::vec3df(pos.x,pos.y,pos.z), true, false, true);
 }
 
-void SoundManager::finished()
+void SoundManager::SetListener(Vec3 pos)
+{
+    pos.x *= 10;
+    pos.z *= 10;
+    this->engine->setListenerPosition(
+            irrklang::vec3df(pos.x,pos.y,pos.z), // Listener's position
+            irrklang::vec3df(0,0,1)); // What direction is the listener's facing directiion -- in this case we are always stareing forward..
+}
+
+void SoundManager::Finished()
 {
 	this->engine->drop();
 }
