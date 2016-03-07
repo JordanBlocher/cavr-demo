@@ -47,7 +47,8 @@ void GLScene::InitializeGL()
 
     // Create sound manager
     shared_ptr<SoundManager> soundMan(new SoundManager("soundMan"));
-    soundMan->playBgm(0);
+    //soundMan->playBgm(0);
+    soundMan->playFX(0);
     this->AddToContext(soundMan);
 
        /****** Deep GPU Stuff ******/
@@ -130,15 +131,15 @@ void GLScene::InitializeGL()
     }
 
     
-    shared_ptr<GLTexture> tex(new GLTexture("pebbles", GL_TEXTURE_2D, "models/pebbles.jpg"));
-    tex->Load();
-    GLRibbons->AddTexture(tex);
-    shared_ptr<GLTexture> tex2(new GLTexture("leaves", GL_TEXTURE_2D, "models/leaves.jpg"));
-    tex2->Load();
-    GLRibbons->AddTexture(tex2);
-    GLRibbons->AssignTexture(0, 1);
-    GLRibbons->AssignTexture(1, 0);
-    GLRibbons->AssignTexture(2, 1);
+    //shared_ptr<GLTexture> tex(new GLTexture("pebbles", GL_TEXTURE_2D, "models/pebbles.jpg"));
+    //tex->Load();
+    //GLRibbons->AddTexture(tex);
+    //shared_ptr<GLTexture> tex2(new GLTexture("leaves", GL_TEXTURE_2D, "models/leaves.jpg"));
+    //tex2->Load();
+    //GLRibbons->AddTexture(tex2);
+    //GLRibbons->AssignTexture(0, 1);
+    //GLRibbons->AssignTexture(1, 0);
+    //GLRibbons->AssignTexture(2, 1);
     //GLRibbons->AddMaterial(Material());
     /*shared_ptr<GLPrimitive> primitive(new GLPrimitive("primitive", 6, 10000));
     primitive->AddPlane(1000, 1000, 1, 1);

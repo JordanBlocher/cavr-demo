@@ -21,12 +21,28 @@ perspective_window = {
   fullscreen = true;
 };
 
+
+back_window = {
+  view = {
+    eyes = {
+      eye = cavr.sixdof("emulated");
+      --left_eye = cavr.sixdof("vrpn[TallGlasses[[0]]");
+      --right_eye = cavr.sixdof("vrpn[TallGlasses[[0]]");
+      --stereo ="mono";
+    };
+    lower_left = cavr.sixdof("emulated") * cavr.translate(1, -1, 1);
+    lower_right = cavr.sixdof("emulated") * cavr.translate(-1, -1, 1);
+    upper_left = cavr.sixdof("emulated") * cavr.translate(1, 1, 1);
+  };
+  fullscreen = true;
+};
+
 x11_renderer = {
   type = "x11gl";
   display = ":0.0";
   windows = {
-    --sim_window = perspective_window;
-    sim_window2 = sim_window;
+    bw = back_window;
+    --sim_window2 = sim_window;
 
   };
 };
@@ -43,7 +59,6 @@ x11_renderer_projector1 = {
 x11_renderer_projector2 = {
   type = "x11gl";
   display = ":1.2";
-    "WiiMote0@tracker.rd.unr.edu";
   windows = {
     sim_window = perspective_window;
     --sim_window2 = sim_window;
@@ -87,10 +102,10 @@ localhost = {
 
 
 
-others = {
-  hostname = "hpcvis2";
-  ssh = "hpcvis2";
-  address = "hpcvis2";--"tcp://" .. "hpcvis7" .. ":8888";
+hpcvis11 = {
+  hostname = "hpcvis9";
+  ssh = "hpcvis9.cse.unr.edu";
+  address = "hpcvis9.cse.unr.edu";--"tcp://" .. "hpcvis7" .. ":8888";
   plugins = {
     x11_renderer = x11_renderer;
     vrpn = vrpn;
@@ -100,7 +115,7 @@ others = {
   };
 };
 
-others2 = {
+projector = {
   hostname = "projector";
   ssh = "projector.cse.unr.edu";
   address = "projector.cse.unr.edu";--"tcp://" .. "hpcvis7" .. ":8888";
@@ -113,7 +128,7 @@ others2 = {
 
 
 machines = {
-  self=others2;
-  --self2 = others;
+  self=projector;
+  hpcvis11;
   --self3 = others2;
 };
