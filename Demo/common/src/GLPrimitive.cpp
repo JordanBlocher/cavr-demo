@@ -47,22 +47,12 @@ void GLPrimitive::Allocate()
 void GLPrimitive::AddMesh()
 {
     GLMesh::AddMesh();
-<<<<<<< HEAD
-    Shader shader;
-    shader.material = -1;
-    shader.texture = -1;
-    shader.bump = -1;
-    this->shaders->push_back(shader);
-    this->shader = this->shaders->at(index);
-    //std::cout<<"SHADER SIZE "<<this->shaders->size()<<endl;
-=======
     this->shaders->push_back(*this->shader);
     this->shader = std::shared_ptr<Shader>(new Shader());
     this->shader->material = -1;
     this->shader->texture = -1;
     this->shader->bump = -1;
     cout<<"Adding mesh... at idx= "<<index<<endl;
->>>>>>> 972bec9e18993cd287b95fe99831901f979005a0
 }
 
 bool GLPrimitive::AddUVSphere(int nlats, int nlongs)
@@ -263,15 +253,15 @@ void GLPrimitive::Draw(GLenum MODE)
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     //Draw Model 
-        cout<<"DRAWING "<<_faces->size()<<" "<<_positions->size()<<" "<<shaders->size()<<endl;
+    //cout<<"DRAWING "<<_faces->size()<<" "<<_positions->size()<<" "<<shaders->size()<<endl;
     for(size_t i=0; i< this->_faces->size(); i++)
     {      
-        cout<<"In face "<<i<<" : "<<_positions->at(i).size()<< " : "<<_faces->at(i).size()<<endl;
+        //cout<<"In face "<<i<<" : "<<_positions->at(i).size()<< " : "<<_faces->at(i).size()<<endl;
         if(_positions->at(i).size() == 0)
             continue;
         int textureIdx = this->shaders->at(i).texture;
         int materialIdx = this->shaders->at(i).material;
-        std::cout<<"SHADER: "<<materialIdx<<" "<<textureIdx<<endl;
+        //std::cout<<"SHADER: "<<materialIdx<<" "<<textureIdx<<endl;
         if (textureIdx != -1)
         {
             glBindBuffer(GL_UNIFORM_BUFFER, this->textureUBO);
