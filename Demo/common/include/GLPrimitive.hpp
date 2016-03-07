@@ -21,6 +21,7 @@ class GLPrimitive : public GLMesh
     GLPrimitive(const char*, const char*, GLuint, long);
     ~GLPrimitive();
     
+    void Create(GLenum);
     bool AddSphere(int, int);
     bool AddUVSphere(int, int);
     bool AddCircle(double, double, double, int, bool);

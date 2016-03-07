@@ -213,28 +213,26 @@ Vec2 GLMesh::InterpolateV(Vec2 start, Vec2 stop, int counter, int total)
     return Vec2(start.x, (stop.y - start.y) * counter / total + start.y);
 }
 
-bool GLMesh::Create()
+void GLMesh::Create(GLenum GL_DRAW_TYPE)
 {
     //Create the VAO
     glGenVertexArrays(1, &(this->vao));
     glBindVertexArray(this->vao);
 
-    this->CreateVBOs();
+    this->CreateVBOs(GL_DRAW_TYPE);
 
     //Unbind the VAO
     glBindVertexArray(0);
-
-    return true; 
 }
 
-void GLMesh::CreateVBOs()
+void GLMesh::CreateVBOs(GLenum GL_DRAW_TYPE)
 {
     //Create VBOs 
     vbo_pos = GLBufferObject("vbo_positions",
             sizeof(Vec3),
             this->v_size,
             GL_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
+            GL_DRAW_TYPE);
     size_t offset = 0;
     for(size_t i=0; i<this->_positions->size(); i++)
     {
@@ -251,7 +249,7 @@ void GLMesh::CreateVBOs()
             sizeof(Vec3),
             this->v_size,
             GL_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
+            GL_DRAW_TYPE);
     offset = 0;
     for(size_t i=0; i<this->_positions->size(); i++)
     {
@@ -268,7 +266,7 @@ void GLMesh::CreateVBOs()
             sizeof(Vec2),
             this->v_size,
             GL_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
+            GL_DRAW_TYPE);
     offset = 0;
     for(size_t i=0; i<this->_positions->size(); i++)
     {
@@ -286,7 +284,7 @@ void GLMesh::CreateVBOs()
             sizeof(Vec3),
             this->v_size,
             GL_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
+            GL_DRAW_TYPE);
     offset = 0;
     for(size_t i=0; i<this->_positions->size(); i++)
     {
@@ -304,7 +302,7 @@ void GLMesh::CreateVBOs()
             sizeof(GLuint),
             this->e_size,
             GL_ELEMENT_ARRAY_BUFFER,
-            GL_STATIC_DRAW);
+            GL_DRAW_TYPE);
     offset = 0;
     for(size_t i=0; i<this->_faces->size(); i++)
     {

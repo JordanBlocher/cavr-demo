@@ -23,7 +23,7 @@ class GLModel : public GLPrimitive
     ~GLModel();
 
     bool LoadVertexData();
-    bool Create();
+    bool LoadModel();
 
     const std::vector<Vec3>& Positions(size_t);
     const std::vector<GLuint>& Faces(size_t);

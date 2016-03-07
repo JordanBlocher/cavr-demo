@@ -34,7 +34,7 @@ class GLViewport
     bool AddToContext(const std::shared_ptr<GLNode>);
     
  protected: 
-    virtual void InitializeGL();
+    virtual void InitShaders();
     virtual void Paint();
     virtual void Event();
 

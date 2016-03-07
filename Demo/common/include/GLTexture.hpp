@@ -13,7 +13,7 @@ class GLTexture : GLNode
     GLTexture(const char*, GLenum, const char*);
     ~GLTexture();
     
-    bool Load();
+    void Load();
     void Bind(GLenum);
 
 protected:

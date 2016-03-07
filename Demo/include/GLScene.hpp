@@ -16,10 +16,12 @@ class GLScene : public GLViewport
     GLScene();
 
     void AddModel(const char*, const char*);
-    void InitializeGL();
-    void Paint();
-    void MoveCamera(GLCamera::CamDirection);
+    void InitShaders();
+    void MoveCamera();
     void Event();
+
+    template <typename T> 
+        void Paint(shared_ptr<T>, GLenum);
 
  protected:
     std::string modelpath;
@@ -33,19 +35,11 @@ class GLScene : public GLViewport
     
     bool Break;
 
-    template <typename T> 
-    void PaintHelper(shared_ptr<T>, GLenum);
 
 };
 
 template <typename T> 
-int sgn(T val) 
-{
-    return (T(0) < val) - (val < T(0));
-}
-
-template <typename T> 
-void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)
+void GLScene::Paint(shared_ptr<T> model, GLenum MODE)
 {
 
     // Run Program

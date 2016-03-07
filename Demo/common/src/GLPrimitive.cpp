@@ -45,6 +45,12 @@ void GLPrimitive::Allocate()
     this->shader->bump = -1;
 }
 
+void GLPrimitive::Create(GLenum GL_DRAW_TYPE)
+{
+    GLMesh::Create(GL_DRAW_TYPE);
+    for(size_t i=0; i<this->textures->size(); i++)
+        this->textures->at(i).Load();
+}
 
 void GLPrimitive::AddMesh()
 {

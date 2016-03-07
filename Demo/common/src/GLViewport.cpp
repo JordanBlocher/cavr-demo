@@ -19,17 +19,8 @@ GLViewport::~GLViewport()
 {
 }
 
-
-void GLViewport::InitializeGL()
+void GLViewport::InitShaders()
 {
-     
-    GLenum status = glewInit();
-    if( status != GLEW_OK)
-    {
-        std::cerr << "[F] GLEW not initialized: ";
-        std::cerr << glewGetErrorString(status) << std::endl;
-        return;
-    }
 }
 
 void GLViewport::Paint()
@@ -47,7 +38,6 @@ void GLViewport::Event()
 bool GLViewport::AddProgram(std::shared_ptr<GLProgram> program)
 {
     glLinkProgram(program->getId());
-    this->start_time = std::chrono::high_resolution_clock::now();
     GLuint status = program->Status();
 
     return status;

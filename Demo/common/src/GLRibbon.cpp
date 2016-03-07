@@ -2,21 +2,14 @@
 
 #include "GLTexture.hpp"
 
-GLRibbon::GLRibbon(const char* name, long max) : GLPrimitive(name, "GLRibbon", 4, 3*max)
+GLRibbon::GLRibbon(const char* name, long maxPoints) : GLPrimitive(name, "GLRibbon", 4, maxPoints)
 {
-
+    this->v_size = maxPoints;
+    this->e_size = maxPoints*3;
 }
 
 GLRibbon::~GLRibbon()
 {
-}
-
-bool GLRibbon::Init()
-{
-    this->v_size = maxPoints;
-    this->e_size = maxPoints*3;
-
-    Create();
 }
 
 bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
@@ -99,76 +92,6 @@ void GLRibbon::ClearPoints()
 void GLRibbon::DrawElements(size_t i, GLint face_offset, GLint vertex_offset, GLenum MODE)
 {
     glDrawArrays(MODE, vertex_offset, _positions->at(i).size());
-}
-
-bool GLRibbon::Create()
-{
-	cout << "GLRibbon Create" << std::endl;
-    //Create the VAO
-    glGenVertexArrays(1, &(this->vao));
-    glBindVertexArray(this->vao);
-
-    this->CreateVBOs();
-
-    //Unbind the VAO
-    glBindVertexArray(0);
-
-    return true; 
-}
-
-// GLRibbon Requires GL_DYNAMIC_DRAW
-void GLRibbon::CreateVBOs()
-{
-
-    //Create VBOs 
-    vbo_pos = GLBufferObject ("vbo_positions",
-            sizeof(Vec3),
-            this->v_size,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
-
-    if( this->attributes > V_INDEX)
-    {
-        glEnableVertexAttribArray(V_INDEX);
-        glVertexAttribPointer( V_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-
-    vbo_norm = GLBufferObject ("vbo_normals",
-            sizeof(Vec3),
-            this->v_size,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
-
-    if( this->attributes > NORM_INDEX)
-    {
-        glEnableVertexAttribArray(NORM_INDEX);
-        glVertexAttribPointer( NORM_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-
-    vbo_tex = GLBufferObject ("vbo_textures",
-            sizeof(Vec2),
-            this->v_size,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
-
-
-    if( this->attributes > UV_INDEX)
-    {
-        glEnableVertexAttribArray(UV_INDEX);
-        glVertexAttribPointer( UV_INDEX, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    }
-    
-    vbo_color = GLBufferObject ("vbo_colors",
-            sizeof(Vec3),
-            this->v_size,
-            GL_ARRAY_BUFFER,
-            GL_DYNAMIC_DRAW);
-
-    if( this->attributes > COLOR_INDEX)
-    {
-        glEnableVertexAttribArray(COLOR_INDEX);
-        glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    }
 }
 
 Vec3 GLRibbon::Tail()
