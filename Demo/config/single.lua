@@ -20,6 +20,7 @@ perspective_window = {
     upper_left = cavr.sixdof("emulated") * cavr.translate(-1, 1, -1);
   };
   fullscreen = true;
+  far = 100000.0;
 };
 
 x11_renderer = {
@@ -37,13 +38,14 @@ vrpn = {
   type = "vrpn";
   input_name = "vrpn";
   buttons = {
-    --"WiiMote0@projector.unr.edu";
+    "WiiMote0@projector.cse.unr.edu";
   };
   analogs = {
+    "WiiMote0@projector.cse.unr.edu";
   };
   sixdofs = {
     "TallGlass@tracker.rd.unr.edu";
-    "WiiMote@tracker.rd.unr.edu";
+    "WiiMote0@tracker.rd.unr.edu";
   };
 };
 

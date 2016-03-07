@@ -37,7 +37,7 @@ void GLScene::InitializeGL()
 {
     GLViewport::InitializeGL();
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
     // Create camera
@@ -124,7 +124,7 @@ void GLScene::InitializeGL()
         GLRibbons->AddPoints(glm::vec3(0,0,1),glm::vec3(1,0,0));
         GLRibbons->AddPoints(glm::vec3(1,0,1),glm::vec3(0,0,1));
         GLRibbons->AddPoints(glm::vec3(0,0,-1),glm::vec3(0,1,0));
-
+        GLRibbons->AddBreak();
         this->AddToContext(GLRibbons);
     }
 
@@ -163,6 +163,33 @@ void GLScene::Paint()
    
     //shared_ptr<GLPrimitive> primitive = this->Get<GLPrimitive>("primitive");
     //this->PaintHelper(primitive, GL_TRIANGLES);
+}
+
+void GLScene::Event()
+{
+    // Paint here
+    shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
+
+    if(cavr::input::getButton("clear")->delta() != cavr::input::Button::Open)
+    {
+      GLRibbons->ClearPoints();
+    }
+
+    if(cavr::input::getButton("paint")->delta() != cavr::input::Button::Open)
+    {
+      auto wand = cavr::input:: getSixDOF("wand");
+      shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+
+      auto paintPos = GLMath::vec3ftoGLM(-wand->getForward()) + camera1->getCameraPosition();
+      //cout << glm::to_string(paintPos) << endl; 
+      GLRibbons->AddPoints(paintPos,glm::vec3(1,1,1));
+    }
+    else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Released)
+    {
+        cout << "RELEASED" << endl;
+        GLRibbons->AddBreak();
+    }
+
 }
 
 void GLScene::LoadGlobalUBOs(Matrices matrices)

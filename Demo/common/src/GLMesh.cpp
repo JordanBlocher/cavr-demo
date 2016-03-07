@@ -32,11 +32,7 @@ void GLMesh::Allocate()
     this->_colors->resize(1);
     this->_uvs->resize(1);
     this->_faces->resize(1);
-    this->positions = std::make_shared<std::vector<Vec3>>(this->_positions->at(0));
-    this->normals = std::make_shared<std::vector<Vec3>>(this->_normals->at(0));
-    this->colors = std::make_shared<std::vector<Vec3>>(this->_colors->at(0));
-    this->uvs = std::make_shared<std::vector<Vec2>>(this->_uvs->at(0));
-    this->faces = std::make_shared<std::vector<GLuint>>(this->_faces->at(0));
+    Move();
 }
 
 void GLMesh::AddMesh()
@@ -44,16 +40,31 @@ void GLMesh::AddMesh()
     this->index += 1;
     this->e_size += this->faces->size()*3;
     this->v_size += this->positions->size();
-    this->_positions->push_back(*this->positions);
-    this->_normals->push_back(*this->normals);
-    this->_colors->push_back(*this->colors);
-    this->_uvs->push_back(*this->uvs);
-    this->_faces->push_back(*this->faces);
-    this->positions = std::make_shared<std::vector<Vec3>>(this->_positions->at(index));
-    this->normals = std::make_shared<std::vector<Vec3>>(this->_normals->at(index));
-    this->colors = std::make_shared<std::vector<Vec3>>(this->_colors->at(index));
-    this->uvs = std::make_shared<std::vector<Vec2>>(this->_uvs->at(index));
-    this->faces = std::make_shared<std::vector<GLuint>>(this->_faces->at(index));
+
+    // pass ownership back
+    this->_positions->back() = std::move(*positions);
+    this->_normals->back() = std::move(*normals);
+    this->_colors->back() = std::move(*colors);
+    this->_uvs->back() = std::move(*uvs);
+    this->_faces->back() = std::move(*faces);
+
+    // pass ownership to new vectors
+    this->_positions->push_back(std::vector<glm::vec3> ());
+    this->_normals->push_back(std::vector<glm::vec3> ());
+    this->_colors->push_back(std::vector<glm::vec3> ());
+    this->_uvs->push_back(std::vector<glm::vec2> ());
+    this->_faces->push_back(std::vector<GLuint> ());
+
+    Move();
+}
+
+void GLMesh::Move()
+{
+    this->positions = std::make_shared<std::vector<Vec3>>(std::move(this->_positions->back() ) );
+    this->normals = std::make_shared<std::vector<Vec3>>(std::move(this->_normals->back()) );
+    this->colors = std::make_shared<std::vector<Vec3>>(std::move(this->_colors->back() ) );
+    this->uvs = std::make_shared<std::vector<Vec2>>(std::move(this->_uvs->back()));
+    this->faces = std::make_shared<std::vector<GLuint>>(std::move(this->_faces->back()));
 }
 
 void GLMesh::AddTriangle(Vec3 v0, Vec3 v1, Vec3 v2)

@@ -30,8 +30,6 @@ bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
 
 	if(Points.size() > 1 && !Points[Points.size()-2].Break)
 	{
-		cout << "ADD TWO" << endl;
-
 		// Add the points at the current positionsition in the buffer
 		Vec3 one;
 		Vec3 two;
@@ -61,15 +59,16 @@ bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
         colors->push_back(threeColor); 
 
         AddQuad(four, two, one, three);
-
+        cout << positions->size() << endl;
 		vbo_pos.LoadSubData((Points.size()-2)*6, 0, std::vector<Vec3>(positions->end() - 6, positions->end()));
 		vbo_color.LoadSubData((Points.size()-2)*6, 3, std::vector<Vec3>(colors->end() - 6, colors->end()));
         vbo_tex.LoadSubData((Points.size()-2)*6, 2, std::vector<Vec2>(uvs->end() - 6, uvs->end()) );
         vbo_norm.LoadSubData((Points.size()-2)*6, 1, std::vector<Vec3>(normals->end() - 6, normals->end()) );
         vbo_elements.LoadSubData((Points.size()-2)*6, 1, std::vector<Vec3>(faces->end() - 6, faces->end()) );
-
+        cout << "POSITIONS SIZE: " << positions->size() << endl;
+        cout << "_POSITIONS SIZE: " << ( (*_positions)[0].size() ) << endl;
         AddMesh();
-
+        cout << "POSITIONS SIZE: " << positions->size() << endl;
 		return true;
 	}
 	return false;
@@ -86,8 +85,8 @@ void GLRibbon::ClearPoints()
 {
     Points.clear();
     
-    vector<Vec3> clear3 = vector<vec3> (maxPoints,Vec3);
-    vector<Vec2> clear2 = vector<vec2> (maxPoints,Vec2);
+    vector<Vec3> clear3 = vector<Vec3> (maxPoints,Vec3());
+    vector<Vec2> clear2 = vector<Vec2> (maxPoints,Vec2());
 
     vbo_pos.LoadSubData(clear3.size(), 0, clear3);
     vbo_color.LoadSubData(clear3.size(), 3, clear3);
@@ -110,7 +109,7 @@ void GLRibbon::Draw(GLenum drawmode)
 
 void GLRibbon::DrawElements(size_t i, GLint face_offset, GLint vertex_offset, GLenum MODE)
 {
-    glDrawArrays(MODE, vertex_offset, Points.size() * 6);
+    glDrawArrays(MODE, vertex_offset, Points.size() * 3);
 }
 
 bool GLRibbon::Create()

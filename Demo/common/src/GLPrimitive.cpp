@@ -50,7 +50,7 @@ void GLPrimitive::AddMesh()
     shader.bump = -1;
     this->shaders->push_back(shader);
     this->shader = this->shaders->at(index);
-    std::cout<<"SHADER SIZE "<<this->shaders->size()<<endl;
+    //std::cout<<"SHADER SIZE "<<this->shaders->size()<<endl;
 }
 
 bool GLPrimitive::AddUVSphere(int nlats, int nlongs)

@@ -8,7 +8,9 @@
 #include <cavr/gl/vbo.h>
 #include <glog/logging.h>
 #include <math.h>
+#define GLM_FORCE_RADIANS
 #include <GLScene.hpp>
+#include <GLRibbon.hpp>
 
 // Using IrrKlang for this example
 #include <irrKlang.h>
@@ -56,7 +58,53 @@ void initContext()
 
 void frame() 
 {
+    static GLScene *cd;
+    cd = static_cast<GLScene*>(cavr::System::getContextData());
+    if (cavr::input::getButton("paint")->delta() == cavr::input::Button::Held) 
+        PAINT = true;
+    else PAINT = false;
 
+    if (cavr::input::getButton("up")->delta() == cavr::input::Button::Held) 
+        CAM_DIRECTION = GLCamera::CamDirection::Up;
+    else if (cavr::input::getButton("down")->delta() == cavr::input::Button::Held) 
+        CAM_DIRECTION = GLCamera::CamDirection::Down;
+    else if (cavr::input::getButton("left")->delta() == cavr::input::Button::Held)
+        CAM_DIRECTION = GLCamera::CamDirection::Left;
+    else if (cavr::input::getButton("right")->delta() == cavr::input::Button::Held) 
+        CAM_DIRECTION = GLCamera::CamDirection::Right;
+    else if (cavr::input::getButton("forward")->delta() == cavr::input::Button::Held) 
+        CAM_DIRECTION = GLCamera::CamDirection::Forward;
+    else if (cavr::input::getButton("backward")->delta() == cavr::input::Button::Held)
+        CAM_DIRECTION = GLCamera::CamDirection::Backward;
+    else
+        CAM_DIRECTION = GLCamera::CamDirection::Nop;
+
+    float xVec = 0; // rename these
+    float yVec = 0; // rename
+    glm::vec2 xyVec;
+    float forwardForce = 0;
+    xVec = cavr::input::getAnalog("x_vec")->getValue(); //* cavr::input::InputManager::dt();
+    yVec = cavr::input::getAnalog("y_vec")->getValue(); //* cavr::input::InputManager::dt();
+    if (abs(xVec) < .1)
+      xVec = 0;
+    if (abs(yVec) < .1)
+      yVec = 0;
+
+    if(cavr::input::getButton("forwardEnable")->delta() == cavr::input::Button::Open)
+    {
+      xyVec = glm::vec2(yVec,xVec);
+    }
+    else
+    {
+      forwardForce = -yVec;
+    }
+    
+    cd->Event();
+
+    //std::cout << cd << std::endl;
+    shared_ptr<GLCamera> camera1 = cd->Get<GLCamera>("camera1");
+    //std::cout << camera1 << std::endl;
+    camera1->moveCamera(xyVec,forwardForce);
 }
 
 void render() 
@@ -103,24 +151,6 @@ void update()
       return;
     }
     
-    if (cavr::input::getButton("paint")->delta() == cavr::input::Button::Held) 
-        PAINT = true;
-    else PAINT = false;
-
-    if (cavr::input::getButton("up")->delta() == cavr::input::Button::Held) 
-        CAM_DIRECTION = GLCamera::CamDirection::Up;
-    else if (cavr::input::getButton("down")->delta() == cavr::input::Button::Held) 
-        CAM_DIRECTION = GLCamera::CamDirection::Down;
-    else if (cavr::input::getButton("left")->delta() == cavr::input::Button::Held)
-        CAM_DIRECTION = GLCamera::CamDirection::Left;
-    else if (cavr::input::getButton("right")->delta() == cavr::input::Button::Held) 
-        CAM_DIRECTION = GLCamera::CamDirection::Right;
-    else if (cavr::input::getButton("forward")->delta() == cavr::input::Button::Held) 
-        CAM_DIRECTION = GLCamera::CamDirection::Forward;
-    else if (cavr::input::getButton("backward")->delta() == cavr::input::Button::Held)
-        CAM_DIRECTION = GLCamera::CamDirection::Backward;
-    else
-        CAM_DIRECTION = GLCamera::CamDirection::Nop;
 
     // Get the emulated sixdof and update its position
     auto headPosition = cavr::input::getSixDOF("glass")->getPosition();
@@ -130,6 +160,7 @@ void update()
     // I really wish there was a set position
     emulatedMatrix[3].xyz = headPosition;
     emulated->setState(emulatedMatrix);
+    
     
 }
 
@@ -164,6 +195,17 @@ int main(int argc, char** argv)
   input_map.button_map["backward"] = "vrpn[WWiiMote0[3]]";
   input_map.button_map["exit"] = "vrpn[WiiMote0[0]]";
 #endif
+
+
+  input_map.button_map["clear"] = "keyboard[b]";
+
+  input_map.button_map["forwardEnable"] = "vrpn[WiiMote0[17]]";// 16 and 17 are Z and c, respectively
+  input_map.analog_map["x_vec"] = "vrpn[WiiMote0[21]]"; // analog sticks of the nunchaku
+  input_map.analog_map["y_vec"] = "vrpn[WiiMote0[22]]"; // analog sticks of the nunchaku
+
+  //input_map.button_map["c_button"] = "vrpn[WiiMote0[17]]"; 
+
+
   input_map.sixdof_map["wand"] = "vrpn[WiiMote0[0]]";
   //input_map.button_map["pick"] = "vrpn[WiiMote0[3]]";
 

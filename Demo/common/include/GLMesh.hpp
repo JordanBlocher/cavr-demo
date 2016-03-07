@@ -54,6 +54,7 @@ class GLMesh : public GLNode
     Vec2 InterpolateU(Vec2, Vec2, int, int);
     Vec2 InterpolateV(Vec2, Vec2, int, int);
     Vec2 InterpolateUV(Vec2, Vec2, double, double, double, double);
+    void Move();
     virtual void Allocate();
     virtual void CreateVBOs();
 

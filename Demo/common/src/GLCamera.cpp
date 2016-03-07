@@ -43,27 +43,27 @@ void GLCamera::moveCamera(GLCamera::CamDirection direction)
     switch(direction)
     {
         case (CamDirection::Up):
-            if(polar >= M_PI)
-                polar = -1.0*M_PI;
-            else
+            //if(polar >= M_PI)
+            //    polar = -M_PI;
+            //else
                 polar += M_PI/150.0f;
             break;
         case (CamDirection::Down):
-            if(polar <= -1.0*M_PI)
-                polar = M_PI;
-            else
+            //if(polar <= -1.0*M_PI)
+            //    polar = M_PI;
+            ///else
                 polar -= M_PI/150.0f;
             break;
         case (CamDirection::Left):
-            if(azimuth <= -1.0*M_PI)
-                azimuth = M_PI;
-            else
+            //if(azimuth >= 1.0*M_PI)
+            //    azimuth = -M_PI;
+            //else
                 azimuth += M_PI/150.0f;
             break;
         case (CamDirection::Right):
-            if(azimuth <= -1.0*M_PI)
-                azimuth = M_PI;
-            else
+            //if(azimuth <= -1.0*M_PI)
+            //    azimuth = M_PI;
+            //else
                 azimuth -= M_PI/150.0f;
             break;
         case (CamDirection::Forward):
@@ -83,6 +83,30 @@ void GLCamera::moveCamera(GLCamera::CamDirection direction)
     updateView();
 }
 
+void GLCamera::moveCamera(glm::vec2 angle, float RadiusForce)
+{
+        polar += angle.x * M_PI/150.0f;
+        azimuth += angle.y *M_PI/150.0f;
+        radius += 0.2f * RadiusForce;
+
+        /*if(polar >= M_PI)
+            polar = M_PI;
+        else if(polar <= -1.0*M_PI)
+            polar = -M_PI;
+
+        if(azimuth <= -1.0*M_PI)
+            azimuth = -M_PI;
+        else if(azimuth <= -1.0*M_PI)
+            azimuth = M_PI;*/
+
+        if(radius <= -30.0f)
+            radius = -30.0f;
+        else if(radius >= 30.0f)
+            radius = 30.0f;
+    // Move the camera
+    //updateView();
+}
+
 void GLCamera::updateView()
 {
     float eyeX, eyeY, eyeZ;
@@ -90,17 +114,27 @@ void GLCamera::updateView()
     eyeX = radius * sin (polar) * cos (azimuth);
     eyeZ = -radius * sin (polar) * sin (azimuth);
     eyeY = radius * cos (polar);
-    
+
+    eye_pos = Vec3(eyeX,eyeY,eyeZ);
+
     glm::mat4 view = (GLMath::mat4ftoGLM(cavr::gfx::getView()));
     Vec3 forward = -Vec3(view[2].x,view[2].y,view[2].z);
     Vec3 up = Vec3(view[1].x,view[1].y,view[1].z);
+
+    up.x = up.x  * sin (polar); //* cos (azimuth);
+    up.y = up.y  * sin (polar); //* sin (azimuth);
+    up.z = up.z  * cos (polar);
+    up = glm::normalize(up);
+    //up = glm::abs(up);
     //Vec3 forward = GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getForward());
     //Vec3 up = GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getUp());
-    setAimTarget(forward + Vec3(0,0,1000));
+
+    setAimTarget(forward); //* Vec3(0,0,1000));
+    
 
     this->view = (glm::lookAt(
-                    Vec3(eyeX, eyeY, eyeZ),  //eye pos
-                    this->aimTarget,    //focus point
+                    Vec3(-eyeX, -eyeY, -eyeZ),  //eye pos
+                    Vec3(eyeX, eyeY, eyeZ),    //focus point
                     up));  //up
 
     //std::cout<<"polar "<<polar<<" azimuth "<<azimuth<<" radius "<<radius<<'\n';

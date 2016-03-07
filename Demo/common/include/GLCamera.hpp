@@ -15,6 +15,7 @@ public:
     void updateCavrView();
     void updateCavrPosition();
     void updateView();
+    void moveCamera(glm::vec2 angle, float RadiusForce);
     void moveCamera(CamDirection);
     Vec3 getCameraPosition();
     void setAimTarget(Vec3 aimPos);

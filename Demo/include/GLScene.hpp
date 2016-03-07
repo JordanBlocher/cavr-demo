@@ -18,6 +18,7 @@ class GLScene : public GLViewport
     void InitializeGL();
     void Paint();
     void MoveCamera(GLCamera::CamDirection);
+    void Event();
 
  protected:
     std::string modelpath;
