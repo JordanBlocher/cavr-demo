@@ -34,6 +34,8 @@ GLPrimitive::~GLPrimitive()
 
 void GLPrimitive::Allocate()
 {
+    GLMesh::Allocate();
+
     this->materials = std::shared_ptr<std::vector<Material>>(new std::vector<Material>);
     this->textures = std::shared_ptr<std::vector<GLTexture>>(new std::vector<GLTexture>);
     this->shaders = std::shared_ptr<std::vector<Shader>>(new std::vector<Shader>);
@@ -41,18 +43,18 @@ void GLPrimitive::Allocate()
     this->shader->material = -1;
     this->shader->texture = -1;
     this->shader->bump = -1;
-    GLMesh::Allocate();
 }
+
 
 void GLPrimitive::AddMesh()
 {
     GLMesh::AddMesh();
+
     this->shaders->push_back(*this->shader);
     this->shader = std::shared_ptr<Shader>(new Shader());
     this->shader->material = -1;
     this->shader->texture = -1;
     this->shader->bump = -1;
-    //cout<<"Adding mesh... at idx= "<<index<<endl;
 }
 
 bool GLPrimitive::AddUVSphere(int nlats, int nlongs)
@@ -210,29 +212,38 @@ bool GLPrimitive::AddCylinder()
     return true;
 }
 
-void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
+void GLPrimitive::LoadUBO(GLuint ubo, UBO rtype, Shader shader)
 {
-    bool texture, bump;
+    int textureIdx = shader.texture;
+    int materialIdx = shader.material;
 
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo->getId());
-    
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+
     if (rtype == UBO::CONTROL)
     {
-        int textureIdx = this->shader->texture;
-        int materialIdx = this->shader->material;
-        Shader shader;
-        shader.material = materialIdx == -1 ? 0 : 1;
-        shader.texture = textureIdx == -1 ? 0 : 1;
-        shader.bump = 0;
+
+        Shader tmp;
+        tmp.material = materialIdx == -1 ? 0 : 1;
+        tmp.texture = textureIdx == -1 ? 0 : 1;
+        tmp.bump = 0;
         glBufferSubData( GL_UNIFORM_BUFFER, 
                         0, 
                         sizeof(Shader), 
-                         &shader);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+                         &tmp);
         return;
     }
+    if (rtype == UBO::TEXTURE)
+    {
+        this->textures->at(textureIdx).Bind(GL_TEXTURE0);
+    }
+    if (rtype == UBO::COLOR)
+    {
+            glBufferSubData(GL_UNIFORM_BUFFER,
+                        0,
+                        sizeof(this->materials->at(materialIdx)),
+                        &(this->materials->at(materialIdx)) );
+    }
 
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void GLPrimitive::DrawElements(size_t i, GLint face_offset, GLint vertex_offset, GLenum MODE)
@@ -255,39 +266,22 @@ void GLPrimitive::Draw(GLenum MODE)
     //Draw Model 
     for(size_t i=0; i< this->_faces->size(); i++)
     {      
-        if(_positions->at(i).size() == 0)
-            continue;
         int textureIdx = this->shaders->at(i).texture;
         int materialIdx = this->shaders->at(i).material;
-        Shader tmp;
-        tmp.material = materialIdx < 0 ? 0 : 1;
-        tmp.texture = textureIdx < 0 ? 0 : 1;
-        tmp.bump = 0;
-        glBindBuffer(GL_UNIFORM_BUFFER, this->controlUBO);
-        glBufferSubData( GL_UNIFORM_BUFFER, 
-                        0, 
-                        sizeof(Shader), 
-                         &tmp);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+        this->LoadUBO(this->controlUBO, UBO::CONTROL, this->shaders->at(i));
         if (textureIdx != -1)
         {
-            glBindBuffer(GL_UNIFORM_BUFFER, this->textureUBO);
-            this->textures->at(textureIdx).Bind(GL_TEXTURE0);
+            this->LoadUBO(this->textureUBO, UBO::TEXTURE, this->shaders->at(i));
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
-        if (materialIdx != -1)
+        else if (materialIdx != -1)
         {
-            glBindBuffer(GL_UNIFORM_BUFFER, this->materialUBO);
-            glBufferSubData(GL_UNIFORM_BUFFER,
-                        0,
-                        sizeof(this->materials->at(materialIdx)),
-                        &(this->materials->at(materialIdx)) );
+            this->LoadUBO(this->materialUBO, UBO::COLOR, this->shaders->at(i));
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
-        if(textureIdx == -1 && materialIdx == -1)
-        {
+        else
             DrawElements(i, face_offset, vertex_offset, MODE);
-        }
 
         face_offset += this->_faces->at(i).size();
         vertex_offset += this->_positions->at(i).size();

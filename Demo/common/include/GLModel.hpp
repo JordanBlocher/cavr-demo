@@ -9,12 +9,12 @@
 #include <Magick++.h>
 
 #include "GLFrame.hpp"
-#include "GLMesh.hpp"
+#include "GLPrimitive.hpp"
 #include "GLUniform.hpp"
 
 class GLTexture;
 
-class GLModel : public GLMesh
+class GLModel : public GLPrimitive
 {
  
  public:
@@ -22,40 +22,19 @@ class GLModel : public GLMesh
     GLModel(const char*, const char*);
     ~GLModel();
 
-    virtual bool Create();
-    virtual bool LoadVertexData();
-    virtual void Draw(GLenum);
-    virtual void SetColor(Vec4);
-    virtual void DrawElements(size_t, GLint, GLint, GLenum);
-    virtual Vec4 GetColor();
+    bool LoadVertexData();
+    bool Create();
 
-    virtual void LoadUBO(std::shared_ptr<GLUniform>, UBO);
     const std::vector<Vec3>& Positions(size_t);
     const std::vector<GLuint>& Faces(size_t);
-    glm::mat4 Matrix();
-    Vec4 Position();
-    void setMatrix(glm::mat4);
     
-    GLint materialUBO;
-    GLint textureUBO;
-    GLint bumpUBO;
-    GLint controlUBO;
-    std::shared_ptr<Shader> shader;
 
  protected:
-    virtual void Allocate();
     void AddAttributeData(const aiMesh*, unsigned int);
     void AddVertexData(const aiMesh*, unsigned int);
     void AddMaterials(aiMaterial**, unsigned int);
 
     bool AddMaterials(const char*);
-
-    std::shared_ptr<std::vector<std::pair<aiString, Material>>> materials;
-    std::shared_ptr<std::vector<std::pair<bool,GLTexture>>> textures;
-    std::shared_ptr<std::vector<std::pair<bool,GLTexture>>> bumpmaps;
-    std::vector<GLuint> mtlIndices;
-
-    glm::mat4 matrix;
 
     std::string path;
     std::string filename;
