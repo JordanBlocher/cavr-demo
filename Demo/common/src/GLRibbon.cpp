@@ -173,5 +173,5 @@ void GLRibbon::CreateVBOs()
 
 Vec3 GLRibbon::Tail()
 {
-    return this->positions->at(0);
+    return Points.back().position;
 }
