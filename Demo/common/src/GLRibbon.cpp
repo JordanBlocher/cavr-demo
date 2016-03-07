@@ -170,3 +170,8 @@ void GLRibbon::CreateVBOs()
         glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 }
+
+Vec3 GLRibbon::Tail()
+{
+    return Points.back().position;
+}

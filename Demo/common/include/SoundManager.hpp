@@ -9,11 +9,12 @@ class SoundManager : public GLNode
 {
 	public:
 		SoundManager(const char* name);
-		void playBgm(int bgmNum);
-		void playFX(int fxNum);
+		void PlayBgm(int bgmNum, bool, bool);
+		void PlayFX(int fxNum, Vec3);
+        void SetListener(Vec3);
 
 	protected:
-		void finished();
+		void Finished();
 
 	private:
         irrklang::ISoundEngine* engine;

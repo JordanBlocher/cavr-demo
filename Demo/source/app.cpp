@@ -129,12 +129,9 @@ void render()
     camera1->updateView();
     cd->Paint();
 
-    auto position = cavr::input::getSixDOF("glass")->getPosition();
-    position.x *= 10;
-    position.z *= 10;
-    //cd->engine->setListenerPosition(vec3df(position.x,position.y,position.z), // Listener's position
-    //vec3df(0,0,1)); // What direction is the listener's facing directiion -- in this case we are always stareing forward..
-
+    shared_ptr<SoundManager> soundMan = cd->Get<SoundManager>("soundMan");
+    soundMan->SetListener(GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getPosition()));
+      
 }
 
 void destructContext() 

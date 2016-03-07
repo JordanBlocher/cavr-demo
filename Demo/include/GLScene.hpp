@@ -6,6 +6,7 @@
 #include <GLProgram.hpp>
 #include <GLFrame.hpp>
 #include <GLModel.hpp>
+#include <SoundManager.hpp>
 
 #include <chrono>
 
