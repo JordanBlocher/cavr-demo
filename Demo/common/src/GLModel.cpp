@@ -17,11 +17,7 @@
 #include <assimp/postprocess.h>
 
 
-GLModel::GLModel(const char* name, const char* typeName) : GLMesh(name, typeName)
-{
-}
-
-GLModel::GLModel(const char* filename, const char* name, const GLuint attributes) : GLMesh(name, "GLModel")
+GLModel::GLModel(const char* filename, const char* name, const GLuint attributes) : GLPrimitive(name, "GLModel", attributes, 0)
 {
     this->filename = filename;
     size_t found = (this->filename).find_last_of("/");
@@ -29,24 +25,14 @@ GLModel::GLModel(const char* filename, const char* name, const GLuint attributes
         this->path = "./";
     else
         this->path = this->filename.substr(0,found);
-    this->attributes = attributes;
 
-    GLMesh::Allocate();
-    this->Allocate();
+    GLPrimitive::Allocate();
 }
 
 GLModel::~GLModel()
 {
 }
 
-void GLModel::Allocate()
-{
-    this->materials = std::shared_ptr<std::vector<std::pair<aiString,Material>>>(new std::vector<std::pair<aiString,Material>>);
-    this->textures = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);
-    this->bumpmaps = std::shared_ptr<std::vector<std::pair<bool,GLTexture>>>(new std::vector<std::pair<bool,GLTexture>>);
-    this->shader = std::shared_ptr<Shader>(new Shader());
-
-}
 
 bool GLModel::Create()
 {
@@ -174,7 +160,6 @@ void GLModel::AddVertexData(const aiMesh* mesh, unsigned int index)
 void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
 {
     const aiVector3D zero(0.0f, 0.0f, 0.0f);
-    this->mtlIndices.push_back(mesh->mMaterialIndex);
     this->e_size += mesh->mNumFaces * 3;
     this->v_size += mesh->mNumVertices;
 
@@ -213,6 +198,7 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
 void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
 {
     this->materials->resize(numMaterials);
+    this->shaders->resize(numMaterials);
 
     for ( unsigned int i = 0; i < numMaterials; ++i )
     {
@@ -247,8 +233,6 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
         //int numTextures = material.GetTextureCount(aiTextureType_DIFFUSE);
 
         aiString texPath;
-        this->textures->resize(this->textures->size() + 1 + 1);
-        this->bumpmaps->resize(this->bumpmaps->size() + 1 + 1);
 
         if ( material.Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE,0), texPath) == AI_SUCCESS )
         {
@@ -257,14 +241,14 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
                 location = this->path + texPath.data;
             else
                 location = this->path + "/" + texPath.data;
-            std::cout << "Texture at " << location << std::endl;
             GLTexture texture(name.C_Str(), GL_TEXTURE_2D, location.c_str());
 
             if (!texture.Load()) 
             {
                 printf("Error loading texture '%s'\n", location.c_str());
             }
-            this->textures->at(i) = std::pair<bool, GLTexture>(true, texture);
+            this->textures->push_back(texture);
+            this->shaders->at(i).texture = i;
         }
 
         if ( material.Get(AI_MATKEY_TEXTURE(aiTextureType_HEIGHT,0), texPath) == AI_SUCCESS )
@@ -274,113 +258,19 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
                 location = this->path + texPath.data;
             else
                 location = this->path + "/" + texPath.data;
-            std::cout << "Bump Map at " << location << std::endl;
             GLTexture texture(name.C_Str(), GL_TEXTURE_2D, location.c_str());
 
             if (!texture.Load()) 
             {
                 printf("Error loading texture '%s'\n", location.c_str());
             }
-            this->bumpmaps->at(i) = std::pair<bool, GLTexture>(true, texture);
+            this->bumpmaps->push_back(texture);
+            this->shaders->at(i).bump = i;
         }
 
         if(std::string(name.C_Str()) != std::string("DefaultMaterial") || numMaterials == 1)
-            this->materials->at(i) = std::pair<aiString, Material>(name, mat);
+            this->materials->push_back(mat);
+            this->shaders->at(i).material = i;
     }
 }
 
-void GLModel::DrawElements(size_t i, GLint face_offset, GLint vertex_offset, GLenum MODE)
-{
-    glDrawElementsBaseVertex(MODE, 
-        this->_faces->at(i).size(),
-        GL_UNSIGNED_INT,
-        (void*)(sizeof(GLuint) * face_offset),
-        vertex_offset);
-}
-
-void GLModel::Draw(GLenum MODE)
-{
-    GLint face_offset = 0;
-    GLint vertex_offset = 0;
-    bool texture, bump;
-
-    glBindVertexArray(this->vao);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-    //Draw Model 
-    for(size_t i=0; i< this->_faces->size(); i++)
-    {   
-        texture = this->textures->at(this->mtlIndices.at(i)).first;
-        bump = this->bumpmaps->at(this->mtlIndices.at(i)).first;
-        if (this->shader->texture && texture)
-        {
-            glBindBuffer(GL_UNIFORM_BUFFER, this->textureUBO);
-            this->textures->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE0);
-            DrawElements(i, face_offset, vertex_offset, MODE);
-        }
-        if (this->shader->bump && bump)
-        {
-            glBindBuffer(GL_UNIFORM_BUFFER, this->bumpUBO);
-            this->bumpmaps->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE1);
-            DrawElements(i, face_offset, vertex_offset, MODE);
-        }
-        if (this->shader->material)
-        {
-            glBindBuffer(GL_UNIFORM_BUFFER, this->materialUBO);
-            glBufferSubData(GL_UNIFORM_BUFFER,
-                        0,
-                        sizeof(this->materials->at(this->mtlIndices.at(i)).second),
-                        &(this->materials->at(this->mtlIndices.at(i)).second) );
-            DrawElements(i, face_offset, vertex_offset, MODE);
-        }
-        else
-            DrawElements(i, face_offset, vertex_offset, MODE);
-
-
-        face_offset += this->_faces->at(i).size();
-        vertex_offset += this->_positions->at(i).size();
-    }
-
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-    glBindBuffer(GL_TEXTURE_2D, 0);
-    glBindVertexArray(0);
-}
-
-
-void GLModel::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
-{
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo->getId());
-    if (rtype == UBO::CONTROL)
-    {
-        glBufferSubData( GL_UNIFORM_BUFFER, 
-                        0, 
-                        sizeof(this->shader), 
-                         &this->shader);
-    }
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}
-
-void GLModel::setMatrix(glm::mat4 m)
-{
-    this->matrix = m;
-}
-
-glm::mat4 GLModel::Matrix()
-{
-    return this->matrix;
-}
-
-Vec4 GLModel::Position()
-{
-    return  Vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
-}
-
-void GLModel::SetColor(Vec4 diffuse)
-{
-    this->materials->at(this->mtlIndices.at(0)).second.diffuse = diffuse;
-}
-
-Vec4 GLModel::GetColor()
-{
-    return this->materials->at(this->mtlIndices.at(0)).second.diffuse;
-}
