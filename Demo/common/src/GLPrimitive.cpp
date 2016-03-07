@@ -37,20 +37,22 @@ void GLPrimitive::Allocate()
     this->materials = std::shared_ptr<std::vector<Material>>(new std::vector<Material>);
     this->textures = std::shared_ptr<std::vector<GLTexture>>(new std::vector<GLTexture>);
     this->shaders = std::shared_ptr<std::vector<Shader>>(new std::vector<Shader>);
-    this->shaders->resize(1);
+    this->shader = std::shared_ptr<Shader>(new Shader());
+    this->shader->material = -1;
+    this->shader->texture = -1;
+    this->shader->bump = -1;
     GLMesh::Allocate();
 }
 
 void GLPrimitive::AddMesh()
 {
     GLMesh::AddMesh();
-    Shader shader;
-    shader.material = -1;
-    shader.texture = -1;
-    shader.bump = -1;
-    this->shaders->push_back(shader);
-    this->shader = this->shaders->at(index);
-    std::cout<<"SHADER SIZE "<<this->shaders->size()<<endl;
+    this->shaders->push_back(*this->shader);
+    this->shader = std::shared_ptr<Shader>(new Shader());
+    this->shader->material = -1;
+    this->shader->texture = -1;
+    this->shader->bump = -1;
+    cout<<"Adding mesh... at idx= "<<index<<endl;
 }
 
 bool GLPrimitive::AddUVSphere(int nlats, int nlongs)
@@ -191,7 +193,6 @@ bool GLPrimitive::AddSphere(int num_lats, int num_lons)
             // normals
             normals->push_back(Vec3(0,1,0));
             normals->push_back(Vec3(0,1,0));
-            normals->push_back(Vec3(0,1,0));
 
             // uvs -- too be filled
             uvs->push_back(Vec2(0,0));
@@ -214,12 +215,11 @@ void GLPrimitive::LoadUBO(std::shared_ptr<GLUniform> ubo, UBO rtype)
     bool texture, bump;
 
     glBindBuffer(GL_UNIFORM_BUFFER, ubo->getId());
-    Shader test;
     
     if (rtype == UBO::CONTROL)
     {
-        int textureIdx = this->shader.texture;
-        int materialIdx = this->shader.material;
+        int textureIdx = this->shader->texture;
+        int materialIdx = this->shader->material;
         Shader shader;
         shader.material = materialIdx == -1 ? 0 : 1;
         shader.texture = textureIdx == -1 ? 0 : 1;
@@ -253,35 +253,39 @@ void GLPrimitive::Draw(GLenum MODE)
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     //Draw Model 
+        cout<<"DRAWING "<<_faces->size()<<" "<<_positions->size()<<" "<<shaders->size()<<endl;
     for(size_t i=0; i< this->_faces->size(); i++)
     {      
-        if(_positions->at(i).size() == 0 )
+        cout<<"In face "<<i<<" : "<<_positions->at(i).size()<< " : "<<_faces->at(i).size()<<endl;
+        if(_positions->at(i).size() == 0)
             continue;
         int textureIdx = this->shaders->at(i).texture;
         int materialIdx = this->shaders->at(i).material;
+        std::cout<<"SHADER: "<<materialIdx<<" "<<textureIdx<<endl;
         if (textureIdx != -1)
         {
-            glBindBuffer(GL_UNIFORM_BUFFER, this->textureUBO->getId());
+            glBindBuffer(GL_UNIFORM_BUFFER, this->textureUBO);
             this->textures->at(textureIdx).Bind(GL_TEXTURE0);
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
         if (materialIdx != -1)
         {
-            glBindBuffer(GL_UNIFORM_BUFFER, this->materialUBO->getId());
+            glBindBuffer(GL_UNIFORM_BUFFER, this->materialUBO);
             glBufferSubData(GL_UNIFORM_BUFFER,
                         0,
                         sizeof(this->materials->at(materialIdx)),
                         &(this->materials->at(materialIdx)) );
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
-        Shader shader;
-        shader.material = materialIdx == -1 ? 0 : 1;
-        shader.texture = textureIdx == -1 ? 0 : 1;
-        shader.bump = 0;
+        Shader tmp;
+        tmp.material = materialIdx < 0 ? 0 : 1;
+        tmp.texture = textureIdx < 0 ? 0 : 1;
+        tmp.bump = 0;
+        glBindBuffer(GL_UNIFORM_BUFFER, this->controlUBO);
         glBufferSubData( GL_UNIFORM_BUFFER, 
                         0, 
                         sizeof(Shader), 
-                         &shader);
+                         &tmp);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
         if(textureIdx == -1 && materialIdx == -1)
         {
@@ -301,13 +305,14 @@ void GLPrimitive::Draw(GLenum MODE)
 void GLPrimitive::AddTexture(std::shared_ptr<GLTexture> tex)
 {
    this->textures->push_back(*tex); 
-   this->shaders->at(index).texture = this->textures->size()-1;
+   this->shaders->at(index-1).texture = this->textures->size()-1;
+   std::cout<<"Adding texture "<<this->textures->size()-1<< " to idx "<<index-1<<endl;
 }
 
 void GLPrimitive::AddMaterial(Material mat)
 {
     this->materials->push_back(mat);
-    this->shaders->at(index).material = this->materials->size()-1;
+    this->shaders->at(index-1).material = this->materials->size()-1;
 }
 
 void GLPrimitive::setMatrix(glm::mat4 m)
