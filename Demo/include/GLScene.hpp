@@ -61,16 +61,15 @@ void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)
     LoadGlobalUBOs(matrices);
 
     // Bind Shader Controls
-    shared_ptr<GLUniform> controluniform = this->Get<GLUniform>("Shader");
-    model->LoadUBO(controluniform, UBO::CONTROL);
-    //std::cout<<"UNIFORM "<< controluniform->getId() <<std::endl; 
+    model->controlUBO = this->Get<GLUniform>("Shader")->getId();
+    model->LoadUBO(this->Get<GLUniform>("Shader"), UBO::CONTROL);
     
     // Bind Colors
-    if (model->shader.material)
-        model->materialUBO = this->Get<GLUniform>("GColors");
+    if (model->shader->material > 0)
+        model->materialUBO = this->Get<GLUniform>("GColors")->getId();
     // Bind Textures
-    if (model->shader.texture)
-        model->textureUBO = this->Get<GLUniform>("Texture");
+    if (model->shader->texture > 0)
+        model->textureUBO = this->Get<GLUniform>("Texture")->getId();
 
     model->Draw(MODE);
 

@@ -311,21 +311,21 @@ void GLModel::Draw(GLenum MODE)
     {   
         texture = this->textures->at(this->mtlIndices.at(i)).first;
         bump = this->bumpmaps->at(this->mtlIndices.at(i)).first;
-        if (this->shader.texture && texture)
+        if (this->shader->texture && texture)
         {
-            glBindBuffer(GL_UNIFORM_BUFFER, this->textureUBO->getId());
+            glBindBuffer(GL_UNIFORM_BUFFER, this->textureUBO);
             this->textures->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE0);
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
-        if (this->shader.bump && bump)
+        if (this->shader->bump && bump)
         {
-            glBindBuffer(GL_UNIFORM_BUFFER, this->bumpUBO->getId());
+            glBindBuffer(GL_UNIFORM_BUFFER, this->bumpUBO);
             this->bumpmaps->at(this->mtlIndices.at(i)).second.Bind(GL_TEXTURE1);
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
-        if (this->shader.material)
+        if (this->shader->material)
         {
-            glBindBuffer(GL_UNIFORM_BUFFER, this->materialUBO->getId());
+            glBindBuffer(GL_UNIFORM_BUFFER, this->materialUBO);
             glBufferSubData(GL_UNIFORM_BUFFER,
                         0,
                         sizeof(this->materials->at(this->mtlIndices.at(i)).second),

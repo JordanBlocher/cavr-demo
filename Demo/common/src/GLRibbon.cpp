@@ -97,13 +97,6 @@ void GLRibbon::ClearPoints()
 
 void GLRibbon::Draw(GLenum drawmode)
 {
-    /*
-     * glBindVertexArray(vao);
-
-    glDrawArrays(drawmode, 0, Points.size() * 6);
-
-    glBindVertexArray(0);
-    */
     GLPrimitive::Draw(drawmode);
 }
 

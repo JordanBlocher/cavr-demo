@@ -27,19 +27,28 @@ void GLMesh::Allocate()
     this->_normals = sp2dvec3(new std::vector<std::vector<Vec3>>);
     this->_uvs = sp2dvec2(new std::vector<std::vector<Vec2>>);
     this->_faces = sp2dvec(new std::vector<std::vector<GLuint>>);
+<<<<<<< HEAD
     this->_positions->resize(1);
     this->_normals->resize(1);
     this->_colors->resize(1);
     this->_uvs->resize(1);
     this->_faces->resize(1);
     Move();
+=======
+    this->positions = spvec3(new std::vector<Vec3>);
+    this->normals = spvec3(new std::vector<Vec3>);
+    this->colors = spvec3(new std::vector<Vec3>);
+    this->uvs = spvec2(new std::vector<Vec2>);
+    this->faces = spvec(new std::vector<GLuint>);
+>>>>>>> 972bec9e18993cd287b95fe99831901f979005a0
 }
 
 void GLMesh::AddMesh()
 {
-    this->index += 1;
+
     this->e_size += this->faces->size()*3;
     this->v_size += this->positions->size();
+<<<<<<< HEAD
 
     // pass ownership back
     this->_positions->back() = std::move(*positions);
@@ -65,6 +74,19 @@ void GLMesh::Move()
     this->colors = std::make_shared<std::vector<Vec3>>(std::move(this->_colors->back() ) );
     this->uvs = std::make_shared<std::vector<Vec2>>(std::move(this->_uvs->back()));
     this->faces = std::make_shared<std::vector<GLuint>>(std::move(this->_faces->back()));
+=======
+    this->index += 1;
+    this->_positions->push_back(*this->positions);
+    this->_normals->push_back(*this->normals);
+    this->_colors->push_back(*this->colors);
+    this->_uvs->push_back(*this->uvs);
+    this->_faces->push_back(*this->faces);
+    this->positions = spvec3(new std::vector<Vec3>);
+    this->normals = spvec3(new std::vector<Vec3>);
+    this->colors = spvec3(new std::vector<Vec3>);
+    this->uvs = spvec2(new std::vector<Vec2>);
+    this->faces = spvec(new std::vector<GLuint>);
+>>>>>>> 972bec9e18993cd287b95fe99831901f979005a0
 }
 
 void GLMesh::AddTriangle(Vec3 v0, Vec3 v1, Vec3 v2)
@@ -123,7 +145,6 @@ void GLMesh::AddQuad(Vec3 upperLeft, Vec3 upperRight, Vec3 lowerLeft, Vec3 lower
     this->faces->push_back(cnt);
     this->faces->push_back(cnt+1);
     this->faces->push_back(cnt+2);
-
 }
 
 void GLMesh::AddTriangle(Vec3 v0, Vec3 v1, Vec3 v2, Vec3 normal, int cnt)

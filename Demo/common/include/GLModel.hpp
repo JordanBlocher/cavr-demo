@@ -36,10 +36,11 @@ class GLModel : public GLMesh
     Vec4 Position();
     void setMatrix(glm::mat4);
     
-    Shader shader;
-    std::shared_ptr<GLUniform> materialUBO;
-    std::shared_ptr<GLUniform> textureUBO;
-    std::shared_ptr<GLUniform> bumpUBO;
+    GLint materialUBO;
+    GLint textureUBO;
+    GLint bumpUBO;
+    GLint controlUBO;
+    std::shared_ptr<Shader> shader;
 
  protected:
     virtual void Allocate();

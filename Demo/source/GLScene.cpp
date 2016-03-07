@@ -153,10 +153,10 @@ void GLScene::Paint()
 
     //Choose Model
  
-    shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
-    dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
-    dragon->shader.texture = 1;
-    this->PaintHelper(dragon, GL_TRIANGLES);
+    //shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
+    //dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
+    //dragon->shader->texture = 1;
+    //this->PaintHelper(dragon, GL_TRIANGLES);
     
     shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
     this->PaintHelper(GLRibbons, GL_TRIANGLES);
