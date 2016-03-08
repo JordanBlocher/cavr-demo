@@ -29,9 +29,6 @@ GLScene::GLScene()
 void GLScene::Create()
 {
     cout<<"Creating Scene..\n\n";
-     // Create camera
-    std::shared_ptr<GLCamera> camera(new GLCamera("camera"));
-    this->AddToContext(camera);
 
     // Create sound manager
     shared_ptr<SoundManager> soundMan(new SoundManager("soundMan"));

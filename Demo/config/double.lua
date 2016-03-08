@@ -49,7 +49,7 @@ x11_renderer = {
 
 x11_renderer_projector1 = {
   type = "x11gl";
-  display = ":1.1";
+  display = ":0.1";
   windows = {
     sim_window = perspective_window;
     --sim_window2 = sim_window;
@@ -58,7 +58,7 @@ x11_renderer_projector1 = {
 
 x11_renderer_projector2 = {
   type = "x11gl";
-  display = ":1.2";
+  display = ":0.2";
   windows = {
     sim_window = perspective_window;
     --sim_window2 = sim_window;

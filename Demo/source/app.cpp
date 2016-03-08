@@ -3,12 +3,19 @@
 #include "cavr.hpp"
 
 
-// Context Data 
-static GLScene *cd;
+// Create camera
+std::shared_ptr<GLCamera> camera(new GLCamera("camera"));
+
 
 // Initialize our program
 void initContext() 
 {
+    // Context Data
+    static GLScene *cd;
+    cd = new GLScene();
+    cd->Create();
+    cd->AddToContext(camera);
+
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -21,16 +28,20 @@ void initContext()
     
     shared_ptr<GLRibbon> ribbons = cd->Get<GLRibbon>("ribbons");
     ribbons->Create(GL_DYNAMIC_DRAW);
-    
 }
 
 void frame() 
 {
+    static GLScene *cd;
+    cd = static_cast<GLScene*>(cavr::System::getContextData());
+    cd->Event();
     cd->Update();
 }
 
 void render() 
 {
+    static GLScene *cd;
+    cd = static_cast<GLScene*>(cavr::System::getContextData());
     cd->MoveCamera();
 
     //glEnable(GL_CULL_FACE);
@@ -56,6 +67,8 @@ void render()
 void destructContext() 
 {
     //cd.reset();
+    static GLScene *cd;
+    cd = static_cast<GLScene*>(cavr::System::getContextData());
     delete(cd);
 }
 
@@ -65,14 +78,10 @@ void update()
        cavr::System::shutdown();
       return;
     }
-    cd->Event();
 }
 
 int main(int argc, char** argv) 
 {
-
-  cd = new GLScene();
-  cd->Create();
 
   // cavr is a system of callbacks
   cavr::System::setCallback("update", update);
