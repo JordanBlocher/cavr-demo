@@ -19,6 +19,8 @@ class GLScene : public GLViewport
     void InitShaders();
     void MoveCamera();
     void Event();
+    void Update();
+    void Create();
 
     template <typename T> 
         void Paint(shared_ptr<T>, GLenum);
@@ -47,8 +49,8 @@ void GLScene::Paint(shared_ptr<T> model, GLenum MODE)
     glUseProgram(program->getId());
 
     // Calculate MVP
-    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
-    glm::mat4 vp = camera1->Projection() * camera1->View() ;
+    shared_ptr<GLCamera> camera = this->Get<GLCamera>("camera");
+    glm::mat4 vp = camera->Projection() * camera->View() ;
     Matrices matrices;
     matrices.mvpMatrix = vp * model->Matrix();
     matrices.mvMatrix = model->Matrix(); 

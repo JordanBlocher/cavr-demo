@@ -66,7 +66,7 @@ bool GLModel::LoadModel()
             const aiMesh* mesh = scene->mMeshes[i];
             this->AddAttributeData(mesh, i);
         }
-
+        std::cout<<"Model "<<name<<" loaded.\n";
         return true;
     }
     else 
@@ -201,7 +201,6 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
         float shininess = 10.0f;
         float intensity = 1.0f;
         float diffuseBlend = 1.0f;
-        std::cout<<"diffuseBlend "<<diffuseBlend<<std::endl;
         aiString name;
 
         material.Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);

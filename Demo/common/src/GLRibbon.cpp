@@ -52,20 +52,23 @@ bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
         colors->push_back(threeColor); 
 
         AddQuad(four, two, one, three);
-
         cout << positions->size() << endl;
-		vbo_pos.LoadSubData((Points.size()-2)*6, 0, std::vector<Vec3>(positions->end() - 6, positions->end()));
-		vbo_color.LoadSubData((Points.size()-2)*6, 3, std::vector<Vec3>(colors->end() - 6, colors->end()));
-        vbo_tex.LoadSubData((Points.size()-2)*6, 2, std::vector<Vec2>(uvs->end() - 6, uvs->end()) );
-        vbo_norm.LoadSubData((Points.size()-2)*6, 1, std::vector<Vec3>(normals->end() - 6, normals->end()) );
-        vbo_elements.LoadSubData((Points.size()-2)*6, 1, std::vector<Vec3>(faces->end() - 6, faces->end()) );
-
         cout << Points.size() << endl;
-
         AddMesh();
 		return true;
 	}
 	return false;
+}
+
+void GLRibbon::LoadPoints()
+{
+    cout << positions->size() << endl;
+    cout << Points.size() << endl;
+    vbo_pos.LoadSubData((Points.size()-2)*6, 0, std::vector<Vec3>(positions->end() - 6, positions->end()));
+    vbo_color.LoadSubData((Points.size()-2)*6, 3, std::vector<Vec3>(colors->end() - 6, colors->end()));
+    vbo_tex.LoadSubData((Points.size()-2)*6, 2, std::vector<Vec2>(uvs->end() - 6, uvs->end()) );
+    vbo_norm.LoadSubData((Points.size()-2)*6, 1, std::vector<Vec3>(normals->end() - 6, normals->end()) );
+    vbo_elements.LoadSubData((Points.size()-2)*6, 1, std::vector<Vec3>(faces->end() - 6, faces->end()) );
 }
 
 void GLRibbon::AddBreak()

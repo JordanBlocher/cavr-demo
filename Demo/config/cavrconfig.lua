@@ -1,1 +1,1 @@
-import("config/double.lua")
+import("config/example.lua")

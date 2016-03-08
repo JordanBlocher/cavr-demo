@@ -1,7 +1,5 @@
 #define CHECKGLERROR if ( glGetError() != GL_NO_ERROR ) cout << __LINE__ << endl;
 
-#include <GL/glew.h>
-
 #include <iostream>
 #include <chrono>
 #include <csignal>
@@ -26,6 +24,11 @@ using namespace std;
 
 GLScene::GLScene()
 {
+}
+
+void GLScene::Create()
+{
+    cout<<"Creating Scene..\n\n";
      // Create camera
     std::shared_ptr<GLCamera> camera(new GLCamera("camera"));
     this->AddToContext(camera);
@@ -39,7 +42,7 @@ GLScene::GLScene()
     this->AddModel("dragon", "models/dragon.obj");
 
     // Init a GLRibbon
-    shared_ptr<GLRibbon> ribbons (new GLRibbon());
+    shared_ptr<GLRibbon> ribbons (new GLRibbon("ribbons"));
     ribbons->AddPoints(glm::vec3(0,0,0),glm::vec3(1,1,1));
     ribbons->AddPoints(glm::vec3(0,0,1),glm::vec3(1,0,0));
     ribbons->AddPoints(glm::vec3(1,0,1),glm::vec3(0,0,1));
@@ -53,12 +56,11 @@ GLScene::GLScene()
     shared_ptr<GLTexture> leaves(new GLTexture("leaves", GL_TEXTURE_2D, "models/leaves.jpg"));
     ribbons->AddTexture(leaves);
 
-    /*shared_ptr<GLPrimitive> primitive(new GLPrimitive("primitive", 6, 10000));
+    /*
+    shared_ptr<GLPrimitive> primitive(new GLPrimitive("primitive", 6, 10000));
     primitive->AddPlane(1000, 1000, 1, 1);
     this->AddToContext(primitive);
     */
-
- 
 }
 
 void GLScene::InitShaders()
@@ -121,6 +123,7 @@ void GLScene::InitShaders()
     shared_ptr<GLUniform> texture_uniform(new GLUniform("Texture", program->getId(), 1, "i"));
     this->AddToContext(texture_uniform);
 
+    cout<<"Setting UBOS to share.\n";
     //Set UBOs to Share
     program->SetUBO(vertex_uniform);
     program->SetUBO(lights_uniform);
@@ -130,16 +133,26 @@ void GLScene::InitShaders()
     
 }
 
-void GLScene::Event()
+void GLScene::Update()
 {
-    // Paint here
     shared_ptr<GLRibbon> ribbons = this->Get<GLRibbon>("ribbons");
 
     if(cavr::input::getButton("clear")->delta() != cavr::input::Button::Open)
     {
         ribbons->ClearPoints();
     }
+    if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Held)
+    {
+        ribbons->LoadPoints();
+    }
+}
 
+void GLScene::Event()
+{
+    // Paint here
+    shared_ptr<GLRibbon> ribbons = this->Get<GLRibbon>("ribbons");
+    shared_ptr<SoundManager> soundMan = this->Get<SoundManager>("soundMan");
+  
     if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Held)
     {
         auto wand = cavr::input:: getSixDOF("wand");
@@ -148,6 +161,7 @@ void GLScene::Event()
         auto paintPos = GLMath::vec3ftoGLM(-wand->getForward()) + camera->getCameraPosition() + GLMath::vec3ftoGLM(-wand->getPosition()) ;
         //cout << glm::to_string(paintPos) << endl; 
         ribbons->AddPoints(paintPos,glm::vec3(1,1,1));
+        soundMan->PlayFX(0, ribbons->Tail());
     }
     else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !Break)
     {
@@ -156,7 +170,6 @@ void GLScene::Event()
 
     Break = cavr::input::getButton("paint")->delta() == cavr::input::Button::Open;
 
-    shared_ptr<SoundManager> soundMan = this->Get<SoundManager>("soundMan");
     soundMan->SetListener(GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getPosition()));
 }
 
@@ -204,7 +217,7 @@ void GLScene::MoveCamera()
 void GLScene::LoadGlobalUBOs(Matrices matrices)
 {
 
-    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+    shared_ptr<GLCamera> camera = this->Get<GLCamera>("camera");
 
     // Bind MVP
     shared_ptr<GLUniform> vuniform = this->Get<GLUniform>("GMatrices");
@@ -231,7 +244,7 @@ void GLScene::LoadGlobalUBOs(Matrices matrices)
     // Bind Eye Position
     shared_ptr<GLUniform> eye = this->Get<GLUniform>("Eye");
     glBindBuffer(GL_UNIFORM_BUFFER, eye->getId());
-    glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(Vec4), glm::value_ptr(Vec4(camera1->getCameraPosition(), 1.0f)));
+    glBufferSubData( GL_UNIFORM_BUFFER, 0, sizeof(Vec4), glm::value_ptr(Vec4(camera->getCameraPosition(), 1.0f)));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     
 }

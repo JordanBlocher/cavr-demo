@@ -50,6 +50,7 @@ void GLPrimitive::Create(GLenum GL_DRAW_TYPE)
     GLMesh::Create(GL_DRAW_TYPE);
     for(size_t i=0; i<this->textures->size(); i++)
         this->textures->at(i).Load();
+    cout<<"Creating "<<name<<":: v_size: "<<v_size <<", e_size: "<<e_size<<endl;
 }
 
 void GLPrimitive::AddMesh()
