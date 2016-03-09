@@ -133,6 +133,8 @@ void GLScene::InitializeGL()
 void GLScene::Paint()
 {
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+    auto wand = cavr::input:: getSixDOF("wand");
+
     //Clear the screen
     glClearColor(0.0,0.0,0.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -148,11 +150,10 @@ void GLScene::Paint()
     
     shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
     this->PaintHelper(GLRibbons, GL_TRIANGLES);
-
       
+    glm::mat4 wandMatrix =  GLMath::mat4ftoGLM(wand->getMatrix()) * camera1->View();
+    glm::vec3 paintPos = camera1->getCameraPosition() + glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z) ;
     glm::mat4 rot = glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 wand = GLMath::mat4ftoGLM( cavr::input::getSixDOF("wand")->getMatrix()) * camera1->View();
-    glm::vec3 wand_pos = GLMath::vec3ftoGLM( cavr::input::getSixDOF("wand")->getPosition());
     glm::mat4 glass = GLMath::mat4ftoGLM( cavr::input::getSixDOF("glass")->getMatrix());
     glm::vec3 glass_pos = GLMath::vec3ftoGLM( cavr::input::getSixDOF("glass")->getPosition());
 
@@ -161,7 +162,7 @@ void GLScene::Paint()
     shared_ptr<GLModel> paint = this->Get<GLModel>("paint");
     shared_ptr<GLModel> pallet = this->Get<GLModel>("pallet");
     pallet->setMatrix(glm::translate(glm::mat4(1.0f), glass_pos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f))* rot * glm::translate(glm::mat4(1.0f), glm::vec3(-0.89, -0.49, 0.7)));
-    brush->setMatrix(wand * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * rot);
+    brush->setMatrix(glm::translate(glm::mat4(1.0), paintPos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * rot);
     blob->setMatrix(brush->Matrix());//* glm::translate(glm::mat4(1.0f), glm::vec3(-0.18, -0.25, -0.41)));
     paint->setMatrix(blob->Matrix());//* glm::translate(glm::mat4(1.0f), glm::vec3(0.04, -0.007, 0.035)));
 
@@ -190,13 +191,16 @@ void GLScene::Paint()
 void GLScene::Event()
 {
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+    auto wand = cavr::input:: getSixDOF("wand");
     const char* colors[] = {"blue", "red", "purple", "white", "yellow", "green"};
 
     glm::mat4 rot = glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 wand = GLMath::mat4ftoGLM( cavr::input::getSixDOF("wand")->getMatrix());
-    glm::vec3 wand_pos = GLMath::vec3ftoGLM( cavr::input::getSixDOF("wand")->getPosition());
     glm::mat4 glass = GLMath::mat4ftoGLM( cavr::input::getSixDOF("glass")->getMatrix());
     glm::vec3 glass_pos = GLMath::vec3ftoGLM( cavr::input::getSixDOF("glass")->getPosition());
+;
+    glm::mat4 wandMatrix = GLMath::mat4ftoGLM(wand->getMatrix()) * camera1->View();
+    glm::vec3 wandPos = glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z); 
+    glm::vec3 paintPos = camera1->getCameraPosition() + glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z) ;
 
     shared_ptr<GLModel> brush = this->Get<GLModel>("brush");
     shared_ptr<GLModel> blob = this->Get<GLModel>("blob");
@@ -205,10 +209,10 @@ void GLScene::Event()
 
     // Brush
     float weight = (glm::distance2(brush->Position(),
-            glm::vec4(wand_pos.x, wand_pos.y, wand_pos.z, 0.0f)));  
-    float distX = brush->Position().x - wand_pos.x;
-    float distY = brush->Position().y - wand_pos.y;
-    float distZ = brush->Position().z - wand_pos.z;  
+            glm::vec4(wandPos.x, wandPos.y, wandPos.z, 0.0f)));  
+    float distX = brush->Position().x - wandPos.x;
+    float distY = brush->Position().y - wandPos.y;
+    float distZ = brush->Position().z - wandPos.z;  
     float shear[16] = {70*weight*distX, distX, 0, 0,
                        distY, 70*weight*distY, 0, 0,
                        0, 0, weight, 0,
@@ -219,20 +223,15 @@ void GLScene::Event()
 
     if(cavr::input::getButton("clear")->delta() != cavr::input::Button::Open)
     {
-      GLRibbons->ClearPoints();
+       GLRibbons->ClearPoints();
     }
 
     if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Held)
     {
-      auto wand = cavr::input:: getSixDOF("wand");
-      shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
-      auto wandMatrix =   GLMath::mat4ftoGLM(wand->getMatrix()) * camera1->View();
-
-      auto paintPos = camera1->getCameraPosition() + glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z) ;
       //cout << glm::to_string(paintPos) << endl; 
       GLRibbons->AddPoints(paintPos,glm::vec3(1,1,1));
-      cout<<"Ribbon size "<<GLRibbons->Size();
-      //GLRibbons->AssignTexture(GLRibbons->Size(), this->color);
+      if(GLRibbons->Size() > 1)
+        GLRibbons->AssignTexture(GLRibbons->Size()-1, this->color);
       //this->strokes.push_back(std::pair<glm::vec4, glm::mat4>(Vec4(1,0,0,0), paintPos*glm::make_mat4(shear))); 
     }
     else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !Break)
@@ -242,7 +241,7 @@ void GLScene::Event()
     else
     {
         // Ray and bounding sphere
-        auto look = cavr::input::getSixDOF("wand")->getForward();
+        auto look = cavr::math::vec3f(-wandMatrix[2].x,wandMatrix[2].y,-wandMatrix[2].z);
         auto pos = GLMath::GLMtovec3f(blob->Position());
         cavr::gfx::Ray ray = cavr::gfx::Ray(pos, look);
         float dist;
