@@ -118,8 +118,8 @@ void GLCamera::updateView()
     eye_pos = Vec3(eyeX,eyeY,eyeZ);
 
     glm::mat4 view = (GLMath::mat4ftoGLM(cavr::gfx::getView()));
-    Vec3 forward = -Vec3(view[2].x,view[2].y,view[2].z);
-    Vec3 up = Vec3(view[1].x,view[1].y,view[1].z);
+    Vec3 forward = Vec3(0,0,1);
+    Vec3 up = Vec3(0,1,0);
 
     up.x = up.x  * sin (polar); //* cos (azimuth);
     up.y = up.y  * sin (polar); //* sin (azimuth);
@@ -143,19 +143,26 @@ void GLCamera::updateView()
 }
 
 Vec3 GLCamera::RotatePoint(Vec3 ray)
-{
-    return ray;
-    float dist = glm::length2(ray);
-    if(dist == 0)
+{   
+    float distance = 1;
+    if(glm::length2(ray) > 0)
+    {
+        distance = glm::length(ray);
+    }
+    else
     {
         return ray;
     }
-    cout << "DISTANCE: " << dist << endl;
     //ray = glm::normalize(ray);
+    testview[3][0] = 0;
+    testview[3][1] = 0;
+    testview[3][2] = 0;
+    
+    glm::vec4 test = glm::inverse(testview) * glm::vec4(ray.x,ray.y,ray.z,1);
+    return glm::vec3(test.x,test.y,test.z);    
+    
 
-    glm::vec4 abc = glm::vec4(ray.x,ray.y,ray.z,1.0);
-   abc =  testview * abc;
-    return -glm::vec3(abc.x,abc.y,abc.z);
+    //return ray*distance;
 }
 
 void GLCamera::setCameraOffset(float zenith, float azimuth)

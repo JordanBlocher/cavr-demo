@@ -23,7 +23,7 @@ static bool PAINT;
 std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
 
 
-//#define DEBUG 
+#define DEBUG 
 
 #pragma comment(lib, "irrKlang.lib")
 // IrrKlang

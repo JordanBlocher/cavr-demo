@@ -152,7 +152,7 @@ void GLScene::InitializeGL()
 void GLScene::Paint()
 {
     //Clear the screen
-    glClearColor(0.0,0.0,0.0,1.0);
+    glClearColor(1.0,0.0,0.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Choose Model
@@ -186,11 +186,23 @@ void GLScene::Event()
     {
       auto wand = cavr::input:: getSixDOF("wand");
       shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
-      auto wandMatrix =   GLMath::mat4ftoGLM(wand->getMatrix()) * camera1->View();
+      auto dpos = camera1->RotatePoint(GLMath::vec3ftoGLM(wand->getPosition() ) );
+      auto dforward = camera1->RotatePoint( GLMath::vec3ftoGLM(wand->getForward() ));
+      
+      //dpos.x *= -1;
+      //dpos.z *= -1;
 
-      auto paintPos = camera1->getCameraPosition() - glm::vec3(wandMatrix[3].x,wandMatrix[3].y,wandMatrix[3].z) ;
+      //float tempx = dpos.x;
+      //dpos.x = dpos.z;
+      //dpos.z = tempx; 
+      //dforward *= -1;
+      //dforward.x *= -1;
+      //dforward.z *= -1;
+      //dforward.y *= -1;
+      auto paintPos = camera1->getCameraPosition() + dpos +dforward; 
       //cout << glm::to_string(paintPos) << endl; 
       GLRibbons->AddPoints(paintPos,glm::vec3(1,1,1));
+
     }
     else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !Break)
     {
