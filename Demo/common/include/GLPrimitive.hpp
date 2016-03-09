@@ -34,7 +34,7 @@ class GLPrimitive : public GLMesh
     void AssignTexture(int, int);
     void AssignMaterial(int, int);
     virtual void Draw(GLenum);
-
+    virtual void Clear();
     glm::mat4 Matrix();
     Vec4 Position();
     void setMatrix(glm::mat4);

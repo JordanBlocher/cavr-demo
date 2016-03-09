@@ -34,12 +34,29 @@ void GLMesh::Allocate()
     this->faces = spvec(new std::vector<GLuint>);
 }
 
+void GLMesh::Clear()
+{
+    this->positions = spvec3(new std::vector<Vec3>);
+    this->normals = spvec3(new std::vector<Vec3>);
+    this->colors = spvec3(new std::vector<Vec3>);
+    this->uvs = spvec2(new std::vector<Vec2>);
+    this->faces = spvec(new std::vector<GLuint>);
+    _positions->clear();
+    _colors->clear();
+    _normals->clear();
+    _uvs->clear();
+    _faces->clear();
+
+    cout << _positions->size() << endl;
+}
+
 void GLMesh::AddMesh()
 {
 
     this->e_size += this->faces->size()*3;
     this->v_size += this->positions->size();
     this->index += 1;
+    cout << _positions->size() << endl;
     this->_positions->push_back(*this->positions);
     this->_normals->push_back(*this->normals);
     this->_colors->push_back(*this->colors);

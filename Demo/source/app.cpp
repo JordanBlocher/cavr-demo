@@ -23,7 +23,7 @@ static bool PAINT;
 std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
 
 
-//#define DEBUG 
+#define DEBUG 
 
 #pragma comment(lib, "irrKlang.lib")
 // IrrKlang
@@ -40,20 +40,6 @@ void initContext()
     cd->AddToContext(camera);
     // Choose model
     //cd->AddModel("dragon", "models/dragon.obj");
-    /*cd->addModel("pallet", "models/pallet.obj");
-    cd->addModel("pallet", "models/pallet.obj");
-    cd->addModel("brush", "models/brush.obj");
-    cd->addModel("blob", "models/blob.obj");
-    cd->addModel("paint", "models/paint.obj");
-    cd->addModel("coords", "models/coords.obj");
-    cd->addModel("blue", "models/blue.obj");
-    cd->addModel("red", "models/red.obj");
-    cd->addModel("purple", "models/purple.obj");
-    cd->addModel("white", "models/white.obj");
-    cd->addModel("yellow", "models/yellow.obj");
-    cd->addModel("green", "models/green.obj");
-    */
-
 
     // Camera
     CAM_DIRECTION = GLCamera::CamDirection::Nop;
@@ -71,8 +57,6 @@ void frame()
     else PAINT = false;
     
     cd->Event();
-    cout << "HERENESSSSSSSSSSSSSSSSS" << endl;
-    cout << &(*cd) << endl;
 
 }
 
@@ -126,17 +110,17 @@ void update()
 
 
     if (cavr::input::getButton("up")->delta() == cavr::input::Button::Held) 
-        CAM_DIRECTION = GLCamera::CamDirection::Up;
+        camera->moveCamera(glm::vec2(-4 * cavr::input::InputManager::dt(),0),0);
     else if (cavr::input::getButton("down")->delta() == cavr::input::Button::Held) 
-        CAM_DIRECTION = GLCamera::CamDirection::Down;
+        camera->moveCamera(glm::vec2(4* cavr::input::InputManager::dt(),0),0);
     else if (cavr::input::getButton("left")->delta() == cavr::input::Button::Held)
-        CAM_DIRECTION = GLCamera::CamDirection::Left;
+        camera->moveCamera(glm::vec2(0,-4* cavr::input::InputManager::dt()),0);
     else if (cavr::input::getButton("right")->delta() == cavr::input::Button::Held) 
-        CAM_DIRECTION = GLCamera::CamDirection::Right;
+        camera->moveCamera(glm::vec2(0,4* cavr::input::InputManager::dt()),0);
     else if (cavr::input::getButton("forward")->delta() == cavr::input::Button::Held) 
-        CAM_DIRECTION = GLCamera::CamDirection::Forward;
+        camera->moveCamera(glm::vec2(0,0),4* cavr::input::InputManager::dt());
     else if (cavr::input::getButton("backward")->delta() == cavr::input::Button::Held)
-        CAM_DIRECTION = GLCamera::CamDirection::Backward;
+        camera->moveCamera(glm::vec2(0,0),-4* cavr::input::InputManager::dt());
     else
         CAM_DIRECTION = GLCamera::CamDirection::Nop;
 

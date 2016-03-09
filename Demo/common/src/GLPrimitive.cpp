@@ -255,6 +255,12 @@ void GLPrimitive::DrawElements(size_t i, GLint face_offset, GLint vertex_offset,
         vertex_offset);
 }
 
+void GLPrimitive::Clear()
+{
+    shaders->clear();
+    GLMesh::Clear();
+}
+
 void GLPrimitive::Draw(GLenum MODE)
 {
     GLint face_offset = 0;
@@ -266,6 +272,7 @@ void GLPrimitive::Draw(GLenum MODE)
     //Draw Model 
     for(size_t i=0; i< this->_faces->size(); i++)
     {      
+
         int textureIdx = this->shaders->at(i).texture;
         int materialIdx = this->shaders->at(i).material;
 

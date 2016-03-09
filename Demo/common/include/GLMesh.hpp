@@ -35,7 +35,8 @@ class GLMesh : public GLNode
     const std::vector<GLuint>& Faces(size_t);
 
     virtual bool Create();
-
+    virtual void Clear();
+    
     int AddCircle(int, double, double, double, Vec2 uv0=Vec2(0), Vec2 uv1=Vec2(1));
     void AddTriangleStrip(int, int, int, bool);
     void AddTriangleSurface(int, int, int, bool, bool);

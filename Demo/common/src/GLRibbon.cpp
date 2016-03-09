@@ -93,6 +93,7 @@ void GLRibbon::ClearPoints()
     vbo_color.LoadSubData(0, 3, clear3);
     vbo_norm.LoadSubData(0,1, clear3);
     vbo_tex.LoadSubData(0,2,clear2);
+    GLPrimitive::Clear();
 
 }
 
