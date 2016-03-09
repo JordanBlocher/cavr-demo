@@ -118,6 +118,7 @@ void GLScene::InitializeGL()
     if(GLRibbons->Init())
         this->AddToContext(GLRibbons);
 
+    shared_ptr<GLModel> paint = this->Get<GLModel>("paint");
     const char* colors[] = {"blue", "red", "purple", "white", "yellow", "green"};
     const char* colorpaths[] = {"models/blue.jpg", "models/red.jpg", "models/purple.jpg", "models/white.jpg", "models/yellow.jpg", "models/green.jpg"};
     for (int i=0; i<6; i++)
@@ -125,6 +126,7 @@ void GLScene::InitializeGL()
         shared_ptr<GLTexture> tex(new GLTexture(colors[i], GL_TEXTURE_2D, colorpaths[i]));
         tex->Load();
         GLRibbons->AddTexture(tex);
+	paint->AddTexture(tex);
     }
 
    this->color = 5; 
@@ -140,49 +142,30 @@ void GLScene::Paint()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Choose Model
-    const char* colors[] = {"blue", "red", "purple", "white", "yellow", "green"};
-    glm::vec3 translations[] = {glm::vec3(-0.4, 0.02, -0.9),
-                               glm::vec3(0.19, 0.03, -0.8),
-                               glm::vec3(-0.36, 0.02, -0.13),
-                               glm::vec3(-0.9, 0.02, -0.3),
-                               glm::vec3(-0.8, 0.02, 0.2),
-                               glm::vec3(-0.5, 0.02, 0.67)};
-    
     shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
     this->PaintHelper(GLRibbons, GL_TRIANGLES);
       
     glm::mat4 wandMatrix =  GLMath::mat4ftoGLM(wand->getMatrix()) * camera1->View();
-    glm::vec3 paintPos = camera1->getCameraPosition() + glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z/4.0) ;
+    glm::vec3 wandPos = glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z/4.0) ;
+    glm::vec3 paintPos = camera1->getCameraPosition() + wandPos ;
     glm::mat4 rot = glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 rot2 = glm::rotate(glm::mat4(1.0f), (float)(M_PI/6), glm::vec3(1.0f, 0.0f, 0.0f));
-    glm::mat4 glass = GLMath::mat4ftoGLM( cavr::input::getSixDOF("glass")->getMatrix());
-    glm::vec3 glass_pos = GLMath::vec3ftoGLM( cavr::input::getSixDOF("glass")->getPosition());
+    glm::mat4 rot2 = glm::rotate(glm::mat4(1.0f), (float)(M_PI/3.7), glm::vec3(1.0f, 0.0f, 0.0f));
 
     shared_ptr<GLModel> brush = this->Get<GLModel>("brush");
-    shared_ptr<GLModel> blob = this->Get<GLModel>("blob");
     shared_ptr<GLModel> paint = this->Get<GLModel>("paint");
     shared_ptr<GLModel> pallet = this->Get<GLModel>("pallet");
-    pallet->setMatrix(glm::translate(glm::mat4(1.0f), glass_pos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f))* rot *rot2 * glm::translate(glm::mat4(1.0f), glm::vec3(-2.89, -0.49, 1.7)));
+    pallet->setMatrix(glm::translate(glm::mat4(1.0f), camera1->getCameraPosition()) * glm::scale(glm::mat4(1.0f), glm::vec3(2.4f, 2.4f, 2.4f))* rot *rot2 * glm::translate(glm::mat4(1.0f), glm::vec3(-1.4, -3.2, -1.2)));
     brush->setMatrix(glm::translate(glm::mat4(1.0), paintPos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * rot);
-    blob->setMatrix(brush->Matrix());//* glm::translate(glm::mat4(1.0f), glm::vec3(-0.18, -0.25, -0.41)));
-    paint->setMatrix(blob->Matrix());//* glm::translate(glm::mat4(1.0f), glm::vec3(0.04, -0.007, 0.035)));
+    paint->setMatrix(brush->Matrix());//* glm::translate(glm::mat4(1.0f), glm::vec3(0.04, -0.007, 0.035)));
 
-    for (int i=0; i<6; i++)
-    {
-        shared_ptr<GLModel> color = this->Get<GLModel>(colors[i]);
-        color->setMatrix(pallet->Matrix() * glm::translate(glm::mat4(1.0f), translations[i]));
-        this->PaintHelper(color, GL_TRIANGLES);
-    }
-/*
-    for (int i=0; i<this->strokes.size(); i++)
-    {
-        paint->setMatrix(this->strokes.at(i).second);
-        this->PaintHelper(paint, GL_TRIANGLES);
-    }
-*/
-    this->PaintHelper(pallet, GL_TRIANGLES);
+    //for (int i=0; i<this->strokes.size(); i++)
+    //{
+	//paint->AssignTexture(0, this->strokes.at(i).first);
+        //paint->setMatrix(this->strokes.at(i).second);
+        //this->PaintHelper(paint, GL_TRIANGLES);
+    //}
+
     this->PaintHelper(brush, GL_TRIANGLES);
-    this->PaintHelper(blob, GL_TRIANGLES);
 
     shared_ptr<SoundManager> soundMan = this->Get<SoundManager>("soundMan");
     soundMan->PlayFX(0, GLRibbons->Tail());
@@ -194,6 +177,13 @@ void GLScene::Event()
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
     auto wand = cavr::input:: getSixDOF("wand");
     const char* colors[] = {"blue", "red", "purple", "white", "yellow", "green"};
+    glm::vec3 translations[] = {glm::vec3(-0.4, 0.02, -0.9),
+                               glm::vec3(0.19, 0.03, -0.8),
+                               glm::vec3(-0.36, 0.02, -0.13),
+                               glm::vec3(-0.9, 0.02, -0.3),
+                               glm::vec3(-0.8, 0.02, 0.2),
+                               glm::vec3(-0.5, 0.02, 0.67)};
+    
 
     glm::mat4 rot = glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 glass = GLMath::mat4ftoGLM( cavr::input::getSixDOF("glass")->getMatrix());
@@ -204,7 +194,6 @@ void GLScene::Event()
     glm::vec3 paintPos = camera1->getCameraPosition() + glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z/4.0) ;
 
     shared_ptr<GLModel> brush = this->Get<GLModel>("brush");
-    shared_ptr<GLModel> blob = this->Get<GLModel>("blob");
     shared_ptr<GLModel> paint = this->Get<GLModel>("paint");
     shared_ptr<GLModel> pallet = this->Get<GLModel>("pallet");
 
@@ -231,26 +220,35 @@ void GLScene::Event()
     {
       //cout << glm::to_string(paintPos) << endl; 
       GLRibbons->AddPoints(paintPos,glm::vec3(1,1,1));
-      if(GLRibbons->Size() > 1)
+      if(GLRibbons->Size() > 0)
         GLRibbons->AssignTexture(GLRibbons->Size()-1, this->color);
-      //this->strokes.push_back(std::pair<glm::vec4, glm::mat4>(Vec4(1,0,0,0), paintPos*glm::make_mat4(shear))); 
+      //this->strokes.push_back(std::pair<int, glm::mat4>(this->color, glm::translate(glm::mat4(1.0f), paintPos)*glm::make_mat4(shear))); 
     }
     else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !Break)
     {
         GLRibbons->AddBreak();
     }
-    else
+    else if(cavr::input::getButton("pallet")->delta() == cavr::input::Button::Held)
     {
+    	this->PaintHelper(pallet, GL_TRIANGLES);
+        for (int i=0; i<6; i++)
+        {
+	    shared_ptr<GLModel> color = this->Get<GLModel>(colors[i]);
+	    color->setMatrix(pallet->Matrix() * glm::translate(glm::mat4(1.0f), translations[i]));
+	    this->PaintHelper(color, GL_TRIANGLES);
+        }
+
         // Ray and bounding sphere
-        auto look = cavr::math::vec3f(-wandMatrix[2].x,wandMatrix[2].y,-wandMatrix[2].z);
-        auto pos = GLMath::GLMtovec3f(blob->Position());
+	auto mat = wand->getMatrix();
+        auto look = mat[2].xyz;
+        auto pos = mat[3].xyz;
         cavr::gfx::Ray ray = cavr::gfx::Ray(pos, look);
         float dist;
         for (int i=0; i<6; i++)
         {
             shared_ptr<GLModel> color = this->Get<GLModel>(colors[i]);
             cavr::math::mat4f sphere_mat = GLMath::GLMtomat4f(color->Matrix());
-            cavr::gfx::Sphere bounding_sphere = cavr::gfx::Sphere(sphere_mat[3].xyz, 0.1);
+            cavr::gfx::Sphere bounding_sphere = cavr::gfx::Sphere(sphere_mat[3].xyz, 0.5);
             if (bounding_sphere.intersect(*(&ray), *(&dist)))
             {
                 this->color = i;

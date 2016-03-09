@@ -15,7 +15,7 @@
 // Create camera
 std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
 
-#define DEBUG 
+//#define DEBUG 
 
 // Initialize our program
 void initContext() 
@@ -24,14 +24,12 @@ void initContext()
     static GLScene *cd;
     cd = new GLScene();
 
-    cd->InitializeGL();
 
     cd->AddToContext(camera);
     // Choose model
     //cd->AddModel("dragon", "models/dragon.obj");
     cd->AddModel("pallet", "models/pallet.obj");
     cd->AddModel("brush", "models/brush.obj");
-    cd->AddModel("blob", "models/blob.obj");
     cd->AddModel("paint", "models/paint.obj");
     cd->AddModel("blue", "models/blue.obj");
     cd->AddModel("red", "models/red.obj");
@@ -40,6 +38,7 @@ void initContext()
     cd->AddModel("yellow", "models/yellow.obj");
     cd->AddModel("green", "models/green.obj");
 
+    cd->InitializeGL();
     // Camera
     cavr::System::setContextData(cd);
 }
@@ -161,6 +160,7 @@ int main(int argc, char** argv)
   input_map.button_map["clear"] = "keyboard[b]";
 #else
   input_map.button_map["exit"] = "vrpn[WiiMote0[0]]";
+  input_map.button_map["pallet"] = "vrpn[WiiMote0[3]]";
   input_map.button_map["paint"] = "vrpn[WiiMote0[4]]";
   input_map.button_map["clear"] = "vrpn[WiiMote0[16]]";
   input_map.button_map["forwardEnable"] = "vrpn[WiiMote0[17]]";// 16 and 17 are Z and c, respectively
@@ -182,7 +182,7 @@ int main(int argc, char** argv)
     LOG(ERROR) << "Failed to initialize cavr.";
     return -1;
   }
-  auto emulated = cavr::input:: getSixDOF("glass");
+  auto emulated = cavr::input::getSixDOF("glass");
   auto emulatedMatrix = emulated->getMatrix();
 
   // I really wish there was a set position

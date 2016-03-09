@@ -352,6 +352,12 @@ Vec4 GLPrimitive::Position()
     return Vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
 }
 
+Vec4 GLPrimitive::Look()
+{
+    return Vec4(this->matrix[2].x, this->matrix[2].y, this->matrix[2].z, 1.0f);
+}
+
+
 void GLPrimitive::SetColor(Vec3 diffuse)
 {
     this->colors->clear();

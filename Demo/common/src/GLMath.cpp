@@ -37,4 +37,11 @@ cavr::math::vec3f GLMath::GLMtovec3f(Vec4 vec4)
     temp.z = vec4.z; 
     return temp;
 }
+cavr::math::vec3f GLMath::GLMtovec3f(Vec3 vec3)
+{
+    cavr::math::vec3f temp;
+    temp.x = vec3.x; temp.y = vec3.y; 
+    temp.z = vec3.z; 
+    return temp;
+}
 
