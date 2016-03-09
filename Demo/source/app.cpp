@@ -23,7 +23,7 @@ static bool PAINT;
 std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
 
 
-#define DEBUG 
+//#define DEBUG 
 
 #pragma comment(lib, "irrKlang.lib")
 // IrrKlang
@@ -39,7 +39,7 @@ void initContext()
 
     cd->AddToContext(camera);
     // Choose model
-    //cd->AddModel("dragon", "models/dragon.obj");
+    cd->AddModel("dragon", "models/dragon.obj");
 
     // Camera
     CAM_DIRECTION = GLCamera::CamDirection::Nop;
@@ -78,7 +78,7 @@ void render()
     cd->Paint();
 
     shared_ptr<SoundManager> soundMan = cd->Get<SoundManager>("soundMan");
-    soundMan->SetListener(GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getPosition()));
+    soundMan->SetListener(camera->getCameraPosition(),camera->GetForward());
       
 }
 

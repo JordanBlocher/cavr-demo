@@ -20,6 +20,8 @@ public:
     Vec3 getCameraPosition();
     void setAimTarget(Vec3 aimPos);
     void setCameraOffset(float zenith, float azimuth);
+    Vec3 RotatePoint(Vec3 Ray); // for rotating the wand in the direction that the camera is looking
+    Vec3 GetForward();
 
     glm::mat4 Projection();
     glm::mat4 View();
@@ -31,6 +33,7 @@ public:
     float radius, azimuth, polar;
     glm::mat4 projection;
     glm::mat4 view;
+    glm::mat4 testview;
     Vec3 aimTarget;
     Vec3 eye_pos;
     Vec3 near;

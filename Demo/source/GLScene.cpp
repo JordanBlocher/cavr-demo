@@ -157,10 +157,10 @@ void GLScene::Paint()
 
     //Choose Model
  
-    //shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
-    //dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
-    //dragon->shader->texture = 1;
-    //this->PaintHelper(dragon, GL_TRIANGLES);
+    shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
+    dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
+    dragon->shader->texture = 1;
+    this->PaintHelper(dragon, GL_TRIANGLES);
     
     shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
     this->PaintHelper(GLRibbons, GL_TRIANGLES);
@@ -186,8 +186,9 @@ void GLScene::Event()
     {
       auto wand = cavr::input:: getSixDOF("wand");
       shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+      auto wandMatrix =   GLMath::mat4ftoGLM(wand->getMatrix()) * camera1->View();
 
-      auto paintPos = GLMath::vec3ftoGLM(-2 *wand->getForward()) + camera1->getCameraPosition() + GLMath::vec3ftoGLM(wand->getPosition()) ;
+      auto paintPos = camera1->getCameraPosition() - glm::vec3(wandMatrix[3].x,wandMatrix[3].y,wandMatrix[3].z) ;
       //cout << glm::to_string(paintPos) << endl; 
       GLRibbons->AddPoints(paintPos,glm::vec3(1,1,1));
     }
