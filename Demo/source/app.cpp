@@ -15,11 +15,7 @@
 // Create camera
 std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
 
-
 #define DEBUG 
-
-#pragma comment(lib, "irrKlang.lib")
-// IrrKlang
 
 // Initialize our program
 void initContext() 
@@ -73,7 +69,7 @@ void render()
     cd->Paint();
 
     shared_ptr<SoundManager> soundMan = cd->Get<SoundManager>("soundMan");
-    soundMan->SetListener(GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getPosition()));
+    soundMan->SetListener(camera->getCameraPosition(),camera->GetForward());
       
 }
 

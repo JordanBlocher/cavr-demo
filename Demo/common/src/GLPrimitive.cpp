@@ -269,26 +269,33 @@ void GLPrimitive::Draw(GLenum MODE)
     glBindVertexArray(this->vao);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+    //cout<<"Num textures: "<<this->textures->size()<<endl;
     //Draw Model 
     for(size_t i=0; i< this->_faces->size(); i++)
     {      
 
         int textureIdx = this->shaders->at(i).texture;
         int materialIdx = this->shaders->at(i).material;
+        //cout<<"Checking Shader "<<i<<": "<<textureIdx<<" " <<materialIdx<<endl;
 
         this->LoadUBO(this->controlUBO, UBO::CONTROL, this->shaders->at(i));
         if (textureIdx != -1)
         {
+            //cout<<"Drawing Texture\n";
             this->LoadUBO(this->textureUBO, UBO::TEXTURE, this->shaders->at(i));
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
         else if (materialIdx != -1)
         {
+            //cout<<"Drawing Color\n";
             this->LoadUBO(this->materialUBO, UBO::COLOR, this->shaders->at(i));
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
         else
+        {
+            //cout<<"Drawing Vertex Color\n";
             DrawElements(i, face_offset, vertex_offset, MODE);
+        }
 
         face_offset += this->_faces->at(i).size();
         vertex_offset += this->_positions->at(i).size();

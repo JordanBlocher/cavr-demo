@@ -136,10 +136,26 @@ void GLCamera::updateView()
                     Vec3(eyeX, eyeY, eyeZ),  //eye pos
                     Vec3(-eyeX, -eyeY, -eyeZ),    //focus point
                     up));  //up
-
+    testview = this->view;
     //std::cout<<"polar "<<polar<<" azimuth "<<azimuth<<" radius "<<radius<<'\n';
     //std::cout<< "eye pos "<<eyeX<<" "<< eyeY<< " " <<eyeZ <<'\n';
     this->view = view*this->view; 
+}
+
+Vec3 GLCamera::RotatePoint(Vec3 ray)
+{
+    return ray;
+    float dist = glm::length2(ray);
+    if(dist == 0)
+    {
+        return ray;
+    }
+    cout << "DISTANCE: " << dist << endl;
+    //ray = glm::normalize(ray);
+
+    glm::vec4 abc = glm::vec4(ray.x,ray.y,ray.z,1.0);
+   abc =  testview * abc;
+    return -glm::vec3(abc.x,abc.y,abc.z);
 }
 
 void GLCamera::setCameraOffset(float zenith, float azimuth)
@@ -169,5 +185,8 @@ Vec3 GLCamera::getCameraPosition()
     return this->eye_pos;
 }
 
-
+Vec3 GLCamera::GetForward()
+{
+    return glm::vec3(view[2].x,view[2].y,view[2].z);
+}
 

@@ -11,7 +11,7 @@ class SoundManager : public GLNode
 		SoundManager(const char* name);
 		void PlayBgm(int bgmNum, bool, bool);
 		void PlayFX(int fxNum, Vec3);
-        void SetListener(Vec3);
+        void SetListener(Vec3,Vec3 forward);
 
 	protected:
 		void Finished();
