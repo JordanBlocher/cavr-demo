@@ -9,13 +9,11 @@
 #include <glog/logging.h>
 #include <math.h>
 
-//#define DEBUG 
 
 int setup_map(int argc, char** argv)
 {
   cavr::input::InputMap input_map;
   // set input map for buttons,keyboard, and sixdofs 
-#ifdef DEBUG
   input_map.button_map["up"] = "keyboard[w]";
   input_map.button_map["down"] = "keyboard[s]";
   input_map.button_map["left"] = "keyboard[a]";
@@ -25,8 +23,6 @@ int setup_map(int argc, char** argv)
   input_map.button_map["paint"] = "keyboard[p]";
   input_map.button_map["exit"] = "keyboard[Escape]";
   input_map.button_map["clear"] = "keyboard[b]";
-#endif
-
   input_map.button_map["forwardEnable"] = "vrpn[WiiMote0[17]]";// 16 and 17 are Z and c, respectively
   input_map.analog_map["x_vec"] = "vrpn[WiiMote0[21]]"; // analog sticks of the nunchaku
   input_map.analog_map["y_vec"] = "vrpn[WiiMote0[22]]"; // analog sticks of the nunchaku

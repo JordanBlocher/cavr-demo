@@ -185,6 +185,19 @@ void GLScene::MoveCamera()
     emulatedMatrix[3].xyz = headPosition;
     emulated->setState(emulatedMatrix);
 
+    if (cavr::input::getButton("up")->delta() == cavr::input::Button::Held) 
+        camera->moveCamera(glm::vec2(-4 * cavr::input::InputManager::dt(),0),0);
+    else if (cavr::input::getButton("down")->delta() == cavr::input::Button::Held) 
+        camera->moveCamera(glm::vec2(4* cavr::input::InputManager::dt(),0),0);
+    else if (cavr::input::getButton("left")->delta() == cavr::input::Button::Held)
+        camera->moveCamera(glm::vec2(0,-4* cavr::input::InputManager::dt()),0);
+    else if (cavr::input::getButton("right")->delta() == cavr::input::Button::Held) 
+        camera->moveCamera(glm::vec2(0,4* cavr::input::InputManager::dt()),0);
+    else if (cavr::input::getButton("forward")->delta() == cavr::input::Button::Held) 
+        camera->moveCamera(glm::vec2(0,0),4* cavr::input::InputManager::dt());
+    else if (cavr::input::getButton("backward")->delta() == cavr::input::Button::Held)
+        camera->moveCamera(glm::vec2(0,0),-4* cavr::input::InputManager::dt());
+
     float xVec = 0; // rename these
     float yVec = 0; // rename
     glm::vec2 xyVec;
