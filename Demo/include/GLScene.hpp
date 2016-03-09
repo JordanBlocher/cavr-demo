@@ -27,8 +27,8 @@ class GLScene : public GLViewport
     void LoadGlobalUBOs(Matrices);
 
     std::chrono::time_point<std::chrono::high_resolution_clock> time;
-    std::vector<std::pair<Vec4, glm::mat4>> strokes;
-    Vec4 color;
+    std::vector<std::pair<int, glm::mat4>> strokes;
+    int color;
     bool painting;
     
     bool Break;
@@ -38,11 +38,6 @@ class GLScene : public GLViewport
 
 };
 
-template <typename T> 
-int sgn(T val) 
-{
-    return (T(0) < val) - (val < T(0));
-}
 
 template <typename T> 
 void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)

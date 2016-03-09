@@ -185,7 +185,7 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
 
     // Populate the index buffer
     for (unsigned int i = 0 ; i < mesh->mNumFaces ; i++) 
-    {
+   {
         const aiFace* face = &(mesh->mFaces[i]);
         //assert(face->mNumIndices == 3);
         this->_faces->at(index).at(3*i) = face->mIndices[0];
@@ -197,7 +197,6 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
 
 void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
 {
-    this->materials->resize(numMaterials);
     this->shaders->resize(numMaterials);
 
     for ( unsigned int i = 0; i < numMaterials; ++i )
@@ -210,7 +209,6 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
         float shininess = 10.0f;
         float intensity = 1.0f;
         float diffuseBlend = 1.0f;
-        std::cout<<"diffuseBlend "<<diffuseBlend<<std::endl;
         aiString name;
 
         material.Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
@@ -230,7 +228,6 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
         mat.intensity = 1.0f + intensity;
         mat.diffuseBlend = diffuseBlend;
 
-        //int numTextures = material.GetTextureCount(aiTextureType_DIFFUSE);
 
         aiString texPath;
 
@@ -248,8 +245,10 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
                 printf("Error loading texture '%s'\n", location.c_str());
             }
             this->textures->push_back(texture);
-            this->shaders->at(i).texture = i;
+            this->shaders->at(i).texture = 0;
         }
+        else 
+            this->shaders->at(i).texture = 0;
 
         if ( material.Get(AI_MATKEY_TEXTURE(aiTextureType_HEIGHT,0), texPath) == AI_SUCCESS )
         {
@@ -265,12 +264,20 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
                 printf("Error loading texture '%s'\n", location.c_str());
             }
             this->bumpmaps->push_back(texture);
-            this->shaders->at(i).bump = i;
+            this->shaders->at(i).bump = 0;
         }
+        else 
+            this->shaders->at(i).bump = -1;
 
         if(std::string(name.C_Str()) != std::string("DefaultMaterial") || numMaterials == 1)
+        {
+            this->shaders->at(i).material = 0;
             this->materials->push_back(mat);
-            this->shaders->at(i).material = i;
+            this->shaders->at(i).texture = -1;
+        }
+        else
+            this->shaders->at(i).material = -1;
+       
     }
 }
 

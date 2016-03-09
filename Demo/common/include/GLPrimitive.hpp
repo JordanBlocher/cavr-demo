@@ -37,6 +37,7 @@ class GLPrimitive : public GLMesh
     virtual void Clear();
     glm::mat4 Matrix();
     Vec4 Position();
+    Vec4 Look();
     void setMatrix(glm::mat4);
     virtual void SetColor(Vec3);
     Vec3 GetColor();
