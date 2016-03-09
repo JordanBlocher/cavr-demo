@@ -1,8 +1,8 @@
-# Blender MTL File: 'None'
+# Blender MTL File: 'pallet.blend'
 # Material Count: 1
 
-newmtl Material.002
-Ns 92.156863
+newmtl wire_229166215
+Ns 96.078431
 Ka 0.000000 0.000000 0.000000
 Kd 0.000000 0.000000 0.000000
 Ks 0.500000 0.500000 0.500000

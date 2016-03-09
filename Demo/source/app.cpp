@@ -8,16 +8,9 @@
 #include <cavr/gl/vbo.h>
 #include <glog/logging.h>
 #include <math.h>
-#define GLM_FORCE_RADIANS
 #include <GLScene.hpp>
 #include <GLRibbon.hpp>
 
-// Using IrrKlang for this example
-#include <irrKlang.h>
-using namespace irrklang;
-
-static GLCamera::CamDirection CAM_DIRECTION;
-static bool PAINT;
 
 // Create camera
 std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
@@ -40,11 +33,18 @@ void initContext()
     cd->AddToContext(camera);
     // Choose model
     //cd->AddModel("dragon", "models/dragon.obj");
+    cd->AddModel("pallet", "models/pallet.obj");
+    cd->AddModel("brush", "models/brush.obj");
+    cd->AddModel("blob", "models/blob.obj");
+    cd->AddModel("paint", "models/paint.obj");
+    cd->AddModel("blue", "models/blue.obj");
+    cd->AddModel("red", "models/red.obj");
+    cd->AddModel("purple", "models/purple.obj");
+    cd->AddModel("white", "models/white.obj");
+    cd->AddModel("yellow", "models/yellow.obj");
+    cd->AddModel("green", "models/green.obj");
 
     // Camera
-    CAM_DIRECTION = GLCamera::CamDirection::Nop;
-    PAINT = false;
-
     cavr::System::setContextData(cd);
 }
 
@@ -52,12 +52,7 @@ void frame()
 {
     static GLScene *cd;
     cd = static_cast<GLScene*>(cavr::System::getContextData());
-    if (cavr::input::getButton("paint")->delta() == cavr::input::Button::Held) 
-        PAINT = true;
-    else PAINT = false;
-    
     cd->Event();
-
 }
 
 void render() 
@@ -107,8 +102,6 @@ void update()
     emulatedMatrix[3].xyz = headPosition;
     emulated->setState(emulatedMatrix);
     
-
-
     if (cavr::input::getButton("up")->delta() == cavr::input::Button::Held) 
         camera->moveCamera(glm::vec2(-4 * cavr::input::InputManager::dt(),0),0);
     else if (cavr::input::getButton("down")->delta() == cavr::input::Button::Held) 
@@ -121,8 +114,6 @@ void update()
         camera->moveCamera(glm::vec2(0,0),4* cavr::input::InputManager::dt());
     else if (cavr::input::getButton("backward")->delta() == cavr::input::Button::Held)
         camera->moveCamera(glm::vec2(0,0),-4* cavr::input::InputManager::dt());
-    else
-        CAM_DIRECTION = GLCamera::CamDirection::Nop;
 
     float xVec = 0; // rename these
     float yVec = 0; // rename
@@ -173,23 +164,13 @@ int main(int argc, char** argv)
   input_map.button_map["exit"] = "keyboard[Escape]";
   input_map.button_map["clear"] = "keyboard[b]";
 #else
-  input_map.button_map["up"] = "vrpn[WiiMote0[10]]";
-  input_map.button_map["down"] = "vrpn[WWiiMote0[9]]";
-  input_map.button_map["left"] = "vrpn[WWiiMote0[7]]";
-  input_map.button_map["right"] = "vrpn[WWiiMote0[8]]";
-  input_map.button_map["forward"] = "vrpn[WWiiMote0[4]]";
-  //input_map.button_map["backward"] = "vrpn[WWiiMote0[3]]";
   input_map.button_map["exit"] = "vrpn[WiiMote0[0]]";
   input_map.button_map["paint"] = "vrpn[WiiMote0[4]]";
   input_map.button_map["clear"] = "vrpn[WiiMote0[16]]";
-#endif
-
-
-  
-
   input_map.button_map["forwardEnable"] = "vrpn[WiiMote0[17]]";// 16 and 17 are Z and c, respectively
   input_map.analog_map["x_vec"] = "vrpn[WiiMote0[21]]"; // analog sticks of the nunchaku
   input_map.analog_map["y_vec"] = "vrpn[WiiMote0[22]]"; // analog sticks of the nunchaku
+#endif
 
   //input_map.button_map["c_button"] = "vrpn[WiiMote0[17]]"; 
 

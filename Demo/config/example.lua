@@ -65,9 +65,9 @@ vrpn = {
 };
 
 self = {
-  hostname = "hpcvis6";
-  ssh = "hpcvis6.cse.unr.edu";
-  address = "hpcvis6.cse.unr.edu";
+  hostname = "hpcvis1";
+  ssh = "hpcvis1.cse.unr.edu";
+  address = "hpcvis1.cse.unr.edu";
   plugins = {
     x11_renderer = x11_renderer;
     vrpn = vrpn;
@@ -112,7 +112,7 @@ others2 = {
 
 
 machines = {
-  self=localhost;
+  self=self;
   --self2 = others;
   --self3 = others2;
 };
