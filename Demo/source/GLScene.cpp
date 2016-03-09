@@ -127,7 +127,7 @@ void GLScene::InitializeGL()
         GLRibbons->AddTexture(tex);
     }
 
-   this->color = 0; 
+   this->color = 5; 
 }
 
 void GLScene::Paint()
@@ -152,8 +152,9 @@ void GLScene::Paint()
     this->PaintHelper(GLRibbons, GL_TRIANGLES);
       
     glm::mat4 wandMatrix =  GLMath::mat4ftoGLM(wand->getMatrix()) * camera1->View();
-    glm::vec3 paintPos = camera1->getCameraPosition() + glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z) ;
+    glm::vec3 paintPos = camera1->getCameraPosition() + glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z/4.0) ;
     glm::mat4 rot = glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 rot2 = glm::rotate(glm::mat4(1.0f), (float)(M_PI/6), glm::vec3(1.0f, 0.0f, 0.0f));
     glm::mat4 glass = GLMath::mat4ftoGLM( cavr::input::getSixDOF("glass")->getMatrix());
     glm::vec3 glass_pos = GLMath::vec3ftoGLM( cavr::input::getSixDOF("glass")->getPosition());
 
@@ -161,7 +162,7 @@ void GLScene::Paint()
     shared_ptr<GLModel> blob = this->Get<GLModel>("blob");
     shared_ptr<GLModel> paint = this->Get<GLModel>("paint");
     shared_ptr<GLModel> pallet = this->Get<GLModel>("pallet");
-    pallet->setMatrix(glm::translate(glm::mat4(1.0f), glass_pos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f))* rot * glm::translate(glm::mat4(1.0f), glm::vec3(-0.89, -0.49, 0.7)));
+    pallet->setMatrix(glm::translate(glm::mat4(1.0f), glass_pos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f))* rot *rot2 * glm::translate(glm::mat4(1.0f), glm::vec3(-2.89, -0.49, 1.7)));
     brush->setMatrix(glm::translate(glm::mat4(1.0), paintPos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * rot);
     blob->setMatrix(brush->Matrix());//* glm::translate(glm::mat4(1.0f), glm::vec3(-0.18, -0.25, -0.41)));
     paint->setMatrix(blob->Matrix());//* glm::translate(glm::mat4(1.0f), glm::vec3(0.04, -0.007, 0.035)));
@@ -200,7 +201,7 @@ void GLScene::Event()
 ;
     glm::mat4 wandMatrix = GLMath::mat4ftoGLM(wand->getMatrix()) * camera1->View();
     glm::vec3 wandPos = glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z); 
-    glm::vec3 paintPos = camera1->getCameraPosition() + glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z) ;
+    glm::vec3 paintPos = camera1->getCameraPosition() + glm::vec3(-wandMatrix[3].x,wandMatrix[3].y,-wandMatrix[3].z/4.0) ;
 
     shared_ptr<GLModel> brush = this->Get<GLModel>("brush");
     shared_ptr<GLModel> blob = this->Get<GLModel>("blob");

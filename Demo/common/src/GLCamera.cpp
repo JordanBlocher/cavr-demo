@@ -134,8 +134,8 @@ void GLCamera::updateView()
 
     this->view = (glm::lookAt(
                     Vec3(eyeX, eyeY, eyeZ),  //eye pos
-                    Vec3(-eyeX, -eyeY, -eyeZ),    //focus point
-                    up));  //up
+                    Vec3(0,0,1),    //focus point
+                    Vec3(0,1,0)));  //up
     testview = this->view;
     //std::cout<<"polar "<<polar<<" azimuth "<<azimuth<<" radius "<<radius<<'\n';
     //std::cout<< "eye pos "<<eyeX<<" "<< eyeY<< " " <<eyeZ <<'\n';
