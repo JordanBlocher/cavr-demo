@@ -30,7 +30,6 @@ void initContext()
     //cd->AddModel("dragon", "models/dragon.obj");
     cd->AddModel("pallet", "models/pallet.obj");
     cd->AddModel("brush", "models/brush.obj");
-    cd->AddModel("paint", "models/paint.obj");
     cd->AddModel("blue", "models/blue.obj");
     cd->AddModel("red", "models/red.obj");
     cd->AddModel("purple", "models/purple.obj");
