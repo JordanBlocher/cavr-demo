@@ -29,7 +29,7 @@ class GLScene : public GLViewport
     std::chrono::time_point<std::chrono::high_resolution_clock> time;
     std::vector<std::pair<int, glm::mat4>> strokes;
     int color;
-    bool painting;
+    bool pallet;
     
     bool Break;
 

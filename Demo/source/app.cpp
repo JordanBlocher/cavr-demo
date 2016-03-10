@@ -155,6 +155,7 @@ int main(int argc, char** argv)
   input_map.button_map["forward"] = "keyboard[i]";
   input_map.button_map["backward"] = "keyboard[k]";
   input_map.button_map["paint"] = "keyboard[p]";
+  input_map.button_map["pallet"] = "keyboard[l]";
   input_map.button_map["exit"] = "keyboard[Escape]";
   input_map.button_map["clear"] = "keyboard[b]";
 #else

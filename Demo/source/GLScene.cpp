@@ -128,14 +128,15 @@ void GLScene::InitializeGL()
     }
 
    this->color = 5; 
+   this->pallet = false;
 }
 
 void GLScene::Paint()
 {
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
     auto wand = cavr::input:: getSixDOF("wand");
-    glm::vec3 wandPos = camera1->RotatePoint(GLMath::vec3ftoGLM(wand->getPosition() )); 
-    glm::vec3 paintPos = camera1->getCameraPosition() + wandPos + camera1->RotatePoint(GLMath::vec3ftoGLM(2.0*wand->getForward() )); ;
+    glm::vec3 wandPos = camera1->getCameraPosition() + camera1->RotatePoint(GLMath::vec3ftoGLM(wand->getPosition() )); 
+    glm::vec3 paintPos = wandPos + camera1->RotatePoint(GLMath::vec3ftoGLM(2.0*wand->getForward() )); ;
 
     //Clear the screen
     glClearColor(0.0,0.0,0.0,1.0);
@@ -148,49 +149,17 @@ void GLScene::Paint()
     shared_ptr<GLModel> brush = this->Get<GLModel>("brush");
     glm::mat4 rot = glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 1.0f, 0.0f));
     brush->setMatrix(glm::translate(glm::mat4(1.0), paintPos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * rot);
-
     this->PaintHelper(brush, GL_TRIANGLES);
 
-    shared_ptr<SoundManager> soundMan = this->Get<SoundManager>("soundMan");
-    soundMan->PlayFX(0, GLRibbons->Tail());
-
-}
-
-void GLScene::Event()
-{
-    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
-    auto wand = cavr::input:: getSixDOF("wand");
-    
-    glm::vec3 wandPos = camera1->RotatePoint(GLMath::vec3ftoGLM(wand->getPosition() )); 
-    glm::vec3 paintPos = camera1->getCameraPosition() + wandPos + camera1->RotatePoint(GLMath::vec3ftoGLM(2.0*wand->getForward() )); ;
-
-    shared_ptr<GLModel> brush = this->Get<GLModel>("brush");
     shared_ptr<GLModel> pallet = this->Get<GLModel>("pallet");
-
-    // Paint here
-    shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
-
-    if(cavr::input::getButton("clear")->delta() != cavr::input::Button::Open)
-    {
-       GLRibbons->ClearPoints();
-    }
-
-    if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Held)
-    {
-      //cout << glm::to_string(paintPos) << endl; 
-      GLRibbons->AddPoints(paintPos,glm::vec3(1,1,1));
-      if(GLRibbons->Size() > 0)
-        GLRibbons->AssignTexture(GLRibbons->Size()-1, this->color);
-    }
-    if(cavr::input::getButton("pallet")->delta() == cavr::input::Button::Held)
+    if(this->pallet)
     {
         glm::mat4 rot = glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::mat4 rot2 = glm::rotate(glm::mat4(1.0f), (float)(M_PI/3.7), glm::vec3(1.0f, 0.0f, 0.0f));
 
-        shared_ptr<GLModel> pallet = this->Get<GLModel>("pallet");
         pallet->setMatrix(glm::translate(glm::mat4(1.0f), wandPos) 
                 * glm::scale(glm::mat4(1.0f), glm::vec3(2.4f, 2.4f, 2.4f))* rot *rot2 
-                * glm::translate(glm::mat4(1.0f), glm::vec3(-1.4, -3.2, -1.2)));
+                * glm::translate(glm::mat4(1.0f), glm::vec3(-.4, -.2, -.2)));
 
     	this->PaintHelper(pallet, GL_TRIANGLES);
 
@@ -221,6 +190,41 @@ void GLScene::Event()
                 this->color = i;
             }
         }
+    }
+
+    shared_ptr<SoundManager> soundMan = this->Get<SoundManager>("soundMan");
+    soundMan->PlayFX(0, GLRibbons->Tail());
+
+}
+
+void GLScene::Event()
+{
+    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+    auto wand = cavr::input:: getSixDOF("wand");
+    
+    glm::vec3 wandPos = camera1->getCameraPosition() + camera1->RotatePoint(GLMath::vec3ftoGLM(wand->getPosition() )); 
+    glm::vec3 paintPos = wandPos + camera1->RotatePoint(GLMath::vec3ftoGLM(2.0*wand->getForward() )); ;
+
+    // Paint here
+    shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
+
+    if(cavr::input::getButton("pallet")->delta() == cavr::input::Button::Held)
+    {
+        this->pallet = true; 
+    }
+    else this->pallet = false;
+
+    if(cavr::input::getButton("clear")->delta() != cavr::input::Button::Open)
+    {
+       GLRibbons->ClearPoints();
+    }
+
+    if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Held)
+    {
+      //cout << glm::to_string(paintPos) << endl; 
+      GLRibbons->AddPoints(paintPos,glm::vec3(1,1,1));
+      if(GLRibbons->Size() > 0)
+        GLRibbons->AssignTexture(GLRibbons->Size()-1, this->color);
     }
     else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !Break)
     {
