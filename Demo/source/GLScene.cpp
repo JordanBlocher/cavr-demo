@@ -157,7 +157,7 @@ void GLScene::Paint()
         glm::mat4 rot = glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::mat4 rot2 = glm::rotate(glm::mat4(1.0f), (float)(M_PI/3.7), glm::vec3(1.0f, 0.0f, 0.0f));
 
-        pallet->setMatrix(glm::translate(glm::mat4(1.0f), wandPos) 
+        pallet->setMatrix(glm::translate(glm::mat4(1.0f), camera1->getCameraPosition()) 
                 * glm::scale(glm::mat4(1.0f), glm::vec3(2.4f, 2.4f, 2.4f))* rot *rot2 
                 * glm::translate(glm::mat4(1.0f), glm::vec3(-.4, -.2, -.2)));
 
@@ -178,7 +178,7 @@ void GLScene::Paint()
         }
 
         // Ray and bounding sphere
-        cavr::gfx::Ray ray = cavr::gfx::Ray(GLMath::GLMtovec3f(wandPos), GLMath::GLMtovec3f(paintPos));
+        cavr::gfx::Ray ray = cavr::gfx::Ray(GLMath::GLMtovec3f(wandPos), GLMath::GLMtovec3f(camera1->RotatePoint(GLMath::vec3ftoGLM(2.0*wand->getForward()))));
         float dist;
         for (int i=0; i<6; i++)
         {
