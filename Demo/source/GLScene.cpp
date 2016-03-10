@@ -188,7 +188,7 @@ void GLScene::Event()
         glm::mat4 rot2 = glm::rotate(glm::mat4(1.0f), (float)(M_PI/3.7), glm::vec3(1.0f, 0.0f, 0.0f));
 
         shared_ptr<GLModel> pallet = this->Get<GLModel>("pallet");
-        pallet->setMatrix(glm::translate(glm::mat4(1.0f), camera1->getCameraPosition()) 
+        pallet->setMatrix(glm::translate(glm::mat4(1.0f), wandPos) 
                 * glm::scale(glm::mat4(1.0f), glm::vec3(2.4f, 2.4f, 2.4f))* rot *rot2 
                 * glm::translate(glm::mat4(1.0f), glm::vec3(-1.4, -3.2, -1.2)));
 
