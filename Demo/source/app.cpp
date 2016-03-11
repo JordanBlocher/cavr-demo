@@ -169,8 +169,8 @@ int main(int argc, char** argv)
   input_map.analog_map["y_vec"] = "vrpn[WiiMote0[22]]"; // analog sticks of the nunchaku
 #endif
 
-  input_map.button_map["play"] = "keyboard[m]";
-  input_map.button_map["record"] = "keyboard[r]";
+  input_map.button_map["play"] = "vrpn[WiiMote0[1]]";//"keyboard[m]";
+  input_map.button_map["record"] = "vrpn[WiiMote0[2]]";//"keyboard[r]";
   //input_map.button_map["c_button"] = "vrpn[WiiMote0[17]]"; 
 
 
@@ -179,7 +179,6 @@ int main(int argc, char** argv)
 
   input_map.sixdof_map["glass"] = "vrpn[TallGlasses[0]]";
   input_map.sixdof_map["emulated"] = "emulated";
-
   
   if (!cavr::System::init(argc, argv, &input_map)) {
     LOG(ERROR) << "Failed to initialize cavr.";

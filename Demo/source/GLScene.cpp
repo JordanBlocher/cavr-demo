@@ -216,6 +216,8 @@ void GLScene::Paint()
             if (bounding_sphere.intersect(*(&ray), *(&dist)))
             {
                 this->color = i;
+                auto soundMan = this->Get<SoundManager>("soundMan");
+                soundMan->PlayFX(player.GetSound(i),camera1->getCameraPosition());
             }
         }
     }
@@ -240,6 +242,8 @@ void GLScene::Event()
     if(cavr::input::getButton("record")->delta() != cavr::input::Button::Open && record)
     {
         cout << "Record" << endl;
+        auto soundMan = this->Get<SoundManager>("soundMan");
+        soundMan->PlayFX(player.GetSound(6),camera1->getCameraPosition());
         player.ToggleRecord();
     }
     record = cavr::input::getButton("record")->delta() == cavr::input::Button::Open;
@@ -259,8 +263,10 @@ void GLScene::Event()
        player.ClearTracked();
     }
 
-    if(cavr::input::getButton("play")->delta() != cavr::input::Button::Open)
+    if(cavr::input::getButton("play")->delta() == cavr::input::Button::Pressed)
     {
+        auto soundMan = this->Get<SoundManager>("soundMan");
+        soundMan->PlayFX(player.GetSound(7),camera1->getCameraPosition());
         player.PlaySound();
     }
 

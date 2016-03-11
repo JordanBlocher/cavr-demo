@@ -27,7 +27,11 @@ public:
 	void ToggleRecord()
 	{
 	 	record = !record;
-	}
+	};
+	string GetSound(int mapping)
+	{
+		return Sounds[mapping];
+	};
 private:
 	map<int,string> Sounds;	
 	float currenttime;
