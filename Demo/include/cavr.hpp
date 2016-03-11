@@ -10,9 +10,8 @@
 #include <math.h>
 
 
-int setup_map(int argc, char** argv)
+int setup_map(cavr::input::InputMap &inputMap)
 {
-  cavr::input::InputMap input_map;
   // set input map for buttons,keyboard, and sixdofs 
   input_map.button_map["up"] = "keyboard[w]";
   input_map.button_map["down"] = "keyboard[s]";
