@@ -22,7 +22,7 @@ void SoundPlayer::ClearTracked()
 	}
 	sounds.clear();
 	currenttime = 0;
-	intervaltime = 1.0/3.0;
+	intervaltime = 1.0/2.0;
 	playtime = 0;
 
 }
@@ -39,7 +39,7 @@ void SoundPlayer::AddPoint(Vec3 Position,int sound)
 			temp.time = currenttime;
 			sounds.push_back(temp);
 		}
-		intervaltime = 1.0/120.0;
+		intervaltime = 1.0/2.0;
 
 	}
 }
