@@ -30,7 +30,6 @@ void initContext()
     //cd->AddModel("dragon", "models/dragon.obj");
     cd->AddModel("pallet", "models/pallet.obj");
     cd->AddModel("brush", "models/brush.obj");
-    cd->AddModel("paint", "models/paint.obj");
     cd->AddModel("blue", "models/blue.obj");
     cd->AddModel("red", "models/red.obj");
     cd->AddModel("purple", "models/purple.obj");
@@ -157,6 +156,7 @@ int main(int argc, char** argv)
   input_map.button_map["forward"] = "keyboard[i]";
   input_map.button_map["backward"] = "keyboard[k]";
   input_map.button_map["paint"] = "keyboard[p]";
+  input_map.button_map["pallet"] = "keyboard[l]";
   input_map.button_map["exit"] = "keyboard[Escape]";
   input_map.button_map["clear"] = "keyboard[b]";
 #else

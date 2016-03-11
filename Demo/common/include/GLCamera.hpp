@@ -15,6 +15,7 @@ public:
     void updateCavrView();
     void updateCavrPosition();
     void updateView();
+    glm::mat4 GetCameraView() {return testview;};
     void moveCamera(glm::vec2 angle, float RadiusForce);
     void moveCamera(CamDirection);
     Vec3 getCameraPosition();

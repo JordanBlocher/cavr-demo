@@ -32,11 +32,12 @@ class GLScene : public GLViewport
     std::chrono::time_point<std::chrono::high_resolution_clock> time;
     std::vector<std::pair<int, glm::mat4>> strokes;
     int color;
-    bool painting;
+    bool pallet;
     
     bool Break;
     bool PaintOff;
     bool record;
+    
     template <typename T> 
     void PaintHelper(shared_ptr<T>, GLenum);
     SoundPlayer player;
