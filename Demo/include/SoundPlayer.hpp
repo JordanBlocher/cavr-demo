@@ -35,6 +35,7 @@ private:
 	float intervaltime;
 	bool play;
 	bool record;
+	bool noteOn;
 	vector<SoundStructure> sounds;
 	shared_ptr<SoundManager> soundMan;
 };

@@ -284,7 +284,9 @@ void GLScene::Event()
       //cout << glm::to_string(paintPos) << endl; 
       GLRibbons->AddPoints(paintPos,glm::vec3(1,1,1));
       if(GLRibbons->Size() > 0)
+      {
         GLRibbons->AssignTexture(GLRibbons->Size()-1, this->color);
+      }
         player.AddPoint(paintPos,color);
         player.SetOffPoint();
     }

@@ -7,6 +7,8 @@ SoundPlayer::SoundPlayer(shared_ptr<SoundManager> SoundMan)
 	play = false;
 	record = false;
 	soundMan = SoundMan;
+	noteOn = false;
+	intervaltime = 1.0 / 1000.0;
 }
 
 void SoundPlayer::ClearTracked()
@@ -22,7 +24,7 @@ void SoundPlayer::ClearTracked()
 	}
 	sounds.clear();
 	currenttime = 0;
-	intervaltime = 1.0/2.0;
+	intervaltime = 1.0/1000.0;
 	playtime = 0;
 
 }
@@ -33,13 +35,16 @@ void SoundPlayer::AddPoint(Vec3 Position,int sound)
 	{
 		if(record)
 		{
+			cout << "ADDED" << endl;
 			SoundStructure temp;
 			temp.Position = Position;
 			temp.sound = sound;
 			temp.time = currenttime;
 			sounds.push_back(temp);
+			sounds[sounds.size()-1].offtime = currenttime + 1.0/100.0;
+			sounds[sounds.size()-1].Sound =NULL;
 		}
-		intervaltime = 1.0/2.0;
+		intervaltime = 1.0/1000.0;
 
 	}
 }
@@ -55,10 +60,11 @@ void SoundPlayer::Update(float dt)
 	{
 		for(int i = 0; i < sounds.size(); i++ )
 		{
+			cout << i << endl;
 
-			if(playtime >= sounds[i].time && sounds[i].Sound == NULL)// && (sounds[i].offtime > playtime))
+			if(playtime >= sounds[i].time && sounds[i].Sound == NULL && (sounds[i].offtime > playtime))
 			{
-				sounds[i].Sound = soundMan->PlayFX(Sounds[sounds[i].sound], sounds[i].Position,false,false,false,false);
+				sounds[i].Sound = soundMan->PlayFX(Sounds[sounds[i].sound], sounds[i].Position,false,false,true,false);
 
 				//sounds[i].Sound->getSoundEffectControl()->enableEchoSoundEffect();
 			}
@@ -94,7 +100,7 @@ void SoundPlayer::SetOffPoint()
 {
 	if(record)
 	{
-		sounds[sounds.size()-1].offtime = currenttime;
-		sounds[sounds.size()-1].Sound =NULL;
+		//sounds[sounds.size()-1].offtime = currenttime + 1.0/2.0;
+		//sounds[sounds.size()-1].Sound =NULL;
 	}
 }
