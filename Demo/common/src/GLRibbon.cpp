@@ -22,25 +22,17 @@ bool GLRibbon::Init()
 bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
 {
 
-    if(Points.size() == 0)
-    {
         PaintStruct temp;
         temp.position = worldPoint;
         temp.color = Color;
         temp.Break = false;
         Points.push_back(temp);
-    }
 
 	if(Points.size() > 1 && !Points[Points.size()-2].Break)
 	{
-        //if(glm::distance(Points[Points.size()-2].position, worldPoint) > 2)
-        //    return;
-
-        PaintStruct temp;
-        temp.position = worldPoint;
-        temp.color = Color;
-        temp.Break = false;
-        Points.push_back(temp);
+        	float dist =glm::distance(Points[Points.size()-2].position, worldPoint);
+		if(dist >= 1.0)	
+        	    return false;
 
 		// Add the points at the current positionsition in the buffer
 		Vec3 one;

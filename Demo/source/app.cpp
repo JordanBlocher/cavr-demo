@@ -15,7 +15,7 @@
 // Create camera
 std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
 
-#define DEBUG 
+//#define DEBUG 
 
 // Initialize our program
 void initContext() 
@@ -177,7 +177,7 @@ int main(int argc, char** argv)
   input_map.sixdof_map["wand"] = "vrpn[WiiMote0[0]]";
   //input_map.button_map["pick"] = "vrpn[WiiMote0[3]]";
 
-  input_map.sixdof_map["glass"] = "vrpn[TallGlasses[0]]";
+  input_map.sixdof_map["glass"] = "vrpn[ShortGlasses[0]]";
   input_map.sixdof_map["emulated"] = "emulated";
   
   if (!cavr::System::init(argc, argv, &input_map)) {

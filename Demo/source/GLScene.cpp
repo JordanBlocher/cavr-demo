@@ -238,17 +238,7 @@ void GLScene::Event()
 
     // Paint here
     shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
-    
-    if(cavr::input::getButton("record")->delta() != cavr::input::Button::Open && record)
-    {
-        cout << "Record" << endl;
-        auto soundMan = this->Get<SoundManager>("soundMan");
-        soundMan->PlayFX(player.GetSound(6),camera1->getCameraPosition());
-        player.ToggleRecord();
-    }
-    record = cavr::input::getButton("record")->delta() == cavr::input::Button::Open;
-
-    glm::vec3 wandPos = camera1->getCameraPosition() +  camera1->RotatePoint(GLMath::vec3ftoGLM(wand->getPosition() )); 
+       glm::vec3 wandPos = camera1->getCameraPosition() +  camera1->RotatePoint(GLMath::vec3ftoGLM(wand->getPosition() )); 
     glm::vec3 paintPos = wandPos + camera1->RotatePoint(GLMath::vec3ftoGLM(2.0*wand->getForward() )); ;
 
     if(cavr::input::getButton("pallet")->delta() == cavr::input::Button::Held)
@@ -263,7 +253,7 @@ void GLScene::Event()
        player.ClearTracked();
     }
 
-    if(cavr::input::getButton("play")->delta() == cavr::input::Button::Pressed)
+    if(cavr::input::getButton("play")->delta() != cavr::input::Button::Open)
     {
         auto soundMan = this->Get<SoundManager>("soundMan");
         soundMan->PlayFX(player.GetSound(7),camera1->getCameraPosition());
@@ -275,12 +265,21 @@ void GLScene::Event()
         cout << "PRESSED" << endl;
         //player.AddPoint(paintPos,0);
     }
-
     else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !PaintOff)
     {
         cout << "RELEASED" << endl;
         //player.SetOffPoint();
     }
+ 
+    if(cavr::input::getButton("record")->delta() != cavr::input::Button::Open && record)
+    {
+        cout << "Record" << endl;
+        auto soundMan = this->Get<SoundManager>("soundMan");
+        soundMan->PlayFX(player.GetSound(6),camera1->getCameraPosition());
+        player.ToggleRecord();
+    }
+    record = cavr::input::getButton("record")->delta() == cavr::input::Button::Open;
+
 
     PaintOff = cavr::input::getButton("paint")->delta() == cavr::input::Button::Open;
     if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Held)

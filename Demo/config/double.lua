@@ -10,8 +10,8 @@ perspective_window = {
   view = {
     eyes = {
       eye = cavr.sixdof("emulated");
-      --left_eye = cavr.sixdof("vrpn[TallGlasses[[0]]");
-      --right_eye = cavr.sixdof("vrpn[TallGlasses[[0]]");
+      --left_eye = cavr.sixdof("vrpn[ShortGlasses[[0]]");
+      --right_eye = cavr.sixdof("vrpn[ShortGlasses[[0]]");
       --stereo ="mono";
     };
     lower_left = cavr.sixdof("emulated") * cavr.translate(-1, -1, -1);
@@ -26,8 +26,8 @@ back_window = {
   view = {
     eyes = {
       eye = cavr.sixdof("emulated");
-      --left_eye = cavr.sixdof("vrpn[TallGlasses[[0]]");
-      --right_eye = cavr.sixdof("vrpn[TallGlasses[[0]]");
+      --left_eye = cavr.sixdof("vrpn[ShortGlasses[[0]]");
+      --right_eye = cavr.sixdof("vrpn[ShortGlasses[[0]]");
       --stereo ="mono";
     };
     lower_left = cavr.sixdof("emulated") * cavr.translate(1, -1, 1);
@@ -75,7 +75,7 @@ vrpn = {
     "WiiMote0@projector.cse.unr.edu";
   };
   sixdofs = {
-    "TallGlasses@tracker.rd.unr.edu:1";
+    "ShortGlasses@tracker.rd.unr.edu:1";
     "WiiMote0@tracker.rd.unr.edu:1";
   };
 };
@@ -129,6 +129,6 @@ projector = {
 
 machines = {
   self=projector;
-  --hpcvis9;
+  hpcvis9;
   --self3 = others2;
 };
