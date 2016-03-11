@@ -22,14 +22,26 @@ bool GLRibbon::Init()
 bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
 {
 
-	PaintStruct temp;
-	temp.position = worldPoint;
-    temp.color = Color;
-	temp.Break = false;
-	Points.push_back(temp);
+    if(Points.size() == 0)
+    {
+        PaintStruct temp;
+        temp.position = worldPoint;
+        temp.color = Color;
+        temp.Break = false;
+        Points.push_back(temp);
+    }
 
 	if(Points.size() > 1 && !Points[Points.size()-2].Break)
 	{
+        if(glm::distance(Points[Points.size()-2].position, worldPoint) > 2)
+            return;
+
+        PaintStruct temp;
+        temp.position = worldPoint;
+        temp.color = Color;
+        temp.Break = false;
+        Points.push_back(temp);
+
 		// Add the points at the current positionsition in the buffer
 		Vec3 one;
 		Vec3 two;
@@ -50,6 +62,7 @@ bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
 		threeColor = Points[Points.size() - 1].color;
 		fourColor = Points[Points.size() - 2].color;
 
+        if(glm::distance(
         // Set vertex colors
 		colors->push_back(fourColor);
 		colors->push_back(threeColor);
@@ -57,7 +70,7 @@ bool GLRibbon::AddPoints(vec3 worldPoint,vec3 Color)
         colors->push_back(fourColor);
         colors->push_back(oneColor);
         colors->push_back(threeColor); 
-
+        
         AddQuad(four, two, one, three);
 
 		vbo_pos.LoadSubData((Points.size()-2)*6, 0, std::vector<Vec3>(positions->end() - 6, positions->end()));
