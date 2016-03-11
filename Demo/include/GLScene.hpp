@@ -7,8 +7,11 @@
 #include <GLFrame.hpp>
 #include <GLModel.hpp>
 #include <SoundManager.hpp>
+#include <SoundPlayer.hpp>
 
 #include <chrono>
+#include <map>
+
 
 class GLScene : public GLViewport
 {
@@ -32,10 +35,11 @@ class GLScene : public GLViewport
     bool painting;
     
     bool Break;
-
+    bool PaintOff;
+    bool record;
     template <typename T> 
     void PaintHelper(shared_ptr<T>, GLenum);
-
+    SoundPlayer player;
 };
 
 

@@ -47,7 +47,7 @@ void GLMesh::Clear()
     _uvs->clear();
     _faces->clear();
 
-    cout << _positions->size() << endl;
+    //cout << _positions->size() << endl;
 }
 
 void GLMesh::AddMesh()
@@ -56,7 +56,7 @@ void GLMesh::AddMesh()
     this->e_size += this->faces->size()*3;
     this->v_size += this->positions->size();
     this->index += 1;
-    cout << _positions->size() << endl;
+    //cout << _positions->size() << endl;
     this->_positions->push_back(*this->positions);
     this->_normals->push_back(*this->normals);
     this->_colors->push_back(*this->colors);

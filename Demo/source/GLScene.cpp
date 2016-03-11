@@ -35,6 +35,7 @@ GLScene::GLScene()
 
 void GLScene::InitializeGL()
 {
+    PaintOff = cavr::input::getButton("paint")->delta() == cavr::input::Button::Open;
     GLViewport::InitializeGL();
 
     glEnable(GL_DEPTH_TEST);
@@ -44,7 +45,26 @@ void GLScene::InitializeGL()
 
     // Create sound manager
     shared_ptr<SoundManager> soundMan(new SoundManager("soundMan"));
-    soundMan->PlayBgm(0, true, false);
+    //soundMan->PlayBgm("bgm0", true, false);
+    record = cavr::input::getButton("record")->delta() == cavr::input::Button::Open;
+    /// C Major scale here 
+    soundMan->AddFx("media/C5.mp3","C5");
+    soundMan->AddFx("media/D5.mp3","D5");
+    soundMan->AddFx("media/E5.mp3","E5");
+    soundMan->AddFx("media/F5.mp3","F5");
+    soundMan->AddFx("media/G5.mp3","G5");
+    soundMan->AddFx("media/A5.mp3","A5");
+    soundMan->AddFx("media/B5.mp3","B5");
+    soundMan->AddFx("media/C5.mp3","C6");
+    player = SoundPlayer(soundMan);
+    player.SetSound(0,"C5");
+    player.SetSound(1,"D5");
+    player.SetSound(2,"E5");
+    player.SetSound(3,"F5");
+    player.SetSound(4,"G5");
+    player.SetSound(5,"A5");
+    player.SetSound(6,"B5");
+    player.SetSound(7,"C6");
     this->AddToContext(soundMan);
 
        /****** Deep GPU Stuff ******/
@@ -158,22 +178,26 @@ void GLScene::Paint()
     brush->setMatrix(glm::translate(glm::mat4(1.0), paintPos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * rot);
     paint->setMatrix(brush->Matrix());//* glm::translate(glm::mat4(1.0f), glm::vec3(0.04, -0.007, 0.035)));
 
-    //for (int i=0; i<this->strokes.size(); i++)
-    //{
-	//paint->AssignTexture(0, this->strokes.at(i).first);
-        //paint->setMatrix(this->strokes.at(i).second);
-        //this->PaintHelper(paint, GL_TRIANGLES);
-    //}
+    for (int i=0; i<this->strokes.size(); i++)
+    {
+	paint->AssignTexture(0, this->strokes.at(i).first);
+        paint->setMatrix(this->strokes.at(i).second);
+        this->PaintHelper(paint, GL_TRIANGLES);
+    }
 
     this->PaintHelper(brush, GL_TRIANGLES);
+    this->PaintHelper(pallet,GL_TRIANGLES);
 
-    shared_ptr<SoundManager> soundMan = this->Get<SoundManager>("soundMan");
-    soundMan->PlayFX(0, GLRibbons->Tail());
 
 }
 
 void GLScene::Event()
 {
+    // recording the player
+    player.Update(cavr::input::InputManager::dt());
+
+
+    // camera and wand code here
     shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
     auto wand = cavr::input:: getSixDOF("wand");
     const char* colors[] = {"blue", "red", "purple", "white", "yellow", "green"};
@@ -188,7 +212,7 @@ void GLScene::Event()
     glm::mat4 rot = glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 glass = GLMath::mat4ftoGLM( cavr::input::getSixDOF("glass")->getMatrix());
     glm::vec3 glass_pos = GLMath::vec3ftoGLM( cavr::input::getSixDOF("glass")->getPosition());
-;
+
     glm::mat4 wandMatrix = GLMath::mat4ftoGLM(wand->getMatrix()) * camera1->View();
     glm::vec3 wandPos = camera1->RotatePoint(GLMath::vec3ftoGLM(wand->getPosition() )); 
     glm::vec3 paintPos = camera1->getCameraPosition() + wandPos + camera1->RotatePoint(GLMath::vec3ftoGLM(2.0*wand->getForward() )); ;
@@ -210,18 +234,50 @@ void GLScene::Event()
 
     // Paint here
     shared_ptr<GLRibbon> GLRibbons = this->Get<GLRibbon>("GLRibbon");
-
+    
+    if(cavr::input::getButton("record")->delta() != cavr::input::Button::Open && record)
+    {
+        cout << "Record" << endl;
+        player.ToggleRecord();
+    }
+    record = cavr::input::getButton("record")->delta() == cavr::input::Button::Open;
     if(cavr::input::getButton("clear")->delta() != cavr::input::Button::Open)
     {
        GLRibbons->ClearPoints();
+       player.ClearTracked();
     }
 
+    if(cavr::input::getButton("play")->delta() != cavr::input::Button::Open)
+    {
+        player.PlaySound();
+    }
+
+    if(cavr::input::getButton("paint")->delta() != cavr::input::Button::Open && PaintOff)
+    {
+        cout << "PRESSED" << endl;
+        player.AddPoint(paintPos,0);
+    }
+
+    else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !PaintOff)
+    {
+        cout << "RELEASED" << endl;
+        player.SetOffPoint();
+    }
+
+    PaintOff = cavr::input::getButton("paint")->delta() == cavr::input::Button::Open;
     if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Held)
     {
+
       //cout << glm::to_string(paintPos) << endl; 
       GLRibbons->AddPoints(paintPos,glm::vec3(1,1,1));
       if(GLRibbons->Size() > 0)
         GLRibbons->AssignTexture(GLRibbons->Size()-1, this->color);
+            shared_ptr<SoundManager> soundMan = this->Get<SoundManager>("soundMan");
+        //soundMan->PlayFX("fx0", GLRibbons->Tail());
+        //soundMan->PlayFX("C5", GLRibbons->Tail());
+        //soundMan->PlayFX("E5", GLRibbons->Tail());
+        //soundMan->PlayFX("G5", GLRibbons->Tail());
+        
       //this->strokes.push_back(std::pair<int, glm::mat4>(this->color, glm::translate(glm::mat4(1.0f), paintPos)*glm::make_mat4(shear))); 
     }
     else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !Break)

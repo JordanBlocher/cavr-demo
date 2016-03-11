@@ -51,7 +51,7 @@ INCLUDE_DIRECTORIES(${INCLUDES})
 file(GLOB_RECURSE SOURCES "source/*.cpp")
 ADD_EXECUTABLE(Example ${SOURCES})
 
-add_custom_target(BUILD_SUCCESSFUL ALL
+add_custom_target(BUILD_${PROJECT_NAME} ALL
                   DEPENDS Example
                   COMMAND ${CMAKE_COMMAND} -E echo ""
                   COMMAND ${CMAKE_COMMAND} -E echo "====================="
@@ -63,6 +63,7 @@ add_custom_target(BUILD_SUCCESSFUL ALL
                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/config/ ${CMAKE_CURRENT_BINARY_DIR}/config
                   COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/config/cavrconfig.lua ${CMAKE_CURRENT_BINARY_DIR}
                   COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/config/cavrplugins.lua ${CMAKE_CURRENT_BINARY_DIR}
+
                  )
 
              TARGET_LINK_LIBRARIES(Example cavr cavrgl cavrgfx IrrKlang common pthread Magick++ ${BULLET_LIBRARIES} ${MAGIC++_LIBRARY} ${IMAGEMAGIC_LIBRARIES} ${ASSIMP_LIBRARY} ${GLOG_LIBRARIES} ${OPENGL_LIBRARY} ${GLEW_LIBRARIES} ${CAVR_LIBRARIES} )

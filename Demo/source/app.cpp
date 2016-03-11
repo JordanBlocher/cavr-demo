@@ -48,6 +48,8 @@ void frame()
     static GLScene *cd;
     cd = static_cast<GLScene*>(cavr::System::getContextData());
     cd->Event();
+    shared_ptr<SoundManager> soundMan = cd->Get<SoundManager>("soundMan");
+    soundMan->SetListener(camera->getCameraPosition(),camera->GetForward());
 }
 
 void render() 
@@ -67,8 +69,7 @@ void render()
     camera->updateView();
     cd->Paint();
 
-    shared_ptr<SoundManager> soundMan = cd->Get<SoundManager>("soundMan");
-    soundMan->SetListener(camera->getCameraPosition(),camera->GetForward());
+
       
 }
 
@@ -168,6 +169,8 @@ int main(int argc, char** argv)
   input_map.analog_map["y_vec"] = "vrpn[WiiMote0[22]]"; // analog sticks of the nunchaku
 #endif
 
+  input_map.button_map["play"] = "keyboard[m]";
+  input_map.button_map["record"] = "keyboard[r]";
   //input_map.button_map["c_button"] = "vrpn[WiiMote0[17]]"; 
 
 
