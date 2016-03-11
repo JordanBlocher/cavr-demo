@@ -167,7 +167,6 @@ void GLScene::Paint()
     this->PaintHelper(GLRibbons, GL_TRIANGLES);
       
     shared_ptr<GLModel> brush = this->Get<GLModel>("brush");
-    glm::mat4 rot = glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 1.0f, 0.0f));
     auto cv = glm::inverse(camera1->GetCameraView());
     cv[3][0] = 0;
     cv[3][1] = 0;
@@ -176,7 +175,7 @@ void GLScene::Paint()
     wandMatrix[3][0] = 0;
     wandMatrix[3][1] = 0;
     wandMatrix[3][2] = 0;
-    brush->setMatrix( glm::translate(glm::mat4(1.0), paintPos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * cv * rot * wandMatrix );//* GLMath::mat4ftoGLM(wand->getMatrix()) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * rot );//glm::translate(glm::mat4(1.0), GLMath::vec3ftoGLM(wand->getPosition() )) *  );// *rot);
+    brush->setMatrix( glm::translate(glm::mat4(1.0), paintPos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * cv * wandMatrix );//* GLMath::mat4ftoGLM(wand->getMatrix()) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * rot );//glm::translate(glm::mat4(1.0), GLMath::vec3ftoGLM(wand->getPosition() )) *  );// *rot);
     this->PaintHelper(brush, GL_TRIANGLES);
 
     shared_ptr<GLModel> pallet = this->Get<GLModel>("pallet");
