@@ -12,6 +12,7 @@
 #include <GLRibbon.hpp>
 #include <GLScene.hpp>
 #include <GLPrimitive.hpp>
+#include <GLText.h>
 #include <cavr/cavr.h>
 #include <cavr/gfx/renderer.h>
 #include <cavr/gfx/ray.h>
@@ -66,6 +67,10 @@ void GLScene::InitializeGL()
     player.SetSound(6,"B5");
     player.SetSound(7,"C6");
     this->AddToContext(soundMan);
+
+
+    shared_ptr<GLText> Text(new GLText("text"));
+    this->AddToContext(Text);
 
        /****** Deep GPU Stuff ******/
     //Shaders

@@ -28,7 +28,7 @@ x11_renderer = {
   display = ":0.0";
   windows = {
     sim_window = perspective_window;
-    sim_window2 = sim_window;
+    --sim_window2 = sim_window;
 
   };
 };
@@ -38,14 +38,14 @@ vrpn = {
   type = "vrpn";
   input_name = "vrpn";
   buttons = {
-    "WiiMote0@projector.cse.unr.edu";
+    --"WiiMote0@projector.cse.unr.edu";
   };
   analogs = {
-    "WiiMote0@projector.cse.unr.edu";
+    --"WiiMote0@projector.cse.unr.edu";
   };
   sixdofs = {
-    "ShortGlasses@tracker.rd.unr.edu:1";
-    "WiiMote0@tracker.rd.unr.edu:1";
+    --"ShortGlasses@tracker.rd.unr.edu:1";
+    --"WiiMote0@tracker.rd.unr.edu:1";
   };
 };
 
