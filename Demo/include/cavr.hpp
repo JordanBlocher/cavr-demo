@@ -10,7 +10,7 @@
 #include <math.h>
 
 
-int setup_map(cavr::input::InputMap &inputMap)
+int setup_map(cavr::input::InputMap &input_map)
 {
   // set input map for buttons,keyboard, and sixdofs 
   input_map.button_map["up"] = "keyboard[w]";
@@ -37,13 +37,6 @@ int setup_map(cavr::input::InputMap &inputMap)
   // I really wish there was a set position
   emulatedMatrix[3].xyz = cavr::math::vec3f(0,1,0);
   emulated->setState(emulatedMatrix);
-
-  if (!cavr::System::init(argc, argv, &input_map)) {
-    LOG(ERROR) << "Failed to initialize cavr.";
-    return 0;
-  }
-  LOG(INFO) << "Successfully initialized cavr.";
-
 
   return 1;
 }
