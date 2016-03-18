@@ -35,6 +35,7 @@ GLModel::~GLModel()
 
 bool GLModel::LoadModel()
 {
+cout<<"Loading "<<this->name<<endl;
     //Clear
     for(size_t i=0; i<this->_positions->size(); i++)
     {
@@ -60,11 +61,14 @@ bool GLModel::LoadModel()
         this->_colors->resize(scene->mNumMeshes);
         this->_normals->resize(scene->mNumMeshes);
         this->_uvs->resize(scene->mNumMeshes);
+        this->shaders->resize(scene->mNumMaterials);
+cout<<"Num meshes "<< scene->mNumMeshes<<endl;
         this->AddMaterials(scene->mMaterials, scene->mNumMaterials);
         for(unsigned int i=0; i<scene->mNumMeshes; i++)
         {
             const aiMesh* mesh = scene->mMeshes[i];
             this->AddAttributeData(mesh, i);
+cout<<"Adding face "<<i<<" from "<< this->_faces->at(i).size()<<endl;
         }
         std::cout<<"Model "<<name<<" loaded.\n";
         return true;
@@ -176,7 +180,7 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
 
     // Populate the index buffer
     for (unsigned int i = 0 ; i < mesh->mNumFaces ; i++) 
-    {
+   {
         const aiFace* face = &(mesh->mFaces[i]);
         //assert(face->mNumIndices == 3);
         this->_faces->at(index).at(3*i) = face->mIndices[0];
@@ -188,9 +192,7 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
 
 void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
 {
-    this->materials->resize(numMaterials);
-    this->shaders->resize(numMaterials);
-
+    cout<<"Num mats: "<<numMaterials << " shader size "<<this->shaders->size()<<endl;
     for ( unsigned int i = 0; i < numMaterials; ++i )
     {
         aiMaterial &material = *(materials[i]);
@@ -220,8 +222,6 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
         mat.intensity = 1.0f + intensity;
         mat.diffuseBlend = diffuseBlend;
 
-        //int numTextures = material.GetTextureCount(aiTextureType_DIFFUSE);
-
         aiString texPath;
 
         if ( material.Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE,0), texPath) == AI_SUCCESS )
@@ -234,8 +234,9 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
             GLTexture texture(name.C_Str(), GL_TEXTURE_2D, location.c_str());
 
             this->textures->push_back(texture);
-            this->shaders->at(i).texture = i;
+            this->shaders->at(i).texture = 0;
         }
+        this->shaders->at(i).texture = 0;
 
         if ( material.Get(AI_MATKEY_TEXTURE(aiTextureType_HEIGHT,0), texPath) == AI_SUCCESS )
         {
@@ -247,12 +248,15 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
             GLTexture texture(name.C_Str(), GL_TEXTURE_2D, location.c_str());
 
             this->bumpmaps->push_back(texture);
-            this->shaders->at(i).bump = i;
+            this->shaders->at(i).bump = 0;
         }
 
         if(std::string(name.C_Str()) != std::string("DefaultMaterial") || numMaterials == 1)
+        {
             this->materials->push_back(mat);
-            this->shaders->at(i).material = i;
+            this->shaders->at(i).material = 0;
+        }
+
     }
 }
 

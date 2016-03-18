@@ -40,9 +40,6 @@ void GLPrimitive::Allocate()
     this->textures = std::shared_ptr<std::vector<GLTexture>>(new std::vector<GLTexture>);
     this->shaders = std::shared_ptr<std::vector<Shader>>(new std::vector<Shader>);
     this->shader = std::shared_ptr<Shader>(new Shader());
-    this->shader->material = -1;
-    this->shader->texture = -1;
-    this->shader->bump = -1;
 }
 
 void GLPrimitive::Create(GLenum GL_DRAW_TYPE)
@@ -59,9 +56,6 @@ void GLPrimitive::AddMesh()
 
     this->shaders->push_back(*this->shader);
     this->shader = std::shared_ptr<Shader>(new Shader());
-    this->shader->material = -1;
-    this->shader->texture = -1;
-    this->shader->bump = -1;
 }
 
 bool GLPrimitive::AddUVSphere(int nlats, int nlongs)
@@ -255,11 +249,20 @@ void GLPrimitive::LoadUBO(GLuint ubo, UBO rtype, Shader shader)
 
 void GLPrimitive::DrawElements(size_t i, GLint face_offset, GLint vertex_offset, GLenum MODE)
 {
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 4);
+cout<<"Drawing face " <<i <<" from "<< this->_faces->at(i).size()<<endl;
     glDrawElementsBaseVertex(MODE, 
         this->_faces->at(i).size(),
         GL_UNSIGNED_INT,
         (void*)(sizeof(GLuint) * face_offset),
         vertex_offset);
+cout<<"DONE"<<endl;
+}
+
+void GLPrimitive::Clear()
+{
+    shaders->clear();
+    GLMesh::Clear();
 }
 
 void GLPrimitive::Draw(GLenum MODE)
@@ -267,28 +270,36 @@ void GLPrimitive::Draw(GLenum MODE)
     GLint face_offset = 0;
     GLint vertex_offset = 0;
 
-    glBindVertexArray(this->vao);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBindVertexArray(this->vao);
 
+    cout<<this->name<<" has " <<this->textures->size()<<" textures\n";
     //Draw Model 
     for(size_t i=0; i< this->_faces->size(); i++)
     {      
+
         int textureIdx = this->shaders->at(i).texture;
         int materialIdx = this->shaders->at(i).material;
+        cout<<"Checking Shader "<<i<<": "<<textureIdx<<" " <<materialIdx<<endl;
 
         this->LoadUBO(this->controlUBO, UBO::CONTROL, this->shaders->at(i));
         if (textureIdx != -1)
         {
+            //cout<<"Drawing Texture\n";
             this->LoadUBO(this->textureUBO, UBO::TEXTURE, this->shaders->at(i));
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
         else if (materialIdx != -1)
         {
+            //cout<<"Drawing Color\n";
             this->LoadUBO(this->materialUBO, UBO::COLOR, this->shaders->at(i));
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
         else
+        {
+            //cout<<"Drawing Vertex Color\n";
             DrawElements(i, face_offset, vertex_offset, MODE);
+        }
 
         face_offset += this->_faces->at(i).size();
         vertex_offset += this->_positions->at(i).size();
@@ -344,6 +355,12 @@ Vec4 GLPrimitive::Position()
 {
     return Vec4(this->matrix[3].x, this->matrix[3].y, this->matrix[3].z, 1.0f);
 }
+
+Vec4 GLPrimitive::Look()
+{
+    return Vec4(this->matrix[2].x, this->matrix[2].y, this->matrix[2].z, 1.0f);
+}
+
 
 void GLPrimitive::SetColor(Vec3 diffuse)
 {

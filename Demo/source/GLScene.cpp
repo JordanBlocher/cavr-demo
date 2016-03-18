@@ -18,7 +18,7 @@
 #define SENSOR_DISTANCE 0.01f
 #define FOCAL_DISTANCE 100.0f
 
-const GLuint NUM_ATTRIBUTES = 4;
+const GLuint NUM_ATTRIBUTES = 5;
 
 using namespace std;
 
@@ -29,35 +29,64 @@ GLScene::GLScene()
 void GLScene::Create()
 {
     cout<<"Creating Scene..\n\n";
+    PaintOff = cavr::input::getButton("paint")->delta() == cavr::input::Button::Open;
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     // Create sound manager
     shared_ptr<SoundManager> soundMan(new SoundManager("soundMan"));
-    soundMan->PlayBgm(0, true, false);
+    //soundMan->PlayBgm("bgm0", true, false);
+    record = cavr::input::getButton("record")->delta() == cavr::input::Button::Open;
+    /// C Major scale here 
+    soundMan->AddFx("media/C5.mp3","C5");
+    soundMan->AddFx("media/D5.mp3","D5");
+    soundMan->AddFx("media/E5.mp3","E5");
+    soundMan->AddFx("media/F5.mp3","F5");
+    soundMan->AddFx("media/G5.mp3","G5");
+    soundMan->AddFx("media/A5.mp3","A5");
+    soundMan->AddFx("media/B5.mp3","B5");
+    soundMan->AddFx("media/C5.mp3","C6");
+    player = SoundPlayer(soundMan);
+    player.SetSound(0,"C5");
+    player.SetSound(1,"D5");
+    player.SetSound(2,"E5");
+    player.SetSound(3,"F5");
+    player.SetSound(4,"G5");
+    player.SetSound(5,"A5");
+    player.SetSound(6,"B5");
+    player.SetSound(7,"C6");
     this->AddToContext(soundMan);
 
-    // Add models
+    // Choose model
     this->AddModel("dragon", "models/dragon.obj");
+    this->AddModel("pallet", "models/pallet.obj");
+    this->AddModel("brush", "models/brush.obj");
+    this->AddModel("blue", "models/blue.obj");
+    this->AddModel("red", "models/red.obj");
+    this->AddModel("purple", "models/purple.obj");
+    this->AddModel("white", "models/white.obj");
+    this->AddModel("yellow", "models/yellow.obj");
+    this->AddModel("green", "models/green.obj");
 
-    // Init a GLRibbon
-    shared_ptr<GLRibbon> ribbons (new GLRibbon("ribbons"));
-    ribbons->AddPoints(glm::vec3(0,0,0),glm::vec3(1,1,1));
-    ribbons->AddPoints(glm::vec3(0,0,1),glm::vec3(1,0,0));
-    ribbons->AddPoints(glm::vec3(1,0,1),glm::vec3(0,0,1));
-    ribbons->AddPoints(glm::vec3(0,0,-1),glm::vec3(0,1,0));
-    ribbons->AddBreak();
+    cavr::System::setContextData(this);
+
+    this->InitShaders();
+
+    shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
+
+    shared_ptr<GLRibbon> ribbons (new GLRibbon("ribbons")); 
     this->AddToContext(ribbons);
+    ribbons->Create(GL_DYNAMIC_DRAW);
 
-    // Add textures 
-    shared_ptr<GLTexture> pebbles(new GLTexture("pebbles", GL_TEXTURE_2D, "models/pebbles.jpg"));
-    ribbons->AddTexture(pebbles);
-    shared_ptr<GLTexture> leaves(new GLTexture("leaves", GL_TEXTURE_2D, "models/leaves.jpg"));
-    ribbons->AddTexture(leaves);
-
-    /*
-    shared_ptr<GLPrimitive> primitive(new GLPrimitive("primitive", 6, 10000));
-    primitive->AddPlane(1000, 1000, 1, 1);
-    this->AddToContext(primitive);
-    */
+    const char* colors[] = {"blue", "red", "purple", "white", "yellow", "green"};
+    const char* colorpaths[] = {"models/blue.jpg", "models/red.jpg", "models/purple.jpg", "models/white.jpg", "models/yellow.jpg", "models/green.jpg"};
+    for (int i=0; i<6; i++)
+    {
+        shared_ptr<GLTexture> tex(new GLTexture(colors[i], GL_TEXTURE_2D, colorpaths[i]));
+        tex->Load();
+        ribbons->AddTexture(tex);
+    }
 }
 
 void GLScene::InitShaders()
@@ -123,51 +152,160 @@ void GLScene::InitShaders()
     cout<<"Setting UBOS to share.\n";
     //Set UBOs to Share
     program->SetUBO(vertex_uniform);
+
     program->SetUBO(lights_uniform);
     program->SetUBO(frag_uniform);
     program->SetUBO(eye_uniform);
     program->SetUBO(control_uniform);
-    
+
+
+
+   this->color = 5; 
+   this->pallet = false;
 }
 
 void GLScene::Update()
 {
-    shared_ptr<GLRibbon> ribbons = this->Get<GLRibbon>("ribbons");
+    shared_ptr<GLCamera> camera = this->Get<GLCamera>("camera");
+    auto wand = cavr::input:: getSixDOF("wand");
+    glm::vec3 wandPos = camera->getCameraPosition() + camera->RotatePoint(GLMath::vec3ftoGLM(wand->getPosition() )); 
+    glm::vec3 paintPos = wandPos + camera->RotatePoint(GLMath::vec3ftoGLM(2.0*wand->getForward() )); ;
 
-    if(cavr::input::getButton("clear")->delta() != cavr::input::Button::Open)
+    //Clear the screen
+    glClearColor(0.0,0.0,0.0,1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //Choose Model
+    shared_ptr<GLRibbon> ribbons = this->Get<GLRibbon>("ribbons");
+    this->Paint(ribbons, GL_TRIANGLES);
+      
+    shared_ptr<GLModel> brush = this->Get<GLModel>("brush");
+    auto cv = glm::inverse(camera->GetCameraView());
+    cv[3][0] = 0;
+    cv[3][1] = 0;
+    cv[3][2] = 0;
+    auto wandMatrix = GLMath::mat4ftoGLM(wand->getMatrix());
+    wandMatrix[3][0] = 0;
+    wandMatrix[3][1] = 0;
+    wandMatrix[3][2] = 0;
+    brush->setMatrix( glm::translate(glm::mat4(1.0), paintPos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * cv * wandMatrix );//* GLMath::mat4ftoGLM(wand->getMatrix()) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * rot );//glm::translate(glm::mat4(1.0), GLMath::vec3ftoGLM(wand->getPosition() )) *  );// *rot);
+    this->Paint(brush, GL_TRIANGLES);
+
+    shared_ptr<GLModel> pallet = this->Get<GLModel>("pallet");
+    if(this->pallet)
     {
-        ribbons->ClearPoints();
-    }
-    if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Held)
-    {
-        ribbons->LoadPoints();
+        glm::mat4 rot = glm::rotate(glm::mat4(1.0f), (float)(M_PI), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 rot2 = glm::rotate(glm::mat4(1.0f), (float)(M_PI/3.7), glm::vec3(1.0f, 0.0f, 0.0f));
+
+
+        pallet->setMatrix(glm::translate(glm::mat4(1.0f), camera->getCameraPosition()) 
+                * glm::scale(glm::mat4(1.0f), glm::vec3(2.4f, 2.4f, 2.4f))* rot *rot2 
+                * glm::translate(glm::mat4(1.0f), glm::vec3(-.4, -.2, -.2)));
+
+    	this->Paint(pallet, GL_TRIANGLES);
+
+        glm::vec3 translations[] = {glm::vec3(-0.4, 0.02, -0.9),
+                               glm::vec3(0.19, 0.03, -0.8),
+                               glm::vec3(-0.36, 0.02, -0.13),
+                               glm::vec3(-0.9, 0.02, -0.3),
+                               glm::vec3(-0.8, 0.02, 0.2),
+                               glm::vec3(-0.5, 0.02, 0.67)};
+        const char* colors[] = {"blue", "red", "purple", "white", "yellow", "green"};
+        for (int i=0; i<6; i++)
+        {
+            shared_ptr<GLModel> color = this->Get<GLModel>(colors[i]);
+            color->setMatrix(pallet->Matrix() * glm::translate(glm::mat4(1.0f), translations[i]));
+            this->Paint(color, GL_TRIANGLES);
+        }
+
+        // Ray and bounding sphere
+        cavr::gfx::Ray ray = cavr::gfx::Ray(GLMath::GLMtovec3f(wandPos), GLMath::GLMtovec3f(camera->RotatePoint(GLMath::vec3ftoGLM(2.0*wand->getForward()))));
+        float dist;
+        for (int i=0; i<6; i++)
+        {
+            shared_ptr<GLModel> color = this->Get<GLModel>(colors[i]);
+            cavr::math::mat4f sphere_mat = GLMath::GLMtomat4f(color->Matrix());
+            cavr::gfx::Sphere bounding_sphere = cavr::gfx::Sphere(sphere_mat[3].xyz, 0.5);
+            if (bounding_sphere.intersect(*(&ray), *(&dist)))
+            {
+                this->color = i;
+            }
+        }
     }
 }
 
 void GLScene::Event()
 {
+    // recording the player
+    player.Update(cavr::input::InputManager::dt());
+
+    // camera and wand code here
+    shared_ptr<GLCamera> camera = this->Get<GLCamera>("camera");
+    auto wand = cavr::input:: getSixDOF("wand");
+
     // Paint here
     shared_ptr<GLRibbon> ribbons = this->Get<GLRibbon>("ribbons");
-    shared_ptr<SoundManager> soundMan = this->Get<SoundManager>("soundMan");
-  
+    
+    if(cavr::input::getButton("record")->delta() != cavr::input::Button::Open && record)
+    {
+        cout << "Record" << endl;
+        player.ToggleRecord();
+    }
+    record = cavr::input::getButton("record")->delta() == cavr::input::Button::Open;
+
+    glm::vec3 wandPos = camera->getCameraPosition() +  camera->RotatePoint(GLMath::vec3ftoGLM(wand->getPosition() )); 
+    glm::vec3 paintPos = wandPos + camera->RotatePoint(GLMath::vec3ftoGLM(2.0*wand->getForward() )); ;
+
+    if(cavr::input::getButton("pallet")->delta() == cavr::input::Button::Held)
+    {
+        cout<< "Get Pallet"<<endl;
+        this->pallet = true; 
+    }
+    else this->pallet = false;
+
+    if(cavr::input::getButton("clear")->delta() != cavr::input::Button::Open)
+    {
+       ribbons->ClearPoints();
+       player.ClearTracked();
+    }
+
+    if(cavr::input::getButton("play")->delta() != cavr::input::Button::Open)
+    {
+        player.PlaySound();
+    }
+
+    if(cavr::input::getButton("paint")->delta() != cavr::input::Button::Open && PaintOff)
+    {
+        cout << "PRESSED" << endl;
+        //player.AddPoint(paintPos,0);
+    }
+
+    else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !PaintOff)
+    {
+        cout << "RELEASED" << endl;
+        //player.SetOffPoint();
+    }
+
+
+    PaintOff = cavr::input::getButton("paint")->delta() == cavr::input::Button::Open;
     if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Held)
     {
-        auto wand = cavr::input:: getSixDOF("wand");
-        shared_ptr<GLCamera> camera = this->Get<GLCamera>("camera");
 
-        auto paintPos = GLMath::vec3ftoGLM(-wand->getForward()) + camera->getCameraPosition() + GLMath::vec3ftoGLM(-wand->getPosition()) ;
-        //cout << glm::to_string(paintPos) << endl; 
-        ribbons->AddPoints(paintPos,glm::vec3(1,1,1));
-        soundMan->PlayFX(0, ribbons->Tail());
+      //cout << glm::to_string(paintPos) << endl; 
+      ribbons->AddPoints(paintPos,glm::vec3(1,1,1));
+      if(ribbons->Size() > 0)
+      {
+        ribbons->AssignTexture(ribbons->Size()-1, this->color);
+      }
+        player.AddPoint(paintPos,color);
+        player.SetOffPoint();
     }
     else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !Break)
     {
         ribbons->AddBreak();
     }
-
     Break = cavr::input::getButton("paint")->delta() == cavr::input::Button::Open;
 
-    soundMan->SetListener(GLMath::vec3ftoGLM(cavr::input::getSixDOF("glass")->getPosition()));
 }
 
 void GLScene::MoveCamera()
@@ -196,7 +334,7 @@ void GLScene::MoveCamera()
     else if (cavr::input::getButton("forward")->delta() == cavr::input::Button::Held) 
         camera->moveCamera(glm::vec2(0,0),4* cavr::input::InputManager::dt());
     else if (cavr::input::getButton("backward")->delta() == cavr::input::Button::Held)
-        camera->moveCamera(glm::vec2(0,0),-4* cavr::input::InputManager::dt());
+        camera->moveCamera(glm::vec2(0,0), -4* cavr::input::InputManager::dt());
 
     float xVec = 0; // rename these
     float yVec = 0; // rename
@@ -219,6 +357,7 @@ void GLScene::MoveCamera()
         forwardForce = -yVec;
     }
     
+
     camera->moveCamera(xyVec,forwardForce);
     
     camera->updateView();
@@ -265,6 +404,8 @@ void GLScene::AddModel(const char* name, const char* path)
     shared_ptr<GLModel> model(new GLModel(path, name, NUM_ATTRIBUTES));
     if (model->LoadModel())
         this->AddToContext(model);
+
+    model->Create(GL_STATIC_DRAW);
 }
 
 

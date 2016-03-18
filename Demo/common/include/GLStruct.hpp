@@ -78,7 +78,7 @@ struct Lights
 
 struct Shader
 {
-    Shader():texture(0), bump(0), material(0) {}
+    Shader():texture(-1), bump(-1), material(-1) {}
     int texture;
     int bump;
     int material;

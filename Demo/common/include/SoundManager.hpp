@@ -4,14 +4,20 @@
 #include "GLNode.hpp"
 #include <irrKlang.h>
 #include <vector>
+#include <map>
+#include <string>
 
+// Strings are nice
+using std::string;
 class SoundManager : public GLNode
 {
 	public:
-		SoundManager(const char* name);
-		void PlayBgm(int bgmNum, bool, bool);
-		void PlayFX(int fxNum, Vec3);
-        void SetListener(Vec3);
+		SoundManager(const char* name="");
+		void PlayBgm(string bgmNum, bool, bool);
+		irrklang::ISound* PlayFX(string fxNum, Vec3,bool looped = false,bool paused = false,bool tracked = false,bool enableSoundEffects = false);
+		void AddFx(string filename,string alias);
+		void AddBgm(string filename,string alias);
+        void SetListener(Vec3,Vec3 forward);
 
 	protected:
 		void Finished();
@@ -19,9 +25,11 @@ class SoundManager : public GLNode
 	private:
         irrklang::ISoundEngine* engine;
         irrklang::ISound* bgmusic; 
-        irrklang::ISound* fxmusic; 
-        std::vector<const char*> bgm;
-        std::vector<const char*> fx;
+        irrklang::ISound* fxmusic;
+
+        // Maps will make this a bit easier -- we can use named sounds -- i.e. call E4.mp3 -- E4  
+        std::map<string,string> bgm;
+        std::map<string,string> fx;
 };
 
 #endif 

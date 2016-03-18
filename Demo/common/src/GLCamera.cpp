@@ -118,8 +118,8 @@ void GLCamera::updateView()
     eye_pos = Vec3(eyeX,eyeY,eyeZ);
 
     glm::mat4 view = (GLMath::mat4ftoGLM(cavr::gfx::getView()));
-    Vec3 forward = -Vec3(view[2].x,view[2].y,view[2].z);
-    Vec3 up = Vec3(view[1].x,view[1].y,view[1].z);
+    Vec3 forward = Vec3(0,0,1);
+    Vec3 up = Vec3(0,1,0);
 
     up.x = up.x  * sin (polar); //* cos (azimuth);
     up.y = up.y  * sin (polar); //* sin (azimuth);
@@ -132,14 +132,37 @@ void GLCamera::updateView()
     setAimTarget(forward); //* Vec3(0,0,1000));
     
 
-    this->view = (glm::lookAt(
+    this->view = glm::lookAt(
                     Vec3(eyeX, eyeY, eyeZ),  //eye pos
-                    Vec3(-eyeX, -eyeY, -eyeZ),    //focus point
-                    up));  //up
-
+                    Vec3(-eyeX,-eyeY,-eyeZ),    //focus point
+                    up);  //up
+    testview = this->view;
     //std::cout<<"polar "<<polar<<" azimuth "<<azimuth<<" radius "<<radius<<'\n';
     //std::cout<< "eye pos "<<eyeX<<" "<< eyeY<< " " <<eyeZ <<'\n';
     this->view = view*this->view; 
+}
+
+Vec3 GLCamera::RotatePoint(Vec3 ray)
+{   
+    float distance = 1;
+    if(glm::length2(ray) > 0)
+    {
+        distance = glm::length(ray);
+    }
+    else
+    {
+        return ray;
+    }
+    //ray = glm::normalize(ray);
+    testview[3][0] = 0;
+    testview[3][1] = 0;
+    testview[3][2] = 0;
+    
+    glm::vec4 test = glm::inverse(testview) * glm::vec4(ray.x,ray.y,ray.z,1);
+    return glm::vec3(test.x,test.y,test.z);    
+    
+
+    //return ray*distance;
 }
 
 void GLCamera::setCameraOffset(float zenith, float azimuth)
@@ -169,5 +192,8 @@ Vec3 GLCamera::getCameraPosition()
     return this->eye_pos;
 }
 
-
+Vec3 GLCamera::GetForward()
+{
+    return glm::vec3(view[2].x,view[2].y,view[2].z);
+}
 

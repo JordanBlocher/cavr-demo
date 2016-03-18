@@ -12,7 +12,7 @@
 using namespace std;
 using namespace glm;
 
-const long MAX_POINTS = 10000;
+const long MAX_POINTS = 100000;
 
 
 class GLRibbon : public GLPrimitive

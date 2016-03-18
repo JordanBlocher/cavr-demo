@@ -7,8 +7,11 @@
 #include <GLFrame.hpp>
 #include <GLModel.hpp>
 #include <SoundManager.hpp>
+#include <SoundPlayer.hpp>
 
 #include <chrono>
+#include <map>
+
 
 class GLScene : public GLViewport
 {
@@ -31,14 +34,19 @@ class GLScene : public GLViewport
     void LoadGlobalUBOs(Matrices);
 
     std::chrono::time_point<std::chrono::high_resolution_clock> time;
-    std::vector<std::pair<Vec4, glm::mat4>> strokes;
-    Vec4 color;
-    bool painting;
+    std::vector<std::pair<int, glm::mat4>> strokes;
+    int color;
+    bool pallet;
     
     bool Break;
-
-
+    bool PaintOff;
+    bool record;
+    
+    template <typename T> 
+    void PaintHelper(shared_ptr<T>, GLenum);
+    SoundPlayer player;
 };
+
 
 template <typename T> 
 void GLScene::Paint(shared_ptr<T> model, GLenum MODE)
