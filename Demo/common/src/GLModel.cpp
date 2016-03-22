@@ -33,8 +33,7 @@ GLModel::~GLModel()
 {
 }
 
-
-bool GLModel::Create()
+bool GLModel::LoadModel()
 {
     //Clear
     for(size_t i=0; i<this->_positions->size(); i++)
@@ -48,10 +47,6 @@ bool GLModel::Create()
         this->_faces->at(i).clear();
 
     Assimp::Importer Importer;
-
-    //Create the VAO
-    glGenVertexArrays(1, &(this->vao));
-    glBindVertexArray(this->vao);
 
     const aiScene* scene = Importer.ReadFile(filename,
             aiProcess_Triangulate | 
@@ -71,10 +66,6 @@ bool GLModel::Create()
             const aiMesh* mesh = scene->mMeshes[i];
             this->AddAttributeData(mesh, i);
         }
-        this->CreateVBOs();
-
-        //Unbind the VAO
-        glBindVertexArray(0);
 
         return true;
     }
@@ -240,10 +231,6 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
                 location = this->path + "/" + texPath.data;
             GLTexture texture(name.C_Str(), GL_TEXTURE_2D, location.c_str());
 
-            if (!texture.Load()) 
-            {
-                printf("Error loading texture '%s'\n", location.c_str());
-            }
             this->textures->push_back(texture);
             this->shaders->at(i).texture = 0;
         }
@@ -259,10 +246,6 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
                 location = this->path + "/" + texPath.data;
             GLTexture texture(name.C_Str(), GL_TEXTURE_2D, location.c_str());
 
-            if (!texture.Load()) 
-            {
-                printf("Error loading texture '%s'\n", location.c_str());
-            }
             this->bumpmaps->push_back(texture);
             this->shaders->at(i).bump = 0;
         }

@@ -19,10 +19,12 @@ class GLScene : public GLViewport
     GLScene();
 
     void AddModel(const char*, const char*);
-    void InitializeGL();
-    void Paint();
-    void MoveCamera(GLCamera::CamDirection);
+    void InitShaders();
+    void MoveCamera();
     void Event();
+
+    template <typename T> 
+        void Paint(shared_ptr<T>, GLenum);
 
  protected:
     std::string modelpath;
@@ -35,11 +37,8 @@ class GLScene : public GLViewport
     bool pallet;
     
     bool Break;
-    bool PaintOff;
     bool record;
-    
-    template <typename T> 
-    void PaintHelper(shared_ptr<T>, GLenum);
+    bool PaintOff;
 
     // To call custom programs... or maybe to replace the one above
     template<typename T>
@@ -50,9 +49,8 @@ class GLScene : public GLViewport
 
 
 template <typename T> 
-void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)
+void GLScene::Paint(shared_ptr<T> model, GLenum MODE)
 {
-
     // Run Program
     shared_ptr<GLProgram> program = this->Get<GLProgram>("program");
     glUseProgram(program->getId());
@@ -78,7 +76,6 @@ void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)
     model->Draw(MODE);
 
     glUseProgram(0);
-
 }
 
 template <typename T> 

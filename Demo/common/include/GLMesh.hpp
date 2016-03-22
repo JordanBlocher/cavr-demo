@@ -34,9 +34,9 @@ class GLMesh : public GLNode
     const std::vector<Vec3>& Positions(size_t);
     const std::vector<GLuint>& Faces(size_t);
 
-    virtual bool Create();
     virtual void Clear();
-    
+
+    virtual void Create(GLenum);
     int AddCircle(int, double, double, double, Vec2 uv0=Vec2(0), Vec2 uv1=Vec2(1));
     void AddTriangleStrip(int, int, int, bool);
     void AddTriangleSurface(int, int, int, bool, bool);
@@ -56,7 +56,7 @@ class GLMesh : public GLNode
     Vec2 InterpolateV(Vec2, Vec2, int, int);
     Vec2 InterpolateUV(Vec2, Vec2, double, double, double, double);
     virtual void Allocate();
-    virtual void CreateVBOs();
+    virtual void CreateVBOs(GLenum);
 
     sp2dvec3 _positions;
     sp2dvec3 _colors;

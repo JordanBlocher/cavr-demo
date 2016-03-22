@@ -11,22 +11,22 @@ GLTexture::GLTexture(const char* name, GLenum type, const char* file) : GLNode(n
 {
 	this->file = file;
     this->type = type;
-}
-
-GLTexture::~GLTexture()
-{
-}
-
-bool GLTexture::Load()
-{
     try {
         this->image = new Magick::Image(this->file);
         this->image->write(&this->blob, "RGBA");
     }
     catch (Magick::Error& error) {
         std::cout << "Error loading texture '" << this->file << "': " << error.what() << std::endl;
-        return false;
     }
+}
+
+GLTexture::~GLTexture()
+{
+}
+
+
+bool GLTexture::Load()
+{
 
     glGenTextures(1, &(this->id));
     glBindTexture(this->type, this->id);
@@ -34,7 +34,6 @@ bool GLTexture::Load()
     glTexParameteri(this->type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(this->type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
-    return true;
 }
 
 bool GLTexture::Load(int width,int height,unsigned char* Buffer)

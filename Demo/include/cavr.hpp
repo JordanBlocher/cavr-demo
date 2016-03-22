@@ -17,10 +17,10 @@ int setup_map(int argc, char** argv)
 
   if (!cavr::System::init(argc, argv, &input_map)) {
     LOG(ERROR) << "Failed to initialize cavr.";
-    return 0;
+    return -1;
   }
   LOG(INFO) << "Successfully initialized cavr.";
-  
+
   // set input map for buttons,keyboard, and sixdofs 
 #ifdef DEBUG
   input_map.button_map["up"] = "keyboard[w]";
@@ -50,7 +50,7 @@ int setup_map(int argc, char** argv)
   emulatedMatrix[3].xyz = cavr::math::vec3f(0,1,0);
   emulated->setState(emulatedMatrix);
 
-  return 1;
+  return 0;
 }
 
 

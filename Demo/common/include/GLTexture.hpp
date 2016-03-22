@@ -18,6 +18,7 @@ class GLTexture : GLNode
 
 
     void SetData(int width,int height, unsigned char* Buffer);
+
     void Bind(GLenum);
 
 protected:
