@@ -25,7 +25,7 @@ perspective_window = {
 
 x11_renderer = {
   type = "x11gl";
-  display = ":0.0";
+  display = ":1.0";
   windows = {
     sim_window = perspective_window;
     sim_window2 = sim_window;

@@ -249,14 +249,11 @@ void GLPrimitive::LoadUBO(GLuint ubo, UBO rtype, Shader shader)
 
 void GLPrimitive::DrawElements(size_t i, GLint face_offset, GLint vertex_offset, GLenum MODE)
 {
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 4);
-cout<<"Drawing face " <<i <<" from "<< this->_faces->at(i).size()<<endl;
     glDrawElementsBaseVertex(MODE, 
         this->_faces->at(i).size(),
         GL_UNSIGNED_INT,
         (void*)(sizeof(GLuint) * face_offset),
         vertex_offset);
-cout<<"DONE"<<endl;
 }
 
 void GLPrimitive::Clear()
@@ -270,34 +267,31 @@ void GLPrimitive::Draw(GLenum MODE)
     GLint face_offset = 0;
     GLint vertex_offset = 0;
 
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindVertexArray(this->vao);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    cout<<this->name<<" has " <<this->textures->size()<<" textures\n";
+    //cout<<this->name<<" has " <<this->textures->size()<<" textures\n";
     //Draw Model 
     for(size_t i=0; i< this->_faces->size(); i++)
     {      
 
         int textureIdx = this->shaders->at(i).texture;
         int materialIdx = this->shaders->at(i).material;
-        cout<<"Checking Shader "<<i<<": "<<textureIdx<<" " <<materialIdx<<endl;
+        //cout<<"Checking Shader "<<i<<": "<<textureIdx<<" " <<materialIdx<<endl;
 
         this->LoadUBO(this->controlUBO, UBO::CONTROL, this->shaders->at(i));
         if (textureIdx != -1)
         {
-            //cout<<"Drawing Texture\n";
             this->LoadUBO(this->textureUBO, UBO::TEXTURE, this->shaders->at(i));
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
         else if (materialIdx != -1)
         {
-            //cout<<"Drawing Color\n";
             this->LoadUBO(this->materialUBO, UBO::COLOR, this->shaders->at(i));
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
         else
         {
-            //cout<<"Drawing Vertex Color\n";
             DrawElements(i, face_offset, vertex_offset, MODE);
         }
 
@@ -305,9 +299,9 @@ void GLPrimitive::Draw(GLenum MODE)
         vertex_offset += this->_positions->at(i).size();
     }
 
+    glBindVertexArray(0);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindBuffer(GL_TEXTURE_2D, 0);
-    glBindVertexArray(0);
 }
 
 

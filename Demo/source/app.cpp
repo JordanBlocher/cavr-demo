@@ -24,7 +24,6 @@ void frame()
     static GLScene *cd;
     cd = static_cast<GLScene*>(cavr::System::getContextData());
     cd->Event();
-    cd->Update();
     shared_ptr<SoundManager> soundMan = cd->Get<SoundManager>("soundMan");
     soundMan->SetListener(camera->getCameraPosition(),camera->GetForward());
 }
@@ -40,16 +39,13 @@ void render()
     glClearColor(0.0,0.0,0.0,1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    shared_ptr<GLModel> dragon = cd->Get<GLModel>("dragon");
-    dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
-    cd->Paint<GLModel>(dragon, GL_TRIANGLES);
-    
+    cd->Render();
+
     camera->updateView();
 }
 
 void destructContext() 
 {
-    //cd.reset();
     static GLScene *cd;
     cd = static_cast<GLScene*>(cavr::System::getContextData());
     delete(cd);

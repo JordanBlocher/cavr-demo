@@ -22,18 +22,15 @@ class GLScene : public GLViewport
     void InitShaders();
     void MoveCamera();
     void Event();
-    void Update();
+    void Render();
     void Create();
 
     template <typename T> 
         void Paint(shared_ptr<T>, GLenum);
 
  protected:
-    std::string modelpath;
-    std::string materialpath;
     void LoadGlobalUBOs(Matrices);
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> time;
     std::vector<std::pair<int, glm::mat4>> strokes;
     int color;
     bool pallet;
@@ -42,8 +39,6 @@ class GLScene : public GLViewport
     bool PaintOff;
     bool record;
     
-    template <typename T> 
-    void PaintHelper(shared_ptr<T>, GLenum);
     SoundPlayer player;
 };
 

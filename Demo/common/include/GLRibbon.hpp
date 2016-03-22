@@ -33,7 +33,6 @@ class GLRibbon : public GLPrimitive
 	bool AddPoints(vec3 worldPoint,vec3 Color);
 	void LoadPoints();
 	void ClearPoints();
-	bool Init();
 	void AddBreak();
     Vec3 Tail();
 

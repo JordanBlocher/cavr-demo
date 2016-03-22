@@ -60,8 +60,9 @@ void GLScene::Create()
 
     // Choose model
     this->AddModel("dragon", "models/dragon.obj");
-    this->AddModel("pallet", "models/pallet.obj");
+
     this->AddModel("brush", "models/brush.obj");
+    this->AddModel("pallet", "models/pallet.obj");
     this->AddModel("blue", "models/blue.obj");
     this->AddModel("red", "models/red.obj");
     this->AddModel("purple", "models/purple.obj");
@@ -73,11 +74,9 @@ void GLScene::Create()
 
     this->InitShaders();
 
-    shared_ptr<GLModel> dragon = this->Get<GLModel>("dragon");
-
     shared_ptr<GLRibbon> ribbons (new GLRibbon("ribbons")); 
-    this->AddToContext(ribbons);
     ribbons->Create(GL_DYNAMIC_DRAW);
+    this->AddToContext(ribbons);
 
     const char* colors[] = {"blue", "red", "purple", "white", "yellow", "green"};
     const char* colorpaths[] = {"models/blue.jpg", "models/red.jpg", "models/purple.jpg", "models/white.jpg", "models/yellow.jpg", "models/green.jpg"};
@@ -105,6 +104,7 @@ void GLScene::InitShaders()
     program->SetAttributeIndex("v_position", 0);
     program->SetAttributeIndex("v_normal", 1);
     program->SetAttributeIndex("v_uv", 2);
+    program->SetAttributeIndex("v_color", 3);
 
     //Add Program
     if( this->AddProgram(program) )
@@ -164,8 +164,12 @@ void GLScene::InitShaders()
    this->pallet = false;
 }
 
-void GLScene::Update()
+void GLScene::Render()
 {
+    //shared_ptr<GLModel> dragon = cd->Get<GLModel>("dragon");
+    //dragon->setMatrix(glm::translate(glm::mat4(1.0f), Vec3(0.0f, -1.0f, -3.0f)) * glm::scale(glm::mat4(1.0f), Vec3(0.2f, 0.2f, 0.2f)));
+    //cd->Paint<GLModel>(dragon, GL_TRIANGLES);
+    
     shared_ptr<GLCamera> camera = this->Get<GLCamera>("camera");
     auto wand = cavr::input:: getSixDOF("wand");
     glm::vec3 wandPos = camera->getCameraPosition() + camera->RotatePoint(GLMath::vec3ftoGLM(wand->getPosition() )); 
@@ -177,7 +181,7 @@ void GLScene::Update()
 
     //Choose Model
     shared_ptr<GLRibbon> ribbons = this->Get<GLRibbon>("ribbons");
-    this->Paint(ribbons, GL_TRIANGLES);
+    this->Paint<GLRibbon>(ribbons, GL_TRIANGLES);
       
     shared_ptr<GLModel> brush = this->Get<GLModel>("brush");
     auto cv = glm::inverse(camera->GetCameraView());
@@ -189,7 +193,7 @@ void GLScene::Update()
     wandMatrix[3][1] = 0;
     wandMatrix[3][2] = 0;
     brush->setMatrix( glm::translate(glm::mat4(1.0), paintPos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * cv * wandMatrix );//* GLMath::mat4ftoGLM(wand->getMatrix()) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * rot );//glm::translate(glm::mat4(1.0), GLMath::vec3ftoGLM(wand->getPosition() )) *  );// *rot);
-    this->Paint(brush, GL_TRIANGLES);
+    this->Paint<GLModel>(brush, GL_TRIANGLES);
 
     shared_ptr<GLModel> pallet = this->Get<GLModel>("pallet");
     if(this->pallet)
@@ -202,7 +206,7 @@ void GLScene::Update()
                 * glm::scale(glm::mat4(1.0f), glm::vec3(2.4f, 2.4f, 2.4f))* rot *rot2 
                 * glm::translate(glm::mat4(1.0f), glm::vec3(-.4, -.2, -.2)));
 
-    	this->Paint(pallet, GL_TRIANGLES);
+    	this->Paint<GLModel>(pallet, GL_TRIANGLES);
 
         glm::vec3 translations[] = {glm::vec3(-0.4, 0.02, -0.9),
                                glm::vec3(0.19, 0.03, -0.8),
@@ -215,7 +219,7 @@ void GLScene::Update()
         {
             shared_ptr<GLModel> color = this->Get<GLModel>(colors[i]);
             color->setMatrix(pallet->Matrix() * glm::translate(glm::mat4(1.0f), translations[i]));
-            this->Paint(color, GL_TRIANGLES);
+            this->Paint<GLModel>(color, GL_TRIANGLES);
         }
 
         // Ray and bounding sphere
@@ -258,7 +262,6 @@ void GLScene::Event()
 
     if(cavr::input::getButton("pallet")->delta() == cavr::input::Button::Held)
     {
-        cout<< "Get Pallet"<<endl;
         this->pallet = true; 
     }
     else this->pallet = false;
@@ -276,16 +279,15 @@ void GLScene::Event()
 
     if(cavr::input::getButton("paint")->delta() != cavr::input::Button::Open && PaintOff)
     {
-        cout << "PRESSED" << endl;
+        //cout << "PRESSED" << endl;
         //player.AddPoint(paintPos,0);
     }
 
     else if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Open && !PaintOff)
     {
-        cout << "RELEASED" << endl;
+        //cout << "RELEASED" << endl;
         //player.SetOffPoint();
     }
-
 
     PaintOff = cavr::input::getButton("paint")->delta() == cavr::input::Button::Open;
     if(cavr::input::getButton("paint")->delta() == cavr::input::Button::Held)
@@ -403,9 +405,10 @@ void GLScene::AddModel(const char* name, const char* path)
 {
     shared_ptr<GLModel> model(new GLModel(path, name, NUM_ATTRIBUTES));
     if (model->LoadModel())
+    {
+        model->Create(GL_STATIC_DRAW);
         this->AddToContext(model);
-
-    model->Create(GL_STATIC_DRAW);
+    }
 }
 
 

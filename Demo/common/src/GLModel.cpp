@@ -35,7 +35,8 @@ GLModel::~GLModel()
 
 bool GLModel::LoadModel()
 {
-cout<<"Loading "<<this->name<<endl;
+    cout<<"Loading "<<this->name<<" model."<<endl;
+
     //Clear
     for(size_t i=0; i<this->_positions->size(); i++)
     {
@@ -61,16 +62,13 @@ cout<<"Loading "<<this->name<<endl;
         this->_colors->resize(scene->mNumMeshes);
         this->_normals->resize(scene->mNumMeshes);
         this->_uvs->resize(scene->mNumMeshes);
-        this->shaders->resize(scene->mNumMaterials);
-cout<<"Num meshes "<< scene->mNumMeshes<<endl;
+        this->shaders->resize(scene->mNumMaterials-1);
         this->AddMaterials(scene->mMaterials, scene->mNumMaterials);
         for(unsigned int i=0; i<scene->mNumMeshes; i++)
         {
             const aiMesh* mesh = scene->mMeshes[i];
             this->AddAttributeData(mesh, i);
-cout<<"Adding face "<<i<<" from "<< this->_faces->at(i).size()<<endl;
         }
-        std::cout<<"Model "<<name<<" loaded.\n";
         return true;
     }
     else 
@@ -192,7 +190,6 @@ void GLModel::AddAttributeData(const aiMesh* mesh, unsigned int index)
 
 void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
 {
-    cout<<"Num mats: "<<numMaterials << " shader size "<<this->shaders->size()<<endl;
     for ( unsigned int i = 0; i < numMaterials; ++i )
     {
         aiMaterial &material = *(materials[i]);
@@ -233,10 +230,10 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
                 location = this->path + "/" + texPath.data;
             GLTexture texture(name.C_Str(), GL_TEXTURE_2D, location.c_str());
 
+            //cout<<"Assigning texture "<<name.C_Str()<<" to shader "<<i-1<<endl;
             this->textures->push_back(texture);
-            this->shaders->at(i).texture = 0;
+            this->shaders->at(i-1).texture = i-1;
         }
-        this->shaders->at(i).texture = 0;
 
         if ( material.Get(AI_MATKEY_TEXTURE(aiTextureType_HEIGHT,0), texPath) == AI_SUCCESS )
         {
@@ -248,13 +245,14 @@ void GLModel::AddMaterials(aiMaterial** materials, unsigned int numMaterials)
             GLTexture texture(name.C_Str(), GL_TEXTURE_2D, location.c_str());
 
             this->bumpmaps->push_back(texture);
-            this->shaders->at(i).bump = 0;
+            this->shaders->at(i-1).bump = i-1;
         }
-
-        if(std::string(name.C_Str()) != std::string("DefaultMaterial") || numMaterials == 1)
+        
+        if(numMaterials == 1)
         {
+            //cout<<"Assigning material "<<i <<" to shader "<<i<<endl;
             this->materials->push_back(mat);
-            this->shaders->at(i).material = 0;
+            this->shaders->at(i).material = i;
         }
 
     }
