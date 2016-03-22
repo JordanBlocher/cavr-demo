@@ -2,7 +2,7 @@
 
 #include "GLTexture.hpp"
 
-GLRibbon::GLRibbon(const char* name, long max) : GLPrimitive(name, "GLRibbon", 4, 3*max)
+GLRibbon::GLRibbon(const char* name, long max) : GLPrimitive(name, "GLRibbon", 6, 3*max)
 {
 
 }

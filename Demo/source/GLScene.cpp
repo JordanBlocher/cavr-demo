@@ -70,7 +70,13 @@ void GLScene::InitializeGL()
 
 
     shared_ptr<GLText> Text(new GLText("text"));
-    this->AddToContext(Text);
+    if( Text->Create() )
+        this->AddToContext(Text);
+    Material mat;
+    mat.diffuse = glm::vec4(1,1,1,1);
+    Text->AddMaterial(mat);
+
+    //Text->AssignMaterial(0,0);
 
        /****** Deep GPU Stuff ******/
     //Shaders
@@ -91,6 +97,27 @@ void GLScene::InitializeGL()
     if( this->AddProgram(program) )
         this->AddToContext( program );
     
+    // Text Program
+    //////////
+    //Shaders
+    shared_ptr<GLShader> vertex2(new GLShader("textvertex.glsl", GL_VERTEX_SHADER, "vshader"));
+    shared_ptr<GLShader> fragment2(new GLShader("textfragment.glsl", GL_FRAGMENT_SHADER, "fshader"));
+
+    //Programs
+    shared_ptr<GLProgram> textprogram(new GLProgram("textprogram"));
+    
+    //Add Shaders
+    textprogram->AddShader(vertex2); 
+    textprogram->AddShader(fragment2); 
+    textprogram->SetAttributeIndex("v_position", 0);
+    textprogram->SetAttributeIndex("v_normal", 1);
+    textprogram->SetAttributeIndex("v_uv", 2);
+
+    //Add Program
+    if( this->AddProgram(textprogram) )
+        this->AddToContext( textprogram );
+    ///////////////
+
     //Create UBOs 
     cout<<"Matrix UBO"<<endl;
     shared_ptr<GLUniform> vertex_uniform(new GLUniform("GMatrices"));
@@ -182,6 +209,9 @@ void GLScene::Paint()
     wandMatrix[3][2] = 0;
     brush->setMatrix( glm::translate(glm::mat4(1.0), paintPos) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * cv * wandMatrix );//* GLMath::mat4ftoGLM(wand->getMatrix()) * glm::scale(glm::mat4(1.0f), glm::vec3(1.4f, 1.4f, 1.4f)) * rot );//glm::translate(glm::mat4(1.0), GLMath::vec3ftoGLM(wand->getPosition() )) *  );// *rot);
     this->PaintHelper(brush, GL_TRIANGLES);
+
+    auto Test = this->Get<GLText>("text");
+    this->CustomHelper("textprogram",Test,GL_TRIANGLES);
 
     shared_ptr<GLModel> pallet = this->Get<GLModel>("pallet");
     if(this->pallet)

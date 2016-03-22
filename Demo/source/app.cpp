@@ -15,7 +15,7 @@
 // Create camera
 std::shared_ptr<GLCamera> camera(new GLCamera("camera1"));
 
-//#define DEBUG 
+#define DEBUG 
 
 // Initialize our program
 void initContext() 

@@ -40,6 +40,11 @@ class GLScene : public GLViewport
     
     template <typename T> 
     void PaintHelper(shared_ptr<T>, GLenum);
+
+    // To call custom programs... or maybe to replace the one above
+    template<typename T>
+    void CustomHelper(string program, shared_ptr<T>, GLenum);
+
     SoundPlayer player;
 };
 
@@ -50,6 +55,38 @@ void GLScene::PaintHelper(shared_ptr<T> model, GLenum MODE)
 
     // Run Program
     shared_ptr<GLProgram> program = this->Get<GLProgram>("program");
+    glUseProgram(program->getId());
+
+    // Calculate MVP
+    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+    glm::mat4 vp = camera1->Projection() * camera1->View() ;
+    Matrices matrices;
+    matrices.mvpMatrix = vp * model->Matrix();
+    matrices.mvMatrix = model->Matrix(); 
+    matrices.normalMatrix = glm::transpose(glm::inverse(model->Matrix()));
+
+    // Load Global UBOs
+    LoadGlobalUBOs(matrices);
+
+    // Bind Controls
+    model->controlUBO = this->Get<GLUniform>("Shader")->getId();
+    // Bind Colors
+    model->materialUBO = this->Get<GLUniform>("GColors")->getId();
+    // Bind Textures
+    model->textureUBO = this->Get<GLUniform>("Texture")->getId();
+
+    model->Draw(MODE);
+
+    glUseProgram(0);
+
+}
+
+template <typename T> 
+void GLScene::CustomHelper(string Program, shared_ptr<T> model, GLenum MODE)
+{
+
+    // Run Program
+    shared_ptr<GLProgram> program = this->Get<GLProgram>(Program.c_str());
     glUseProgram(program->getId());
 
     // Calculate MVP

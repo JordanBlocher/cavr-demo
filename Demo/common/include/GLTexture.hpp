@@ -14,6 +14,10 @@ class GLTexture : GLNode
     ~GLTexture();
     
     bool Load();
+    bool Load(int width,int height,unsigned char* Buffer);
+
+
+    void SetData(int width,int height, unsigned char* Buffer);
     void Bind(GLenum);
 
 protected:

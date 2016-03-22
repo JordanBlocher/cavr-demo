@@ -97,11 +97,11 @@ void GLMesh::AddQuad(Vec3 upperLeft, Vec3 upperRight, Vec3 lowerLeft, Vec3 lower
     this->uvs->push_back(glm::vec2(1,1));
     this->uvs->push_back(glm::vec2(1,0));
 
-    int cnt = this->positions->size();
+    int cnt = this->positions->size()-1;
+    this->faces->push_back(cnt - 2);
+    this->faces->push_back(cnt - 1);
     this->faces->push_back(cnt);
-    this->faces->push_back(cnt+1);
-    this->faces->push_back(cnt+2);
-
+    
     // Triangle Two
     this->positions->push_back(upperLeft);
     this->positions->push_back(lowerLeft);
@@ -121,10 +121,10 @@ void GLMesh::AddQuad(Vec3 upperLeft, Vec3 upperRight, Vec3 lowerLeft, Vec3 lower
     this->normals->push_back(normal);
     this->normals->push_back(normal);
 
-    cnt = this->positions->size();
+    cnt = this->positions->size() - 1;
+    this->faces->push_back(cnt - 2);
+    this->faces->push_back(cnt - 1);
     this->faces->push_back(cnt);
-    this->faces->push_back(cnt+1);
-    this->faces->push_back(cnt+2);
 }
 
 void GLMesh::AddTriangle(Vec3 v0, Vec3 v1, Vec3 v2, Vec3 normal, int cnt)
