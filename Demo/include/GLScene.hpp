@@ -89,7 +89,7 @@ void GLScene::CustomHelper(string Program, shared_ptr<T> model, GLenum MODE)
     glm::mat4 vp = camera->Projection() * camera->View() ;
 
     Matrices matrices;
-    matrices.mvpMatrix = vp * model->Matrix();
+    matrices.mvpMatrix = /*vp **/ model->Matrix();
     matrices.mvMatrix = model->Matrix(); 
     matrices.normalMatrix = glm::transpose(glm::inverse(model->Matrix()));
 
