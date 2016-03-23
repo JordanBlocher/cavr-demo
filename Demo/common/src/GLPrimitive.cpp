@@ -274,7 +274,7 @@ void GLPrimitive::Draw(GLenum MODE)
     //Draw Model 
     for(size_t i=0; i< this->_faces->size(); i++)
     {      
-        cout << this->_faces->size() << endl;
+
         int textureIdx = this->shaders->at(i).texture;
         int materialIdx = this->shaders->at(i).material;
         //cout<<"Checking Shader "<<i<<": "<<textureIdx<<" " <<materialIdx<<endl;

@@ -274,7 +274,8 @@ void GLScene::Render()
         }
     }
     auto Test = this->Get<GLText>("text");
-    Test->setMatrix(glm::scale(glm::vec3(1,.5,1)));
+    // translate(desired x, -desired y) *translate(x-1,1-y)* Scale(x,y) -- x range is [0,2] and y range is [-2,0]
+    Test->setMatrix(glm::translate(glm::vec3(1,-1,0)) *  glm::translate(glm::vec3(-.8,.8,0)) * glm::scale(glm::vec3(.2,.2,1)));
     this->CustomHelper("textprogram",Test,GL_TRIANGLES);
 }
 
