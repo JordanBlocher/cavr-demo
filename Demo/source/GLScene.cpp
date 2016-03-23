@@ -274,6 +274,7 @@ void GLScene::Render()
         }
     }
     auto Test = this->Get<GLText>("text");
+    Test->setMatrix(glm::scale(glm::vec3(1,.5,1)));
     this->CustomHelper("textprogram",Test,GL_TRIANGLES);
 }
 

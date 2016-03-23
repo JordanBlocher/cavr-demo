@@ -24,7 +24,7 @@ GLText::GLText(const char* name,string fontfile) : GLPrimitive(name, "GLText",5,
 	auto glyph = face->glyph;
 	texture = std::make_shared<GLTexture>(GLTexture("text",GL_TEXTURE_2D,glyph->bitmap.width,glyph->bitmap.rows,glyph->bitmap.buffer,GL_RED,GL_RED)); 
 
-	AddQuad(Vec3(0,1,0),Vec3(1,1,0),Vec3(0,0,0),Vec3(1,0,0));
+	AddQuad(Vec3(-1,1,0),Vec3(1,1,0),Vec3(-1,-1,0),Vec3(1,-1,0));
 	AddMesh();
 	//cout << texture << endl;
 	texture->Load();
