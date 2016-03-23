@@ -3,7 +3,7 @@
 // nothing to read here.
 
 
-GLText::GLText(const char* name,string fontfile) : GLPrimitive(name, "GLText",4,6)
+GLText::GLText(const char* name,string fontfile) : GLPrimitive(name, "GLText",5,6)
 {
 	ft = NULL;
 	// We only need to have this done once. 
@@ -20,13 +20,14 @@ GLText::GLText(const char* name,string fontfile) : GLPrimitive(name, "GLText",4,
 	  fprintf(stderr, "Could not load character 'X'\n");
 	  return;
 	}
-	texture = std::make_shared<GLTexture>(GLTexture()); 
+	
 	auto glyph = face->glyph;
-	texture->Load(glyph->bitmap.width,glyph->bitmap.rows,glyph->bitmap.buffer);
+	texture = std::make_shared<GLTexture>(GLTexture("text",GL_TEXTURE_2D,glyph->bitmap.width,glyph->bitmap.rows,glyph->bitmap.buffer,GL_RED,GL_RED)); 
 
 	AddQuad(Vec3(0,1,0),Vec3(1,1,0),Vec3(0,0,0),Vec3(1,0,0));
 	AddMesh();
-
+	//cout << texture << endl;
+	texture->Load();
 	AddTexture(texture);
 	AssignTexture(0,0);
 }

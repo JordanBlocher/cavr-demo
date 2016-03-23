@@ -9,14 +9,14 @@ fullscreen = true;
 perspective_window = {
   view = {
     eyes = {
-      eye = cavr.sixdof("vrpn[TallGlasses[0]]");
+      eye = cavr.sixdof("emulated");
       --left_eye = cavr.sixdof("vrpn[TallGlasses[[0]]");
       --right_eye = cavr.sixdof("vrpn[TallGlasses[[0]]");
       --stereo ="mono";
     };
-    lower_left = cavr.sixdof("vrpn[TallGlasses[0]]") * cavr.translate(-1, -1, -1);
-    lower_right = cavr.sixdof("vrpn[TallGlasses[0]]") * cavr.translate(1, -1, -1);
-    upper_left = cavr.sixdof("vrpn[TallGlasses[0]]") * cavr.translate(-1, 1, -1);
+    lower_left = cavr.sixdof("emulated") * cavr.translate(-1, -1, -1);
+    lower_right = cavr.sixdof("emulated") * cavr.translate(1, -1, -1);
+    upper_left = cavr.sixdof("emulated") * cavr.translate(-1, 1, -1);
   };
   fullscreen = true;
 };
@@ -25,7 +25,7 @@ x11_renderer = {
   type = "x11gl";
   display = ":0.0";
   windows = {
-    --sim_window = perspective_window;
+    sim_window = perspective_window;
     sim_window2 = sim_window;
 
   };
@@ -43,7 +43,6 @@ x11_renderer_projector1 = {
 x11_renderer_projector2 = {
   type = "x11gl";
   display = ":0.2";
-    "WiiMote0@tracker.rd.unr.edu";
   windows = {
     sim_window = perspective_window;
     --sim_window2 = sim_window;
@@ -112,7 +111,8 @@ others2 = {
 
 
 machines = {
+  --self=self;
   self=self;
   --self2 = others;
-  --self3 = others2;
+  self = others2;
 };

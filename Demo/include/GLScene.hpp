@@ -22,16 +22,15 @@ class GLScene : public GLViewport
     void InitShaders();
     void MoveCamera();
     void Event();
+    void Render();
+    void Create();
 
     template <typename T> 
         void Paint(shared_ptr<T>, GLenum);
 
  protected:
-    std::string modelpath;
-    std::string materialpath;
     void LoadGlobalUBOs(Matrices);
 
-    std::chrono::time_point<std::chrono::high_resolution_clock> time;
     std::vector<std::pair<int, glm::mat4>> strokes;
     int color;
     bool pallet;
@@ -47,7 +46,6 @@ class GLScene : public GLViewport
     SoundPlayer player;
 };
 
-
 template <typename T> 
 void GLScene::Paint(shared_ptr<T> model, GLenum MODE)
 {
@@ -56,7 +54,7 @@ void GLScene::Paint(shared_ptr<T> model, GLenum MODE)
     glUseProgram(program->getId());
 
     // Calculate MVP
-    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
+    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera");
     glm::mat4 vp = camera1->Projection() * camera1->View() ;
     Matrices matrices;
     matrices.mvpMatrix = vp * model->Matrix();
@@ -87,8 +85,9 @@ void GLScene::CustomHelper(string Program, shared_ptr<T> model, GLenum MODE)
     glUseProgram(program->getId());
 
     // Calculate MVP
-    shared_ptr<GLCamera> camera1 = this->Get<GLCamera>("camera1");
-    glm::mat4 vp = camera1->Projection() * camera1->View() ;
+    shared_ptr<GLCamera> camera = this->Get<GLCamera>("camera");
+    glm::mat4 vp = camera->Projection() * camera->View() ;
+
     Matrices matrices;
     matrices.mvpMatrix = vp * model->Matrix();
     matrices.mvMatrix = model->Matrix(); 

@@ -46,8 +46,6 @@ void GLMesh::Clear()
     _normals->clear();
     _uvs->clear();
     _faces->clear();
-
-    //cout << _positions->size() << endl;
 }
 
 void GLMesh::AddMesh()
@@ -56,7 +54,6 @@ void GLMesh::AddMesh()
     this->e_size += this->faces->size()*3;
     this->v_size += this->positions->size();
     this->index += 1;
-    //cout << _positions->size() << endl;
     this->_positions->push_back(*this->positions);
     this->_normals->push_back(*this->normals);
     this->_colors->push_back(*this->colors);
@@ -315,16 +312,20 @@ void GLMesh::CreateVBOs(GLenum GL_DRAW_TYPE)
         glVertexAttribPointer( COLOR_INDEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
     }
 
-    vbo_elements = GLBufferObject("vbo_elements",
-            sizeof(GLuint),
-            this->e_size,
-            GL_ELEMENT_ARRAY_BUFFER,
-            GL_DRAW_TYPE);
-    offset = 0;
-    for(size_t i=0; i<this->_faces->size(); i++)
+    if( this->attributes > ELEM_INDEX)
     {
-        vbo_elements.LoadSubData(offset, 0, this->_faces->at(i));
-        offset += this->_faces->at(i).size();
+        vbo_elements = GLBufferObject("vbo_elements",
+                sizeof(GLuint),
+                this->e_size,
+                GL_ELEMENT_ARRAY_BUFFER,
+                GL_DRAW_TYPE);
+        offset = 0;
+
+        for(size_t i=0; i<this->_faces->size(); i++)
+        {
+            vbo_elements.LoadSubData(offset, 0, this->_faces->at(i));
+            offset += this->_faces->at(i).size();
+        }
     }
 }
 

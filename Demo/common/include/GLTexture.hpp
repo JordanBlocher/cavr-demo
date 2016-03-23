@@ -9,13 +9,12 @@ class GLTexture : GLNode
 {
  
  public:
+    GLTexture(const char*, GLenum,int width,int height,const void* Buffer,GLenum internalFormat=GL_RGB,GLenum format=GL_RGB);
     GLTexture();
     GLTexture(const char*, GLenum, const char*);
     ~GLTexture();
     
     bool Load();
-    bool Load(int width,int height,unsigned char* Buffer);
-
 
     void SetData(int width,int height, unsigned char* Buffer);
 
@@ -24,7 +23,12 @@ class GLTexture : GLNode
 protected:
     Magick::Image* image;
     Magick::Blob blob;
+    int width;
+    int height;
+    const void* data;
     std::string file;
+    GLenum format;
+    GLenum internalFormat;
 };
 
 #endif 
