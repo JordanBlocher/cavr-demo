@@ -17,6 +17,7 @@
 #include <cavr/gfx/renderer.h>
 #include <cavr/gfx/ray.h>
 #include <cavr/gfx/sphere.h>
+#include <GLUIElement.hpp>
 
 #define FOV 45.0f
 #define SENSOR_DISTANCE 0.01f
@@ -88,12 +89,18 @@ void GLScene::Create()
 
     const char* colors[] = {"blue", "red", "purple", "white", "yellow", "green"};
     const char* colorpaths[] = {"models/blue.jpg", "models/red.jpg", "models/purple.jpg", "models/white.jpg", "models/yellow.jpg", "models/green.jpg"};
+    shared_ptr<GLTexture> tempTex;
     for (int i=0; i<6; i++)
     {
         shared_ptr<GLTexture> tex(new GLTexture(colors[i], GL_TEXTURE_2D, colorpaths[i]));
         tex->Load();
         ribbons->AddTexture(tex);
+        tempTex = tex;
     }
+
+    shared_ptr<GLUIElement> TempTexture (new GLUIElement("testtex",tempTex));
+    TempTexture->Create(GL_STATIC_DRAW);
+    AddToContext(TempTexture);
 
     shared_ptr<GLText> Text(new GLText("text"));
     Text->Create(GL_STATIC_DRAW); 
@@ -274,9 +281,17 @@ void GLScene::Render()
         }
     }
     auto Test = this->Get<GLText>("text");
+    Test->SetScreenPos(glm::vec2(0,0));
+    Test->SetSize(glm::vec2(.1,.1) );
     // translate(desired x, -desired y) *translate(x-1,1-y)* Scale(x,y) -- x range is [0,2] and y range is [-2,0]
-    Test->setMatrix(glm::translate(glm::vec3(1,-1,0)) *  glm::translate(glm::vec3(-.8,.8,0)) * glm::scale(glm::vec3(.2,.2,1)));
+    //Test->setMatrix(glm::translate(glm::vec3(1,-1,0)) *  glm::translate(glm::vec3(-.8,.8,0)) * glm::scale(glm::vec3(.2,.2,1)));
     this->CustomHelper("textprogram",Test,GL_TRIANGLES);
+
+    auto Test2 = this->Get<GLUIElement>("testtex");
+    Test2->SetSize(glm::vec2(.1,.2));
+    Test2->SetScreenPos(glm::vec2(.2,.2));
+    this->CustomHelper("textprogram",Test2,GL_TRIANGLES);
+
 }
 
 void GLScene::Event()

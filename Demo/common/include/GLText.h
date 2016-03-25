@@ -1,11 +1,16 @@
+#ifndef GLText_H
+#define GLText_H
+
 #include <ft2build.h>
 #include <string>
 #include "GLPrimitive.hpp"
+#include "GLUIElement.hpp"
 using std::string;
 
 #include FT_FREETYPE_H
 
-class GLText : public GLPrimitive
+
+class GLText : public GLUIElement
 {
 	public:
 		GLText(const char* name = "GLText",string fontfile="FreeSans/FreeSans.ttf");
@@ -15,11 +20,11 @@ class GLText : public GLPrimitive
 	 	void Update();
 	 	void Render();
 	 	void LoadFont(string Str);
-	 	void LoadString(string str);
 	 	void LoadChar(char Character);
 
 	private:
 		FT_Library ft;
 		FT_Face face;
-		shared_ptr<GLTexture> texture;
 };
+
+#endif
