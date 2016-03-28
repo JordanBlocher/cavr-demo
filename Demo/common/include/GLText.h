@@ -25,6 +25,8 @@ class GLText : public GLUIElement
 	private:
 		FT_Library ft;
 		FT_Face face;
+		int MaxFontSize;
+		
 };
 
 #endif

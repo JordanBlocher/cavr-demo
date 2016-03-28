@@ -16,8 +16,9 @@ GLText::GLText(const char* name,string fontfile)  : GLUIElement(name)
 	LoadFont(fontfile.c_str());
 
 	FT_Set_Pixel_Sizes(face, 0, 48);
+	MaxFontSize = 48;
 
-	if(FT_Load_Char(face, 'a', FT_LOAD_RENDER)) {
+	if(FT_Load_Char(face, 'x', FT_LOAD_RENDER)) {
 	  fprintf(stderr, "Could not load character 'X'\n");
 	  return;
 	}
@@ -28,7 +29,9 @@ GLText::GLText(const char* name,string fontfile)  : GLUIElement(name)
 	//AddQuad(Vec3(-1,1,0),Vec3(1,1,0),Vec3(-1,-1,0),Vec3(1,-1,0));
 	//AddMesh();
 	//return;
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	texture->Load();
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	
 	AddQuad(Vec3(-1,1,0),Vec3(1,1,0),Vec3(-1,-1,0),Vec3(1,-1,0));
 	AddMesh();
@@ -48,7 +51,16 @@ GLText::~GLText()
 
 void GLText::LoadChar(char Character)
 {
-	FT_Load_Char(face, Character, FT_LOAD_RENDER);
+	if(FT_Load_Char(face, Character, FT_LOAD_RENDER))
+	{
+		cout << "OUCH SOMETHING WENT WRONG HERE!!!" << endl;
+	}
+	auto glyph = face->glyph;
+	//cout << "WIDTH: " << glyph->bitmap.width << endl;
+	//cout << &glyph->bitmap.buffer << endl;
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	(*textures)[0].SetData(glyph->bitmap.width,glyph->bitmap.rows,glyph->bitmap.buffer);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }
 
 void GLText::Update()
@@ -72,7 +84,16 @@ void GLText::LoadFont(string Str)
 
 void GLText::Draw(GLenum ENUM)
 {
+	// Need for freetype
+	glm::vec2 tempscale = size;
+	auto glyph = face->glyph;
+	size.x = size.x * (float)glyph->bitmap.width / (float)MaxFontSize;
+	size.y = size.y * (float)glyph->bitmap.width / (float)MaxFontSize;
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	GLUIElement::Draw(ENUM);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	size = tempscale;
+	
 	//GLPrimitive::Draw(ENUM);
 }
 

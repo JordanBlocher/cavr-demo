@@ -102,7 +102,7 @@ void GLScene::Create()
     TempTexture->Create(GL_STATIC_DRAW);
     AddToContext(TempTexture);
 
-    shared_ptr<GLText> Text(new GLText("text"));
+    shared_ptr<GLText> Text(new GLText("text","FreeSans/FreeSansBold.ttf"));
     Text->Create(GL_STATIC_DRAW); 
         this->AddToContext(Text);
     Material mat;
@@ -280,17 +280,20 @@ void GLScene::Render()
             }
         }
     }
-    auto Test = this->Get<GLText>("text");
-    Test->SetScreenPos(glm::vec2(0,0));
-    Test->SetSize(glm::vec2(.1,.1) );
+    //auto Test = this->Get<GLText>("text");
+    //Test->SetScreenPos(glm::vec2(0,0));
+    //Test->SetSize(glm::vec2(.1,.1) );
     // translate(desired x, -desired y) *translate(x-1,1-y)* Scale(x,y) -- x range is [0,2] and y range is [-2,0]
+    //Test->LoadChar('a');
     //Test->setMatrix(glm::translate(glm::vec3(1,-1,0)) *  glm::translate(glm::vec3(-.8,.8,0)) * glm::scale(glm::vec3(.2,.2,1)));
-    this->CustomHelper("textprogram",Test,GL_TRIANGLES);
+    //this->CustomHelper("textprogram",Test,GL_TRIANGLES);
 
     auto Test2 = this->Get<GLUIElement>("testtex");
     Test2->SetSize(glm::vec2(.1,.2));
     Test2->SetScreenPos(glm::vec2(.2,.2));
     this->CustomHelper("textprogram",Test2,GL_TRIANGLES);
+
+    DrawString(glm::vec2(.5,.5), glm::vec2(.01,.01), "l L");
 
 }
 
@@ -494,11 +497,16 @@ void GLScene::DrawString(glm::vec2 ScreenPos, glm::vec2 Size, string text)
    {
       if( text[i] != '\n')
       {
-         TextTest->SetScreenPos(ScreenPos + glm::vec2(Size.x * rowCounter, Size.y * colCounter));
+         TextTest->SetScreenPos(ScreenPos + glm::vec2(Size.x * colCounter, Size.y * rowCounter));
          colCounter++;
+         
+         this->CustomHelper("textprogram",TextTest,GL_TRIANGLES);
+         TextTest->LoadChar(text[i]);
+         
       }
       else
       {
+         colCounter = 0;
          rowCounter++;
       }
    }

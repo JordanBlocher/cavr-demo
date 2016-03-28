@@ -50,20 +50,32 @@ bool GLTexture::Load()
     glTexImage2D(this->type, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
     glTexParameteri(this->type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(this->type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 }
 
 
 
-void GLTexture::SetData(int width,int height, unsigned char* Buffer)
+void GLTexture::SetData(int width,int height, const unsigned char* Buffer)
 {
+    //Load();
+    //exit(0);
+    this->width = width;
+    this->height = height;
+    this->data = Buffer;
+    //glActiveTexture(GL_TEXTURE0);
+    //cout << "BUFFER: " << &Buffer << endl;
     glBindTexture(this->type, this->id);
-    glTexImage2D(this->type, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, Buffer);
+    glTexImage2D(this->type, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 }
 
 void GLTexture::Bind(GLenum index)
 {
     glActiveTexture(index);
     glBindTexture(this->type, this->id);
+    //glTexImage2D(this->type, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 }
 
 

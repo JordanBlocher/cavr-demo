@@ -43,7 +43,7 @@ void GLUIElement::Render()
 
 void GLUIElement::Draw(GLenum ENUM)
 {
-	cout << glm::to_string(size) << endl;
+	//cout << glm::to_string(size) << endl;
 	setMatrix(glm::translate(glm::vec3(screenPos.x,screenPos.y,0)) *  glm::translate(glm::vec3(size.x-1,1-size.y,0)) * glm::scale(glm::vec3(size.x,size.y,1)));
 	GLPrimitive::Draw(ENUM);
 }
