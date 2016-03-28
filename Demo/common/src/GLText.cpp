@@ -24,24 +24,30 @@ GLText::GLText(const char* name,string fontfile)  : GLUIElement(name)
 	}
 	
 	auto glyph = face->glyph;
-	texture = std::make_shared<GLTexture>(GLTexture("text",GL_TEXTURE_2D,glyph->bitmap.width,glyph->bitmap.rows,glyph->bitmap.buffer,GL_RED,GL_RED)); 
+	//texture = std::make_shared<GLTexture>(GLTexture("text",GL_TEXTURE_2D,glyph->bitmap.width,glyph->bitmap.rows,glyph->bitmap.buffer,GL_RED,GL_RED)); 
 
 	//AddQuad(Vec3(-1,1,0),Vec3(1,1,0),Vec3(-1,-1,0),Vec3(1,-1,0));
 	//AddMesh();
 	//return;
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	texture->Load();
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	//texture->Load();
+
+	//glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	
 	AddQuad(Vec3(-1,1,0),Vec3(1,1,0),Vec3(-1,-1,0),Vec3(1,-1,0));
 	AddMesh();
 
-	AddTexture(texture);
-	AssignTexture(0,0);
+	//AddTexture(texture);
+	//AssignTexture(0,0);
+
+	//glyphs['x'] = 0;
 
 	screenPos = glm::vec2(0,-1);
 	size = glm::vec2(.1,.1);
 	//GLUIElement(name,texture);
+	//	LoadChar('l');
+	//LoadChar('B');
+	//LoadChar('B');
 }
 
 GLText::~GLText() 
@@ -55,12 +61,49 @@ void GLText::LoadChar(char Character)
 	{
 		cout << "OUCH SOMETHING WENT WRONG HERE!!!" << endl;
 	}
+	if(glyphs.find(Character) == glyphs.end())
+	{
+
+
+
+		auto glyph = face->glyph;
+
+
+		vector<char> buffer;
+		for(int i = 0; i <glyph->bitmap.width * glyph->bitmap.rows ; i++ )
+		{
+			buffer.push_back(glyph->bitmap.buffer[i]);
+		}
+		buffers[Character] = make_shared<vector<char> > (buffer); 
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		
+		auto temptext = std::make_shared<GLTexture>(GLTexture("a",GL_TEXTURE_2D,glyph->bitmap.width,glyph->bitmap.rows,&((*buffers[Character])[0]),GL_RED,GL_RED));
+
+		temptext->Load();
+		AddTexture(temptext);
+
+		glyphs[Character] = textures->size()-1;  
+		
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
+	}
+	AssignTexture(0,glyphs[Character]);
+	
+
+}
+
+void GLText::SetChar(char Character)
+{
+	if(FT_Load_Char(face, Character, FT_LOAD_RENDER))
+	{
+		cout << "OUCH SOMETHING WENT WRONG HERE!!!" << endl;
+	}
+}
+
+glm::vec2 GLText::GetAdvance()
+{
 	auto glyph = face->glyph;
-	//cout << "WIDTH: " << glyph->bitmap.width << endl;
-	//cout << &glyph->bitmap.buffer << endl;
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	(*textures)[0].SetData(glyph->bitmap.width,glyph->bitmap.rows,glyph->bitmap.buffer);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	return glm::vec2(glyph->advance.x/64,glyph->advance.y/64);
 }
 
 void GLText::Update()
@@ -88,13 +131,14 @@ void GLText::Draw(GLenum ENUM)
 	glm::vec2 tempscale = size;
 	auto glyph = face->glyph;
 	size.x = size.x * (float)glyph->bitmap.width / (float)MaxFontSize;
-	size.y = size.y * (float)glyph->bitmap.width / (float)MaxFontSize;
+	size.y = size.y * (float)glyph->bitmap.rows / (float)MaxFontSize;
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	GLUIElement::Draw(ENUM);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	size = tempscale;
 	
 	//GLPrimitive::Draw(ENUM);
+
 }
 
 

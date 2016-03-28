@@ -68,7 +68,7 @@ void GLTexture::SetData(int width,int height, const unsigned char* Buffer)
     //glActiveTexture(GL_TEXTURE0);
     //cout << "BUFFER: " << &Buffer << endl;
     glBindTexture(this->type, this->id);
-    glTexImage2D(this->type, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexSubImage2D(this->type, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 }
 
 void GLTexture::Bind(GLenum index)

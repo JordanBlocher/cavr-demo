@@ -293,7 +293,7 @@ void GLScene::Render()
     Test2->SetScreenPos(glm::vec2(.2,.2));
     this->CustomHelper("textprogram",Test2,GL_TRIANGLES);
 
-    DrawString(glm::vec2(.5,.5), glm::vec2(.01,.01), "l L");
+    DrawString(glm::vec2(.5,.5), glm::vec2(.1,.1), "NO\nMORE!!!");
 
 }
 
@@ -493,21 +493,36 @@ void GLScene::DrawString(glm::vec2 ScreenPos, glm::vec2 Size, string text)
    TextTest->SetSize(Size);
    int colCounter = 0;
    int rowCounter = 0;
+   glm::vec2 offset;
+
    for(int i = 0; i < text.size(); i++)
    {
+
+    cout << i << " "<< text[i] << endl;
       if( text[i] != '\n')
       {
-         TextTest->SetScreenPos(ScreenPos + glm::vec2(Size.x * colCounter, Size.y * rowCounter));
-         colCounter++;
+        //TextTest->LoadChar(text[i]);
+         TextTest->SetChar(text[i]);
+
+         TextTest->SetScreenPos(ScreenPos + offset );
+         offset.x += TextTest->GetAdvance().x/500.0f; // replace 500 with the screen size -- a future note for myself
+         offset.y = Size.y * rowCounter;
+         cout << glm::to_string(TextTest->GetAdvance()/500.0f) << endl; 
+         
+         //TextTest->LoadChar(text[i]);
          
          this->CustomHelper("textprogram",TextTest,GL_TRIANGLES);
          TextTest->LoadChar(text[i]);
+         //this->CustomHelper("textprogram",TextTest,GL_TRIANGLES);
+         colCounter++;
          
       }
       else
       {
          colCounter = 0;
          rowCounter++;
+         offset.x = 0;
+         offset.y = Size.y * rowCounter;
       }
    }
 }
