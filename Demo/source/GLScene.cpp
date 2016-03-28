@@ -483,4 +483,25 @@ void GLScene::AddModel(const char* name, const char* path)
 }
 
 
+void GLScene::DrawString(glm::vec2 ScreenPos, glm::vec2 Size, string text)
+{
+   auto TextTest = this->Get<GLText>("text");
+   TextTest->SetScreenPos(ScreenPos);
+   TextTest->SetSize(Size);
+   int colCounter = 0;
+   int rowCounter = 0;
+   for(int i = 0; i < text.size(); i++)
+   {
+      if( text[i] != '\n')
+      {
+         TextTest->SetScreenPos(ScreenPos + glm::vec2(Size.x * rowCounter, Size.y * colCounter));
+         colCounter++;
+      }
+      else
+      {
+         rowCounter++;
+      }
+   }
+}
+
 

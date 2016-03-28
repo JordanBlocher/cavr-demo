@@ -25,6 +25,9 @@ class GLScene : public GLViewport
     void Render();
     void Create();
 
+    // Positions and size are [0,1] for both x and y dimensions...    
+    void DrawString(glm::vec2 ScreenPos, glm::vec2 Size, string text);
+
     template <typename T> 
         void Paint(shared_ptr<T>, GLenum);
 
