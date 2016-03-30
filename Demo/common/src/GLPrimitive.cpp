@@ -247,6 +247,16 @@ void GLPrimitive::LoadUBO(GLuint ubo, UBO rtype, Shader shader)
 
 }
 
+void GLPrimitive::ClearUBO()
+{
+    glBindBuffer(GL_UNIFORM_BUFFER, this->materialUBO);
+    Material tmp;
+    glBufferSubData(GL_UNIFORM_BUFFER, 
+        0,
+        sizeof(tmp),
+        &tmp);
+}
+
 void GLPrimitive::DrawElements(size_t i, GLint face_offset, GLint vertex_offset, GLenum MODE)
 {
     glDrawElementsBaseVertex(MODE, 
@@ -280,20 +290,30 @@ void GLPrimitive::Draw(GLenum MODE)
         //cout<<"Checking Shader "<<i<<": "<<textureIdx<<" " <<materialIdx<<endl;
 
         this->LoadUBO(this->controlUBO, UBO::CONTROL, this->shaders->at(i));
+
+        // I made some changes here so that I can do both colors and textures..
+        // Does this break anything?
+
         if (textureIdx != -1)
         {
             this->LoadUBO(this->textureUBO, UBO::TEXTURE, this->shaders->at(i));
-            DrawElements(i, face_offset, vertex_offset, MODE);
+            //DrawElements(i, face_offset, vertex_offset, MODE);
         }
-        else if (materialIdx != -1)
+        if (materialIdx != -1)
         {
+
             this->LoadUBO(this->materialUBO, UBO::COLOR, this->shaders->at(i));
-            DrawElements(i, face_offset, vertex_offset, MODE);
+            //DrawElements(i, face_offset, vertex_offset, MODE);
         }
-        else
+        DrawElements(i, face_offset, vertex_offset, MODE);
+        
+        // We need to clear the ubo of color
+        ClearUBO();
+
+        /*else
         {
             DrawElements(i, face_offset, vertex_offset, MODE);
-        }
+        }*/
 
         face_offset += this->_faces->at(i).size();
         vertex_offset += this->_positions->at(i).size();
@@ -302,6 +322,7 @@ void GLPrimitive::Draw(GLenum MODE)
     glBindVertexArray(0);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindBuffer(GL_TEXTURE_2D, 0);
+
 }
 
 

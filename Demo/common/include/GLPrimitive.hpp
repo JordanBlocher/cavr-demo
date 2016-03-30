@@ -53,6 +53,7 @@ class GLPrimitive : public GLMesh
 
     virtual void Allocate();
     virtual void LoadUBO(GLuint, UBO, Shader);
+    virtual void ClearUBO();
     virtual void DrawElements(size_t, GLint, GLint, GLenum);
 
     long maxPoints;

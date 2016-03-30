@@ -13,7 +13,7 @@
 struct Material
 {
     Vec4 ambient;
-    Vec4 diffuse;
+    Vec4 diffuse = glm::vec4(0,0,0,1);
     Vec4 specular;
     float shininess;
     float intensity;

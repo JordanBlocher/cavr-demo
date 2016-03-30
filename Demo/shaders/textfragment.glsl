@@ -72,9 +72,13 @@ out vec4 f_out;
 void main(void)
 {
 
-    vec4 tex = texture2D(diffuseTexture, f_uv.xy);
+    float tex = texture2D(diffuseTexture, f_uv.xy).r ;
 
-    f_out = tex;
+
+    vec4 Color = tex * colors.diffuse;
+    Color.a = 0;
+
+    f_out = Color;
 }
 
  

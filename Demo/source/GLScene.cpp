@@ -106,8 +106,9 @@ void GLScene::Create()
     Text->Create(GL_STATIC_DRAW); 
         this->AddToContext(Text);
     Material mat;
-    mat.diffuse = glm::vec4(1,1,1,1);
+    mat.diffuse = glm::vec4(0,1,0,1);
     Text->AddMaterial(mat);
+    Text->AssignMaterial(0,0);
 }
 
 void GLScene::InitShaders()
@@ -138,9 +139,13 @@ void GLScene::InitShaders()
     shared_ptr<GLShader> vertex2(new GLShader("textvertex.glsl", GL_VERTEX_SHADER, "vshader"));
     shared_ptr<GLShader> fragment2(new GLShader("textfragment.glsl", GL_FRAGMENT_SHADER, "fshader"));
 
+    shared_ptr<GLShader> texturefragment(new GLShader("texturefragment.glsl", GL_FRAGMENT_SHADER, "fshader"));
+
     //Programs
     shared_ptr<GLProgram> textprogram(new GLProgram("textprogram"));
     
+    shared_ptr<GLProgram> textureprogram(new GLProgram("textureprogram"));
+
     //Add Shaders
     textprogram->AddShader(vertex2); 
     textprogram->AddShader(fragment2); 
@@ -148,9 +153,18 @@ void GLScene::InitShaders()
     textprogram->SetAttributeIndex("v_normal", 1);
     textprogram->SetAttributeIndex("v_uv", 2);
 
+    textureprogram->AddShader(vertex2);
+    textureprogram->AddShader(texturefragment);
+    textureprogram->SetAttributeIndex("v_position", 0);
+    textureprogram->SetAttributeIndex("v_normal",1);
+    textureprogram->SetAttributeIndex("v_uv",2);
+
     //Add Program
     if( this->AddProgram(textprogram) )
         this->AddToContext( textprogram );
+
+    if( this->AddProgram(textureprogram))
+        this->AddToContext(textureprogram);
     ///////////////
 
     //Create UBOs 
@@ -291,7 +305,7 @@ void GLScene::Render()
     auto Test2 = this->Get<GLUIElement>("testtex");
     Test2->SetSize(glm::vec2(.1,.2));
     Test2->SetScreenPos(glm::vec2(.2,.2));
-    this->CustomHelper("textprogram",Test2,GL_TRIANGLES);
+    this->CustomHelper("textureprogram",Test2,GL_TRIANGLES);
 
     DrawString(glm::vec2(.5,.5), glm::vec2(.1,.1), "NO\nMORE!!!");
 
@@ -498,7 +512,6 @@ void GLScene::DrawString(glm::vec2 ScreenPos, glm::vec2 Size, string text)
    for(int i = 0; i < text.size(); i++)
    {
 
-    cout << i << " "<< text[i] << endl;
       if( text[i] != '\n')
       {
         //TextTest->LoadChar(text[i]);
@@ -507,7 +520,6 @@ void GLScene::DrawString(glm::vec2 ScreenPos, glm::vec2 Size, string text)
          TextTest->SetScreenPos(ScreenPos + offset );
          offset.x += TextTest->GetAdvance().x/500.0f; // replace 500 with the screen size -- a future note for myself
          offset.y = Size.y * rowCounter;
-         cout << glm::to_string(TextTest->GetAdvance()/500.0f) << endl; 
          
          //TextTest->LoadChar(text[i]);
          

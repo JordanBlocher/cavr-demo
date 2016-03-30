@@ -127,6 +127,8 @@ void GLText::LoadFont(string Str)
 
 void GLText::Draw(GLenum ENUM)
 {
+	//ClearUBO();
+
 	// Need for freetype
 	glm::vec2 tempscale = size;
 	auto glyph = face->glyph;
@@ -137,6 +139,8 @@ void GLText::Draw(GLenum ENUM)
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	size = tempscale;
 	
+
+
 	//GLPrimitive::Draw(ENUM);
 
 }
