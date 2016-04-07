@@ -39,11 +39,11 @@ namespace UnityStandardAssets.Effects
                 }
 
                 var col = m_CollisionEvents[i].collider;
-                var attachedRigidbody = col.GetComponent<Rigidbody>();
-                if (attachedRigidbody != null)
+
+                if (col.attachedRigidbody != null)
                 {
                     Vector3 vel = m_CollisionEvents[i].velocity;
-                    attachedRigidbody.AddForce(vel*force, ForceMode.Impulse);
+                    col.attachedRigidbody.AddForce(vel*force, ForceMode.Impulse);
                 }
 
                 other.BroadcastMessage("Extinguish", SendMessageOptions.DontRequireReceiver);
