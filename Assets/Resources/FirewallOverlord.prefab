@@ -83,8 +83,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 173316}
-  m_LocalRotation: {x: 0.012693514, y: 0.92707384, z: 0.03152077, w: -0.37333566}
-  m_LocalPosition: {x: -2.7721078, y: -0.06999993, z: 2.656353}
+  m_LocalRotation: {x: -0.018286971, y: -0.78338414, z: -0.023074739, w: 0.62084013}
+  m_LocalPosition: {x: -21.043446, y: 1.1525407, z: -12.274673}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 469614}
@@ -1491,9 +1491,9 @@ ParticleSystem:
       minMaxState: 1
     range: {x: 0, y: 1}
   CollisionModule:
-    enabled: 0
+    enabled: 1
     serializedVersion: 2
-    type: 0
+    type: 1
     collisionMode: 0
     plane0: {fileID: 0}
     plane1: {fileID: 0}
@@ -1632,7 +1632,7 @@ ParticleSystem:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 173316}
   serializedVersion: 2
-  lengthInSec: 3
+  lengthInSec: 5
   startDelay:
     scalar: 0
     maxCurve:
@@ -3004,7 +3004,7 @@ ParticleSystem:
     radiusScale: 1
     collidesWith:
       serializedVersion: 2
-      m_Bits: 4294967295
+      m_Bits: 256
     maxCollisionShapes: 256
     quality: 0
     voxelSize: 0.5
@@ -4489,7 +4489,7 @@ ParticleSystemRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
-  m_RenderMode: 0
+  m_RenderMode: 4
   m_SortMode: 1
   m_MinParticleSize: 0
   m_MaxParticleSize: 0.5
@@ -4500,7 +4500,7 @@ ParticleSystemRenderer:
   m_NormalDirection: 1
   m_RenderAlignment: 0
   m_Pivot: {x: 0, y: 0, z: 0}
-  m_Mesh: {fileID: 0}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}

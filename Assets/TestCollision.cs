@@ -17,7 +17,7 @@ public class TestCollision : MonoBehaviour {
         foreach (ContactPoint contact in collision.contacts) {
             Debug.DrawRay(contact.point, contact.normal, Color.white);
         }
-     	Debug.LogError("COLLISION HERE WITH" + collision.gameObject.name);
+     	//Debug.LogError("COLLISION HERE WITH" + collision.gameObject.name);
         
     }
 

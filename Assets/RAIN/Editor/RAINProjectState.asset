@@ -12,10 +12,6 @@ MonoBehaviour:
   m_Name: RAINProjectState
   m_EditorClassIdentifier: 
   _updateMetaformRequired: 0
-  _lastLoadSaveDirectory: C:/Users/jblocher/Documents/cavr-demo/Assets
+  _lastLoadSaveDirectory: 
   _lastUpdateCheck: 
-<<<<<<< HEAD
-  _lastMetricsUpdate: 04/07/2016 22:44:33
-=======
-  _lastMetricsUpdate: 4/7/2016 10:52:28 PM
->>>>>>> 5a7213286d8aa2f4a70f9327b8114f16bcc2c8fb
+  _lastMetricsUpdate: 04/07/2016 23:43:16

@@ -14,6 +14,6 @@ public class testparticlecollision : MonoBehaviour {
 	}
 	void OnParticleCollision(GameObject go)
 	{
-		Debug.LogError("PARTICLE COLLIDED");
+		//Debug.LogError("PARTICLE COLLIDED");
 	}
 }

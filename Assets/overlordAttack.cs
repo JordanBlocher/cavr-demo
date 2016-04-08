@@ -15,7 +15,6 @@ public class overlordAttack : MonoBehaviour {
 	{
 		if(anime.GetCurrentAnimatorStateInfo(0).IsName("attacks") && anime.GetCurrentAnimatorStateInfo(0).normalizedTime > .8 && !trigger)
 		{
-			Debug.LogError("HERE NOW YALL");
 			trigger = true;
 			GameObject wall = Resources.Load<GameObject>("FirewallOverlord");
 

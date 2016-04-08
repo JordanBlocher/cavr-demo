@@ -21,6 +21,9 @@ public class OverlordWall : MonoBehaviour {
 	void OnParticleCollision(GameObject go)
 	{
 		//Debug.Break();
-		Debug.LogError("HERE");
+		if(go.tag == "Player")
+		{
+			Debug.LogError("HERE" + gameObject.name);
+		}
 	}
 }

@@ -3,7 +3,8 @@ using System.Collections;
 
 public class FireballDamage : MonoBehaviour {
 	float time;
-	public AudioSource ac;
+	public ParticleSystem part;
+	ParticleCollisionEvent[] events = new ParticleCollisionEvent[16];
 	// Use this for initialization
 	void Start () {
 		
@@ -20,6 +21,17 @@ public class FireballDamage : MonoBehaviour {
 
 	void OnParticleCollision(GameObject go)
 	{
-		ac.Play();
+		if(go.tag == "Player")
+		{
+
+			Debug.LogError("Player");
+			//Debug.Break();
+		}
+
+		GameObject wall = Resources.Load<GameObject>("FirewallOverlord");
+
+		part.GetCollisionEvents(go,events);
+		wall.transform.position = events[0].intersection;
+		Instantiate(wall);
 	}
 }

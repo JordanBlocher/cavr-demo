@@ -18,7 +18,7 @@ public class FireLauncher : MonoBehaviour {
 			GameObject FireBall = Resources.Load<GameObject>("FireballDamage") ;
 
 
-			Debug.LogError(FireBall);
+			//Debug.LogError(FireBall);
 
 			FireBall.transform.position =  gameObject.transform.position;
 			FireBall.transform.LookAt(GameObject.FindWithTag("Player").transform.position);
