@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SpiderHealth : EnemyPlayer {
+public class OverlordWall : MonoBehaviour {
 
+	float time = 0;
 	// Use this for initialization
 	void Start () {
 	
@@ -10,9 +11,16 @@ public class SpiderHealth : EnemyPlayer {
 	
 	// Update is called once per frame
 	void Update () {
-		if(IsDead())
+		time += Time.deltaTime;
+		if(time > 3)
 		{
 			Destroy(gameObject);
 		}
+	}
+
+	void OnParticleCollision(GameObject go)
+	{
+		//Debug.Break();
+		Debug.LogError("HERE");
 	}
 }

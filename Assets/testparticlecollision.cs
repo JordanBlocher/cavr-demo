@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SpiderHealth : EnemyPlayer {
+public class testparticlecollision : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
@@ -10,9 +10,10 @@ public class SpiderHealth : EnemyPlayer {
 	
 	// Update is called once per frame
 	void Update () {
-		if(IsDead())
-		{
-			Destroy(gameObject);
-		}
+	
+	}
+	void OnParticleCollision(GameObject go)
+	{
+		Debug.LogError("PARTICLE COLLIDED");
 	}
 }
