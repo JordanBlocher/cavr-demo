@@ -36,13 +36,16 @@ public class VRPNInputManager
 
         //AnalogMap.Add("accelerator", "WiiMote0[69]");
 
-        AnalogMap.Add("movementX","WiiMote0[16]");
-        AnalogMap.Add("movementY","WiiMote0[17]");
+        AnalogMap.Add("movementX","WiiMote0[21]");
+        AnalogMap.Add("movementY","WiiMote0[22]");
         ButtonMap.Add("WeaponChangeUp","WiiMote0[10]");
 		ButtonMap.Add("WeaponChangeDown","WiiMote0[9]");
 		ButtonMap.Add("attack","WiiMote0[3]");
         ButtonMap.Add("jump","WiiMote0[4]");
-        ButtonMap.Add("lightning","WiiMote0[0]");
+        ButtonMap.Add("lightning", "WiiMote0[0]");
+        ButtonMap.Add("camera", "WiiMote0[16]");
+        ButtonMap.Add("level1", "WiiMote0[1]");
+        ButtonMap.Add("level2", "WiiMote0[2]");
         SixdofMap.Add("pointer","WiiMote0[0]");
         SixdofMap.Add("forward","ShortGlasses[0]");
 

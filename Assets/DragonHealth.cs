@@ -13,6 +13,9 @@ public class DragonHealth : EnemyPlayer {
 		if(IsDead())
 		{
 			Destroy(gameObject);
-		}
-	}
+            GameObject warrior = GameObject.Find("warrior");
+            GameObject cam = GameObject.Find("ThirdPersonCamera");
+
+        }
+    }
 }

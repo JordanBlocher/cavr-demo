@@ -31,7 +31,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		Vector3 m_CapsuleCenter;
 		CapsuleCollider m_Capsule;
 		bool m_Crouching;
-        public int WeaponState = 0;//unarmed, 1H, 2H, bow, dual, pistol, rifle, spear and ss(sword and shield)
+        public int WeaponIdx = 0;//unarmed, 1H, 2H, bow, dual, pistol, rifle, spear and ss(sword and shield)
         public bool wasAttacking;// we need this so we can take lock the direction we are facing during attacks, mecanim sometimes moves past the target which would flip the character around wildly
 
         float rotateSpeed = 20.0f; //used to smooth out turning
@@ -42,6 +42,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         public bool buttonDown = false;
         GameObject lightning;
         GameObject cavr;
+        int hold;
+        int[] WeaponStates = { 0, 1, 2, 3, 4, 7, 8 };
 
         void Start()
 		{
@@ -56,11 +58,12 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             movementTargetPosition = transform.position;//initializing our movement target as our current position
             m_runTime = 0;
             m_AnimSpeedMultiplier = 1.0f;
-            WeaponState = 0;
+            WeaponIdx = 4;
             lightning = GameObject.Find("Lightning Strike");
             cavr = GameObject.Find("CAVR");
             lightning.SetActive(false);
             m_hasLightning = false;
+            hold = 0;
         }
 
 
@@ -106,21 +109,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             if (!m_IsGrounded)
             {
                 m_Animator.SetFloat("Jump", m_Rigidbody.velocity.y);
-            }
-
-            if (Input.GetMouseButton(1))
-            {
-                m_Animator.SetTrigger("Use");
-            }
-            if (Input.GetMouseButton(0) && m_hasLightning)
-            {
-                Vector3 enemyPos = raycastHit(Input.mousePosition);
-                Debug.Log(Input.mousePosition);
-                if (enemyPos != Vector3.zero)
-                {
-                    lightning.transform.position = enemyPos;
-                    lightning.SetActive(true);
-                }
             }
             
             // the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
@@ -214,10 +202,51 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             }
         }
 
-        public void UpdateWeaponState()
+        public void UpdateState()
         {
-            Vector3 camPos = Camera.main.transform.position;
-            Vector3 camLook = Camera.main.transform.forward;
+            hold++; 
+            //if (Input.GetMouseButton(1))
+            if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("attack"))
+            {
+                m_Animator.SetTrigger("Use");
+            }
+            //if (Input.GetMouseButton(0) && m_hasLightning)
+            if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("lightning") && m_hasLightning)
+            {
+                Vector3 enemyPos = raycastHit(Input.mousePosition);
+                Debug.Log(Input.mousePosition);
+                if (enemyPos != Vector3.zero)
+                {
+                    lightning.transform.position = enemyPos;
+                    lightning.SetActive(true);
+                }
+            }
+            if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("level1"))
+            {
+                GameObject level1 = GameObject.Find("cavePortal");
+                transform.position = level1.transform.position;
+            }
+            if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("level2"))
+            {
+                GameObject level2 = GameObject.Find("castlePortal");
+                transform.position = level2.transform.position;
+            }
+            if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("WeaponChangeUp") && hold > 50)
+            {
+                hold = 0;
+                if (WeaponIdx < 6)
+                    WeaponIdx++;
+            }
+            else if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("WeaponChangeDown") && hold > 50)
+            {
+                hold = 0;
+                if (WeaponIdx > 0)
+                    WeaponIdx--;
+            }
+            Debug.Log(WeaponStates[WeaponIdx]);
+            m_Animator.SetInteger("WeaponState", WeaponStates[WeaponIdx]);// probably would be better to check for change rather than bashing the value in like this
+
+            /*
             switch (Input.inputString)//get keyboard input, probably not a good idea to use strings here...Garbage collection problems with regards to local string usage are known to happen
             {                        //the garbage collection memory problem arises from local alloction of memory, and not freeing it up efficiently
                 case "0":
@@ -248,6 +277,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                     break;
             }
             m_Animator.SetInteger("WeaponState", WeaponState);// probably would be better to check for change rather than bashing the value in like this
+
+            */
         }
 
         void HandleAirborneMovement()

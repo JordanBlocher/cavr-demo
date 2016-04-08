@@ -25,27 +25,27 @@ public class Outfitter : MonoBehaviour
 				weapons[i].models[model].enabled = false;
 			}
 		}
-		for(int model=0;model<weapons[ac.WeaponState].models.Count;model++)
+		for(int model=0;model<weapons[ac.WeaponIdx].models.Count;model++)
 		{
-			weapons[ac.WeaponState].models[model].enabled = true;
+			weapons[ac.WeaponIdx].models[model].enabled = true;
 		}
-		oldWeaponIndex=ac.WeaponState;
+		oldWeaponIndex=ac.WeaponIdx;
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		if(ac.WeaponState!=oldWeaponIndex)
+		if(ac.WeaponIdx!=oldWeaponIndex)
 		{
 			for(int model=0;model<weapons[oldWeaponIndex].models.Count;model++)
 			{
 				weapons[oldWeaponIndex].models[model].enabled = false;
 			}
-			for(int model=0;model<weapons[ac.WeaponState].models.Count;model++)
+			for(int model=0;model<weapons[ac.WeaponIdx].models.Count;model++)
 			{
-				weapons[ac.WeaponState].models[model].enabled = true;
+				weapons[ac.WeaponIdx].models[model].enabled = true;
 			}
-			oldWeaponIndex=ac.WeaponState;
+			oldWeaponIndex=ac.WeaponIdx;
 		}
 	}
 }

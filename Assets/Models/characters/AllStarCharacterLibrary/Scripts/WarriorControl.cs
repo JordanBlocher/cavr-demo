@@ -52,9 +52,9 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             {
                 if (!m_Jump)
                 {
-#ifdef DEBUG
-                    m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
-#endif
+//#ifdef DEBUG
+//                    m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
+//#endif
                     m_Jump = cavr.GetComponent<CaVR>().InputManger.GetButtonValue("jump");
                 }
                 if (m_Character.GetComponent<EnemyPlayer>().IsDead())
@@ -78,8 +78,20 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             if (!m_Dead)
             {
                 // read inputs
-                float h = CrossPlatformInputManager.GetAxis("Horizontal");
-                float v = CrossPlatformInputManager.GetAxis("Vertical");
+                //float h1 = CrossPlatformInputManager.GetAxis("Horizontal");
+                //float v1 = CrossPlatformInputManager.GetAxis("Vertical");
+                float h = cavr.GetComponent<CaVR>().InputManger.GetAnalogValue("movementX");
+                float v = cavr.GetComponent<CaVR>().InputManger.GetAnalogValue("movementY");
+                
+                if (Mathf.Abs(h) < 0.1)
+                {
+                    h = 0;
+                }
+                if(Mathf.Abs(v) < 0.1)
+                {
+                    v = 0;
+                }
+
 
                 // calculate move direction to pass to character
                 if (m_Cam != null)
@@ -100,7 +112,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
                 // pass all parameters to the character control script
                 m_Character.Move(m_Move, m_Jump);
-                m_Character.UpdateWeaponState();
+                m_Character.UpdateState();
                 m_Jump = false;
             }
         }
