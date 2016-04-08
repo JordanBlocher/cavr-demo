@@ -3,6 +3,9 @@ using System.Collections;
 
 public class TestCollision : MonoBehaviour {
 
+	public GameObject spider;
+	public GameObject overlord;
+	public GameObject dragon;
 	// Use this for initialization
 	void Start () {
 	
@@ -10,7 +13,18 @@ public class TestCollision : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+		if(Input.GetKeyDown(KeyCode.I))
+		{
+		spider.GetComponent<EnemyPlayer>().DamageEntity(10000);
+		}
+		if(Input.GetKeyDown(KeyCode.J))
+		{
+		overlord.GetComponent<EnemyPlayer>().DamageEntity(10000);
+		}
+		if(Input.GetKeyDown(KeyCode.K))
+		{
+		dragon.GetComponent<EnemyPlayer>().DamageEntity(10000);
+		}
 	}
 
 	void OnCollisionEnter(Collision collision) {
