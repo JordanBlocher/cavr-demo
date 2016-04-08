@@ -82,7 +82,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 //float v1 = CrossPlatformInputManager.GetAxis("Vertical");
                 float h = cavr.GetComponent<CaVR>().InputManger.GetAnalogValue("movementX");
                 float v = cavr.GetComponent<CaVR>().InputManger.GetAnalogValue("movementY");
-                
+                //Debug.Log("Moving"); Debug.Log(v); Debug.Log(h);
                 if (Mathf.Abs(h) < 0.1)
                 {
                     h = 0;

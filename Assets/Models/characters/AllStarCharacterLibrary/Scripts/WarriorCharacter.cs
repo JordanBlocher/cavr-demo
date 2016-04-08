@@ -42,6 +42,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         public bool buttonDown = false;
         GameObject lightning;
         GameObject cavr;
+        //GameObject cam1, cam2;
+
         int hold;
         int[] WeaponStates = { 0, 1, 2, 3, 4, 7, 8 };
 
@@ -64,6 +66,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             lightning.SetActive(false);
             m_hasLightning = false;
             hold = 0;
+           // cam1 = GameObject.Find("ThirdPersonCamera");
+          //  cam2 = GameObject.Find("FirstPersonCamera");
         }
 
 
@@ -231,6 +235,17 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 GameObject level2 = GameObject.Find("castlePortal");
                 transform.position = level2.transform.position;
             }
+            if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("camera"))
+            {
+                Debug.Log("CAMERA");
+                /*
+
+                cam1.SetActive(true);
+                cam2.SetActive(false);
+                cam1.transform.RotateAround(transform.position, Vector3.forward * 2.0f, 360.0f);
+                cam1.transform.RotateAround(transform.position, Vector3.forward * 1.0f, 360.0f);
+                */
+            }
             if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("WeaponChangeUp") && hold > 50)
             {
                 hold = 0;
@@ -243,6 +258,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 if (WeaponIdx > 0)
                     WeaponIdx--;
             }
+
             Debug.Log(WeaponStates[WeaponIdx]);
             m_Animator.SetInteger("WeaponState", WeaponStates[WeaponIdx]);// probably would be better to check for change rather than bashing the value in like this
 
