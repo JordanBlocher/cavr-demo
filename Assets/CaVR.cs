@@ -23,7 +23,7 @@ public class CaVR : MonoBehaviour {
 
 		UnityEngine.Debug.Log(Environment.GetCommandLineArgs()[0]);
 		if(config.IsMaster) {
-			if(!Application.isEditor && (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)) { 
+			//if(Application.isEditor && (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)) { 
 			    var machines = config.GetLuaStateValue("machines") as LuaTable;
                 foreach(var machineKey in machines.Keys) {
                     var machine = machineKey.ToString();
@@ -62,10 +62,10 @@ public class CaVR : MonoBehaviour {
 
                     Thread.Sleep(1000 * 2);
                 }
-			}
+			/*}
             else {
                 UnityEngine.Debug.LogWarning("Windows currently not supported for cross network CaVR");
-            }
+            }*/
 		}
 
 		networkThread = new Thread(() => {

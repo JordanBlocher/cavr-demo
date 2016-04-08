@@ -67,4 +67,10 @@ public class MainMenu : MonoBehaviour {
     void Update () {
 	
 	}
+
+	public void LoadMainScene()
+	{
+		Application.LoadLevel(1);
+	}
+
 }

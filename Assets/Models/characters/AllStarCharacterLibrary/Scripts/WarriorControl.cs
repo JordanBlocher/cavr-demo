@@ -61,6 +61,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 {
                     m_Character.GetComponent<Animator>().SetInteger("Death", 1);
                     m_Dead = true;
+                    Application.LoadLevel(0);
                 }
                 if (gameObject.GetComponent<PlayerHealth>().PHealth < 100.0f)
                 {
