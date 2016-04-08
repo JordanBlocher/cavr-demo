@@ -57,6 +57,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                     Debug.Log("DYING");
                     m_Character.GetComponent<Animator>().SetInteger("Death", 1);
                     m_Dead = true;
+                    Application.LoadLevel(0);
                 }
                 gameObject.GetComponent<PlayerHealth>().PHealth += 0.05f;
             }
