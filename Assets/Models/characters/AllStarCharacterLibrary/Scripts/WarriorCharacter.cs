@@ -16,7 +16,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		[SerializeField] float m_AnimSpeedMultiplier = 1f;
 		[SerializeField] float m_GroundCheckDistance = 1.5f;
         [SerializeField]
-        bool m_hasLightning = false;
+        bool m_hasLightning = true;
 
         Rigidbody m_Rigidbody;
 		Animator m_Animator;
@@ -63,8 +63,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             WeaponIdx = 4;
             lightning = GameObject.Find("Lightning Strike");
             cavr = GameObject.Find("CAVR");
-            lightning.SetActive(false);
-            m_hasLightning = false;
+            m_hasLightning = true;
             hold = 0;
            // cam1 = GameObject.Find("ThirdPersonCamera");
           //  cam2 = GameObject.Find("FirstPersonCamera");
@@ -73,7 +72,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
         public void Move(Vector3 move, bool jump)
 		{
-            lightning.SetActive(false);
+            //lightning.SetActive(false);
             // convert the world relative moveInput vector into a local-relative
             // turn amount and forward amount required to head in the desired
             // direction.
@@ -218,18 +217,16 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             //if (Input.GetMouseButton(0) && m_hasLightning)
             if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("lightning") && m_hasLightning)
             {
+                Debug.Log("LIGHTNING");
                 Vector3 enemyPos = raycastHit(cavr.GetComponent<CaVR>().InputManger.GetSixdofValue("pointer").Forward);
                 if (enemyPos != Vector3.zero)
                 {
                     lightning.transform.position = enemyPos;
                     lightning.SetActive(true);
                 }
-                else
-                {
-                    GameObject dragon = GameObject.Find("DragonBoss");
-                    lightning.transform.position = dragon.transform.position;
-                    lightning.SetActive(true);
-                }
+
+                GameObject dragon = GameObject.Find("DragonBoss");
+                lightning.transform.position = dragon.transform.position - new Vector3(0,-5,0);
             }
             if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("level1"))
             {
