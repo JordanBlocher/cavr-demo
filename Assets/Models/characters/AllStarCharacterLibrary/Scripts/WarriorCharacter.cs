@@ -58,6 +58,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             WeaponState = 0;
             lightning = GameObject.Find("Lightning Strike");
             lightning.SetActive(false);
+            m_hasLightning = false;
         }
 
 
@@ -119,7 +120,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                     lightning.SetActive(true);
                 }
             }
-
+            
             // the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
             // which affects the movement speed because of the root motion.
             if (m_IsGrounded && move.magnitude > 0)
@@ -298,7 +299,6 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 			// it is also good to note that the transform position in the sample assets is at the base of the character
 			if (Physics.Raycast(transform.position + (Vector3.up * 0.5f), Vector3.down, out hitInfo, 5.5f))
 			{
-
 				m_GroundNormal = hitInfo.normal;
 				m_IsGrounded = true;
 				m_Animator.applyRootMotion = true;
