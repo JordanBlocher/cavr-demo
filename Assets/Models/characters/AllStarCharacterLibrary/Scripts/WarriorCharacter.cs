@@ -217,8 +217,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             //if (Input.GetMouseButton(0) && m_hasLightning)
             if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("lightning") && m_hasLightning)
             {
-                Vector3 enemyPos = raycastHit(Input.mousePosition);
-                Debug.Log(Input.mousePosition);
+                Vector3 enemyPos = raycastHit(cavr.GetComponent<CaVR>().InputManger.GetSixdofValue("pointer").Forward);
                 if (enemyPos != Vector3.zero)
                 {
                     lightning.transform.position = enemyPos;
@@ -237,14 +236,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             }
             if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("camera"))
             {
-                Debug.Log("CAMERA");
-                /*
-
-                cam1.SetActive(true);
-                cam2.SetActive(false);
-                cam1.transform.RotateAround(transform.position, Vector3.forward * 2.0f, 360.0f);
-                cam1.transform.RotateAround(transform.position, Vector3.forward * 1.0f, 360.0f);
-                */
+                Debug.Log("CAMERA");           
+                
             }
             if (cavr.GetComponent<CaVR>().InputManger.GetButtonValue("WeaponChangeUp") && hold > 50)
             {

@@ -16,11 +16,7 @@ MonoBehaviour:
       value="&lt;behaviortree version=&quot;1.1&quot; repeatuntil=&quot;&quot; name=&quot;Overworld&quot;
       debugbreak=&quot;False&quot;&gt;&lt;parallel tiebreaker=&quot;fail&quot; succeed=&quot;all&quot;
       repeatuntil=&quot;&quot; name=&quot;parallel&quot; fail=&quot;any&quot; debugbreak=&quot;False&quot;&gt;&lt;detect
-      sensor=&quot;&amp;quot;OverlordVisual&amp;quot;&quot; repeatuntil=&quot;running&quot;
-      name=&quot;detect the player&quot; matchtype=&quot;best&quot; entityobjectvariable=&quot;player&quot;
-      debugbreak=&quot;False&quot; consistent=&quot;True&quot; aspectvariable=&quot;&quot;
-      aspectobjectvariable=&quot;&quot; aspect=&quot;&amp;quot;Player&amp;quot;&quot;
-      /&gt;&lt;detect sensor=&quot;&amp;quot;Strike Sensor&amp;quot;&quot; repeatuntil=&quot;running&quot;
+      sensor=&quot;&amp;quot;Strike Sensor&amp;quot;&quot; repeatuntil=&quot;running&quot;
       name=&quot;detect&quot; matchtype=&quot;best&quot; entityobjectvariable=&quot;strike&quot;
       debugbreak=&quot;False&quot; consistent=&quot;True&quot; aspectvariable=&quot;&quot;
       aspectobjectvariable=&quot;&quot; aspect=&quot;&amp;quot;Player&amp;quot;&quot;
