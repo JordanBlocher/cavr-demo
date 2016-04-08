@@ -4,7 +4,7 @@ using System.Collections;
 public class OverlordWall : MonoBehaviour {
 
 	float time = 0;
-	float damage = 1;
+	float damage = 8;
 	// Use this for initialization
 	void Start () {
 	
