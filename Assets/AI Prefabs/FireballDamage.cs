@@ -3,6 +3,7 @@ using System.Collections;
 
 public class FireballDamage : MonoBehaviour {
 	float time;
+	float damage = 50;
 	public ParticleSystem part;
 	ParticleCollisionEvent[] events = new ParticleCollisionEvent[16];
 	// Use this for initialization
@@ -23,8 +24,8 @@ public class FireballDamage : MonoBehaviour {
 	{
 		if(go.tag == "Player")
 		{
-
-			Debug.LogError("Player");
+			go.GetComponent<EnemyPlayer>().DamageEntity(damage);
+			//Debug.LogError("Player");
 			//Debug.Break();
 		}
 

@@ -4,6 +4,7 @@ using System.Collections;
 public class OverlordWall : MonoBehaviour {
 
 	float time = 0;
+	float damage = 1;
 	// Use this for initialization
 	void Start () {
 	
@@ -23,6 +24,7 @@ public class OverlordWall : MonoBehaviour {
 		//Debug.Break();
 		if(go.tag == "Player")
 		{
+			go.GetComponent<EnemyPlayer>().DamageEntity(damage);
 			Debug.LogError("HERE" + gameObject.name);
 		}
 	}
