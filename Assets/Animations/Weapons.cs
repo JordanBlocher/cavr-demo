@@ -14,8 +14,12 @@ public class Weapons : MonoBehaviour {
 
     void OnTriggerEnter(Collider col)
     {
-        if (GetComponent<MeshRenderer>().enabled)
+        Debug.Log(GetComponent<MeshRenderer>());
+        Debug.Log(GetComponent<MeshRenderer>().isVisible);
+
+        if (GetComponent<MeshRenderer>().isVisible)
         {
+            Debug.Log("ATTACK");
             if (col.gameObject.CompareTag("Enemy"))
             {
                 if (!col.gameObject.GetComponent<EnemyPlayer>().IsDead())
