@@ -48,7 +48,7 @@ vrpn = {
   };
   sixdofs = {
     "WiiMote0@tracker.rd.unr.edu";
-    --"ShortGlasses@tracker.rd.unr.edu";
+    "ShortGlasses@tracker.rd.unr.edu";
   };
 };
 
