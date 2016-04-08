@@ -15,8 +15,10 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		[SerializeField] float m_MoveSpeedMultiplier = 1f;
 		[SerializeField] float m_AnimSpeedMultiplier = 1f;
 		[SerializeField] float m_GroundCheckDistance = 1.5f;
+        [SerializeField]
+        bool m_hasLightning = false;
 
-		Rigidbody m_Rigidbody;
+        Rigidbody m_Rigidbody;
 		Animator m_Animator;
         long m_runTime;
 		bool m_IsGrounded;
@@ -38,6 +40,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         public Vector3 attackPos;
         public Vector3 lookAtPos;
         public bool buttonDown = false;
+        GameObject lightning;
 
         void Start()
 		{
@@ -53,17 +56,14 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             m_runTime = 0;
             m_AnimSpeedMultiplier = 1.0f;
             WeaponState = 0;
+            lightning = GameObject.Find("Lightning Strike");
+            lightning.SetActive(false);
         }
 
 
         public void Move(Vector3 move, bool jump)
 		{
-            GameObject enchant = GameObject.Find("EnchantHero");
-            if(enchant)
-            {
-                enchant.SetActive(false);
-            }
-
+            lightning.SetActive(false);
             // convert the world relative moveInput vector into a local-relative
             // turn amount and forward amount required to head in the desired
             // direction.
@@ -105,8 +105,20 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 m_Animator.SetFloat("Jump", m_Rigidbody.velocity.y);
             }
 
-            if (Input.GetMouseButton(1))          
+            if (Input.GetMouseButton(1))
+            {
                 m_Animator.SetTrigger("Use");
+            }
+            if (Input.GetMouseButton(0) && m_hasLightning)
+            {
+                Vector3 enemyPos = raycastHit(Input.mousePosition);
+                Debug.Log(Input.mousePosition);
+                if (enemyPos != Vector3.zero)
+                {
+                    lightning.transform.position = enemyPos;
+                    lightning.SetActive(true);
+                }
+            }
 
             // the anim speed multiplier allows the overall speed of walking/running to be tweaked in the inspector,
             // which affects the movement speed because of the root motion.
@@ -121,32 +133,50 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             }   
         }
 
+        public static Vector3 raycastHit(Vector3 position)
+        {
+            Camera camera = Camera.main;
+            float range = float.MaxValue;
+            bool found = false;
+            RaycastHit closestObject = new RaycastHit();
+            /// Cast a ray into the screen at the specified position
+            Ray ray = camera.ScreenPointToRay(position);
 
-        GameObject GetClickedGameObject()
-        {
-            int layerMask = 0;
-            // Builds a ray from camera point of view to the mouse position
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            // Casts the ray and get the first game object hit
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask))
-                return hit.transform.gameObject;
-            else
-                return null;
-        }     
-    
-        void OnTriggerEnter(Collision col)
-        {
-           // if (col.gameObject.CompareTag("Enemy"))
+            // Get all the intersections
+            RaycastHit[] raycasts = Physics.RaycastAll(ray);
+
+            // Search the intersections
+            foreach (RaycastHit i in raycasts)
             {
-                //m_Animator.SetInteger("Death", 2);
+
+                bool ignore = false;
+                // Check if distance is greater than current range 
+                if (i.distance < range && !ignore)
+                {
+                    range = i.distance;
+                    closestObject = i;
+                    found = true;
+                }
             }
+            //case: no object intersection found
+            if (!found)
+            {
+                //return the passed in position
+                return position;
+            }
+            //return the position of the raycast intersection
+            return closestObject.point;
+        }
+
+        void OnTriggerEnter(Collider col)
+        {
             if (col.gameObject.CompareTag("Enchant"))
             {
                 GameObject enchant = GameObject.Find("EnchantHero");
                 if (enchant)
                 {
                     enchant.SetActive(true);
+                    m_hasLightning = true;
                 }
             }
             if (col.gameObject.CompareTag("Cave"))
