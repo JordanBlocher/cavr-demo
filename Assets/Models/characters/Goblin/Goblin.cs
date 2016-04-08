@@ -17,6 +17,20 @@ public class Goblin : MonoBehaviour {
     bool inRange;
     Vector3 move;   
     Vector3 m_Forward;
+    Vector3 m_Up;
+    int counter;
+
+    public bool Roaming
+    {
+        get { return m_Roaming; }
+        set { m_Roaming = value; }
+    }
+
+    public bool InRange
+    {
+        get { return inRange; }
+        set { inRange = value; }
+    }
 
     // Use this for initialization
     void Start () {
@@ -24,7 +38,9 @@ public class Goblin : MonoBehaviour {
         pursuing = false;
         inRange = false;
         m_Forward = Vector3.zero;
-        MoveRandom(); 
+        m_Up = Vector3.zero;
+        MoveRandom();
+        counter = 0;
     }
 
     // Update is called once per frame
@@ -32,6 +48,8 @@ public class Goblin : MonoBehaviour {
     {
         if (!m_Dead)
         {
+            RaycastHit hitInfo;
+
             if (gameObject.GetComponent<EnemyPlayer>().IsDead())
             {
                 Die();
@@ -42,7 +60,11 @@ public class Goblin : MonoBehaviour {
                 transform.LookAt(warrior.transform.position);
                 if (pursuing)
                 {
-                    Move();
+                    if (Physics.Raycast(transform.position + move + (Vector3.up * 0.5f), Vector3.down, out hitInfo, 5.5f))
+                    {
+                        m_Up.y = hitInfo.point.y;
+                        Move();
+                    }
                     if (Vector3.Distance(warrior.transform.position, transform.position) < 1.5f)
                     {
                         pursuing = false;
@@ -60,22 +82,25 @@ public class Goblin : MonoBehaviour {
             }
             else if (m_Roaming)
             {
-                RaycastHit hitInfo;
-
+                counter++;
                 if (Physics.Raycast(transform.position + move + (Vector3.up * 0.5f), Vector3.down, out hitInfo, 5.5f))
                 {
+                    m_Up.y = hitInfo.point.y;
                     if (m_Lead)
                     {
-                        transform.LookAt(transform.position + move);
+                        transform.LookAt(transform.position + move + (Vector3.up * 0.5f));
                         Move();
                     }
                     else
                     {
-                        m_Animation.Play("run");
+                        GameObject ogg = GameObject.Find("LeadGoblin");
+                        transform.LookAt(transform.position + ogg.GetComponent<Goblin>().move);
+                        Move();
                     }
                 }
-                else
+                if (counter >= 50)
                 {
+                    counter = 0;
                     MoveRandom();
                 }
             }
@@ -85,7 +110,7 @@ public class Goblin : MonoBehaviour {
     public void Move()
     {
         m_Forward.z = m_Speed;
-        transform.Translate(m_Forward);
+        transform.Translate(m_Forward + m_Up);
         m_Animation.Play("run");
     }
 
@@ -94,7 +119,7 @@ public class Goblin : MonoBehaviour {
         Vector2 temp = Random.insideUnitCircle;
         float tempDistance = Random.Range(0, 10.0f);
         temp = temp * tempDistance;
-        move = new Vector3(temp.x, 0, temp.y);
+        move = new Vector3(temp.x, m_Up.y, temp.y);
     }
 
     void Attack(GameObject warrior)
@@ -113,19 +138,18 @@ public class Goblin : MonoBehaviour {
         }
     }
 
+    void OnCollisionEnter(Collision col)
+    {
+        if (!inRange)
+        {
+            MoveRandom();
+        }
+    }
+
     public void Die()
     {
         m_Animation.Play("death");
         m_Dead = true;
     }
 
-    public bool InRange()
-    {
-        return inRange;
-    }
-
-    public void SetRoaming()
-    {
-        m_Roaming = true;
-    }
 }

@@ -21,7 +21,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         private Vector3 m_CamForward;             // The current forward direction of the camera
         private Vector3 m_Move;
         private bool m_Jump;                      // the world-relative desired move direction, calculated from the camForward and user input.
-
+        private GameObject heartsBar;
 
         private void Start()
         {
@@ -39,7 +39,8 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 
             // get the third person character ( this should never be null due to require component )
             m_Character = GetComponent<WarriorCharacter>();
-            m_Dead = false; 
+            m_Dead = false;
+            heartsBar = GameObject.Find("HeartsBar");
         }
 
 
@@ -53,10 +54,13 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 }
                 if (m_Character.GetComponent<EnemyPlayer>().IsDead())
                 {
+                    Debug.Log("DYING");
                     m_Character.GetComponent<Animator>().SetInteger("Death", 1);
                     m_Dead = true;
                 }
+                gameObject.GetComponent<PlayerHealth>().PHealth += 0.05f;
             }
+            heartsBar.GetComponent<GUIBarScript>().Value = gameObject.GetComponent<PlayerHealth>().Normalizedhealth();
         }
 
 
