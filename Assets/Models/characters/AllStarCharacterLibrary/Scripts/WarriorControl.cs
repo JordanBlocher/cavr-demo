@@ -22,6 +22,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         private Vector3 m_Move;
         private bool m_Jump;                      // the world-relative desired move direction, calculated from the camForward and user input.
         private GameObject heartsBar;
+        GameObject cavr;
 
         private void Start()
         {
@@ -41,6 +42,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             m_Character = GetComponent<WarriorCharacter>();
             m_Dead = false;
             heartsBar = GameObject.Find("HeartsBar");
+            cavr = GameObject.Find("CAVR");
         }
 
 
@@ -50,11 +52,13 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             {
                 if (!m_Jump)
                 {
+#ifdef DEBUG
                     m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
+#endif
+                    m_Jump = cavr.GetComponent<CaVR>().InputManger.GetButtonValue("jump");
                 }
                 if (m_Character.GetComponent<EnemyPlayer>().IsDead())
                 {
-                    Debug.Log("DYING");
                     m_Character.GetComponent<Animator>().SetInteger("Death", 1);
                     m_Dead = true;
                 }

@@ -41,6 +41,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         public Vector3 lookAtPos;
         public bool buttonDown = false;
         GameObject lightning;
+        GameObject cavr;
 
         void Start()
 		{
@@ -57,6 +58,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             m_AnimSpeedMultiplier = 1.0f;
             WeaponState = 0;
             lightning = GameObject.Find("Lightning Strike");
+            cavr = GameObject.Find("CAVR");
             lightning.SetActive(false);
             m_hasLightning = false;
         }
