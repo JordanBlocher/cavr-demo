@@ -9,6 +9,13 @@ namespace UnityStandardAssets.Characters.ThirdPerson
     {
         [SerializeField]
         bool m_Dead = false;
+
+        public bool Dead
+        {
+            get { return m_Dead; }
+            set { m_Dead = value; }
+        }
+
         private WarriorCharacter m_Character; // A reference to the ThirdPersonCharacter on the object
         private Transform m_Cam;                  // A reference to the main camera in the scenes transform
         private Vector3 m_CamForward;             // The current forward direction of the camera

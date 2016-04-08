@@ -17,6 +17,7 @@ public class EnemyPlayer : MonoBehaviour {
 
 	public bool DamageEntity(float damage)
 	{
+        Debug.LogError("FLOAT DAMAGE: " + damage);
 		Health -= damage;
 		return IsDead();
 	}
