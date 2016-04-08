@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class SpiderHealth : EnemyPlayer {
+public class DragonHealth : EnemyPlayer {
 
 	// Use this for initialization
 	void Start () {

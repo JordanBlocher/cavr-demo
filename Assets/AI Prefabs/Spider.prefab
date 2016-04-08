@@ -70,13 +70,14 @@ GameObject:
   - 4: {fileID: 487596}
   - 95: {fileID: 9525698}
   - 64: {fileID: 6448630}
+  - 114: {fileID: 11448844}
   m_Layer: 0
   m_Name: Spider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &109990
 GameObject:
   m_ObjectHideFlags: 1
@@ -1772,7 +1773,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62c41022c438a4f5495e437aa8ffba7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  anime: {fileID: 9525698}
+--- !u!114 &11448844
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 109668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe70ec1f9684785469a3fefa83f6560c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &11467414
 MonoBehaviour:
   m_ObjectHideFlags: 1

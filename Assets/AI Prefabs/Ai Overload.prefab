@@ -105,9 +105,11 @@ GameObject:
   - 82: {fileID: 8240642}
   - 114: {fileID: 11422912}
   - 64: {fileID: 6492066}
+  - 114: {fileID: 11451164}
+  - 114: {fileID: 11448658}
   m_Layer: 9
   m_Name: Ai Overload
-  m_TagString: Player
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2058,7 +2060,7 @@ Transform:
   m_GameObject: {fileID: 107096}
   m_LocalRotation: {x: 0, y: -0.9787389, z: 0, w: 0.20511022}
   m_LocalPosition: {x: 0, y: 0, z: 5.54}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 3}
   m_Children:
   - {fileID: 404970}
   - {fileID: 421022}
@@ -2633,6 +2635,29 @@ MonoBehaviour:
     m_Bits: 1
   damage: 25
   canattack: 0
+--- !u!114 &11448658
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 107096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09cfa40db91234aee940210ee2edb5ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11451164
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 107096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 394b90262299645a7a818972c03e6a22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anime: {fileID: 9549116}
 --- !u!114 &11452852
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2655,9 +2680,9 @@ MonoBehaviour:
       id="_workingMemory" childrenvisible="False" /><field type="RAIN.Minds.BasicMind"
       reference="2" id="_mind" childrenvisible="False" /><field type="RAIN.Motion.CharacterControllerMotor"
       reference="3" id="_motor" childrenvisible="False" /><field type="RAIN.Animation.MecanimAnimator"
-      reference="4" id="_animator" childrenvisible="True" /><field type="RAIN.Navigation.BasicNavigator"
+      reference="4" id="_animator" childrenvisible="False" /><field type="RAIN.Navigation.BasicNavigator"
       reference="5" id="_navigator" childrenvisible="False" /><field type="RAIN.Perception.BasicSenses"
-      reference="6" id="_senses" childrenvisible="False" /><field type="System.Collections.Generic.List"
+      reference="6" id="_senses" childrenvisible="True" /><field type="System.Collections.Generic.List"
       id="_customElements" elementtype="RAIN.Core.CustomAIElement" /></reference><reference
       type="RAIN.Memory.BasicMemory" refcount="1" id="1"><field type="System.Collections.Generic.List"
       id="_memoryItems" elementtype="RAIN.Memory.BasicMemory+MemoryItem" /></reference><reference
@@ -2691,30 +2716,18 @@ MonoBehaviour:
       /><field type="System.Collections.Generic.List" id="_graphTags" elementtype="System.String"
       /></reference><reference type="RAIN.Perception.BasicSenses" refcount="1" id="6"><field
       type="System.Collections.Generic.List" id="_sensors" elementtype="RAIN.Perception.Sensors.RAINSensor"><field
-      type="RAIN.Perception.Sensors.VisualSensor" reference="7" id="element0" /><field
-      type="RAIN.Perception.Sensors.VisualSensor" reference="23" id="element1" /></field></reference><reference
-      type="RAIN.Perception.Sensors.VisualSensor" refcount="1" id="7"><field value="True"
-      type="System.Boolean" id="_showVisual" /><field value="OverlordVisual" type="System.String"
-      id="_sensorName" /><field value="True" type="System.Boolean" id="_isActive"
-      /><field value="0.6,0,0,1" type="UnityEngine.Color" id="_sensorColor" /><field
-      type="UnityEngine.Transform" id="_mountPoint" gameobject="2" /><field value="0,0,0"
-      type="UnityEngine.Vector3" id="_positionOffset" /><field value="0,0,0" type="UnityEngine.Vector3"
-      id="_angleOffset" /><field type="System.Collections.Generic.List" id="_filters"
-      elementtype="RAIN.Perception.Sensors.Filters.RAINSensorFilter" /><field value="17.22"
-      type="System.Single" id="_range" /><field value="False" type="System.Boolean"
-      id="_canDetectSelf" /><field value="360" type="System.Single" id="_horizontalAngle"
-      /><field value="180" type="System.Single" id="_verticalAngle" /><field value="True"
-      type="System.Boolean" id="_lineOfSight" /><field value="-5" type="UnityEngine.LayerMask"
-      id="_lineOfSightMask" /></reference><reference type="RAIN.Animation.MecanimAnimator+IKTarget"
-      refcount="1" id="8"><field value="False" type="System.Boolean" id="isActive"
-      /><field value="0" type="System.Single" id="positionWeight" /><field value="0"
-      type="System.Single" id="rotationWeight" /><field value="0,0,0" type="UnityEngine.Vector3"
-      id="positionVector" /><field value="0,0,0" type="UnityEngine.Vector3" id="rotationVector"
-      /></reference><reference type="RAIN.Animation.MecanimAnimator+IKTarget" refcount="1"
-      id="9"><field value="False" type="System.Boolean" id="isActive" /><field value="0"
-      type="System.Single" id="positionWeight" /><field value="0" type="System.Single"
-      id="rotationWeight" /><field value="0,0,0" type="UnityEngine.Vector3" id="positionVector"
-      /><field value="0,0,0" type="UnityEngine.Vector3" id="rotationVector" /></reference><reference
+      type="RAIN.Perception.Sensors.VisualSensor" reference="23" id="element0" /></field></reference><reference
+      type="RAIN.Perception.Sensors.VisualSensor" refcount="0" id="7" /><reference
+      type="RAIN.Animation.MecanimAnimator+IKTarget" refcount="1" id="8"><field value="False"
+      type="System.Boolean" id="isActive" /><field value="0" type="System.Single"
+      id="positionWeight" /><field value="0" type="System.Single" id="rotationWeight"
+      /><field value="0,0,0" type="UnityEngine.Vector3" id="positionVector" /><field
+      value="0,0,0" type="UnityEngine.Vector3" id="rotationVector" /></reference><reference
+      type="RAIN.Animation.MecanimAnimator+IKTarget" refcount="1" id="9"><field value="False"
+      type="System.Boolean" id="isActive" /><field value="0" type="System.Single"
+      id="positionWeight" /><field value="0" type="System.Single" id="rotationWeight"
+      /><field value="0,0,0" type="UnityEngine.Vector3" id="positionVector" /><field
+      value="0,0,0" type="UnityEngine.Vector3" id="rotationVector" /></reference><reference
       type="RAIN.Animation.MecanimAnimator+IKTarget" refcount="1" id="10"><field value="False"
       type="System.Boolean" id="isActive" /><field value="0" type="System.Single"
       id="positionWeight" /><field value="0" type="System.Single" id="rotationWeight"
@@ -2767,10 +2780,10 @@ MonoBehaviour:
       type="System.Boolean" id="_showVisual" /><field value="Strike Sensor" type="System.String"
       id="_sensorName" /><field value="True" type="System.Boolean" id="_isActive"
       /><field value="0,0.6,0,1" type="UnityEngine.Color" id="_sensorColor" /><field
-      type="UnityEngine.Transform" id="_mountPoint" gameobject="3" /><field value="0,0,0"
+      type="UnityEngine.Transform" id="_mountPoint" gameobject="2" /><field value="0,0,0"
       type="UnityEngine.Vector3" id="_positionOffset" /><field value="0,0,0" type="UnityEngine.Vector3"
       id="_angleOffset" /><field type="System.Collections.Generic.List" id="_filters"
-      elementtype="RAIN.Perception.Sensors.Filters.RAINSensorFilter" /><field value="10"
+      elementtype="RAIN.Perception.Sensors.Filters.RAINSensorFilter" /><field value="21.2"
       type="System.Single" id="_range" /><field value="False" type="System.Boolean"
       id="_canDetectSelf" /><field value="360" type="System.Single" id="_horizontalAngle"
       /><field value="180" type="System.Single" id="_verticalAngle" /><field value="False"
@@ -2810,7 +2823,7 @@ MonoBehaviour:
     - {fileID: 107096}
     - {fileID: 11400000, guid: 327f88ad8d1964d3198a84c3a4955561, type: 2}
     - {fileID: 492696}
-    - {fileID: 492696}
+    - {fileID: 0}
     _serializedCustomData:
     - _data: 
       _stringData: Cg==
@@ -3003,8 +3016,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 451774}
   m_AABB:
-    m_Center: {x: -0.00000023841858, y: 0.7923169, z: 0.041452765}
-    m_Extent: {x: 0.4969309, y: 0.5170633, z: 0.2304864}
+    m_Center: {x: -0.00000011920929, y: 0.7923162, z: 0.041452825}
+    m_Extent: {x: 0.49693093, y: 0.5170635, z: 0.23048632}
   m_DirtyAABB: 0
 --- !u!137 &13794354
 SkinnedMeshRenderer:
