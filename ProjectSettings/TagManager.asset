@@ -7,6 +7,11 @@ TagManager:
   - Enemy
   - Bubble
   - Cave
+  - Enchant
+  - Melee
+  - Projectile
+  - Dragon
+  - Overlord
   layers:
   - Default
   - TransparentFX

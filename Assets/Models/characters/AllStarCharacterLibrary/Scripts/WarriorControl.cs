@@ -17,7 +17,7 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         }
 
         private WarriorCharacter m_Character; // A reference to the ThirdPersonCharacter on the object
-        private Transform m_Cam;                  // A reference to the main camera in the scenes transform
+        public Transform m_Cam;                  // A reference to the main camera in the scenes transform
         private Vector3 m_CamForward;             // The current forward direction of the camera
         private Vector3 m_Move;
         private bool m_Jump;                      // the world-relative desired move direction, calculated from the camForward and user input.
@@ -58,7 +58,10 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                     m_Character.GetComponent<Animator>().SetInteger("Death", 1);
                     m_Dead = true;
                 }
-                gameObject.GetComponent<PlayerHealth>().PHealth += 0.05f;
+                if (gameObject.GetComponent<PlayerHealth>().PHealth < 100.0f)
+                {
+                    gameObject.GetComponent<PlayerHealth>().PHealth += 0.05f;
+                }
             }
             heartsBar.GetComponent<GUIBarScript>().Value = gameObject.GetComponent<PlayerHealth>().Normalizedhealth();
         }
