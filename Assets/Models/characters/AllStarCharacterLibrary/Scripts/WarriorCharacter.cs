@@ -171,8 +171,9 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 if (enchant)
                 {
                     enchant.SetActive(true);
-                    m_hasLightning = true;
                 }
+                m_hasLightning = true;
+
             }
             if (col.gameObject.CompareTag("Cave"))
             {
@@ -221,6 +222,12 @@ namespace UnityStandardAssets.Characters.ThirdPerson
                 if (enemyPos != Vector3.zero)
                 {
                     lightning.transform.position = enemyPos;
+                    lightning.SetActive(true);
+                }
+                else
+                {
+                    GameObject dragon = GameObject.Find("DragonBoss");
+                    lightning.transform.position = dragon.transform.position;
                     lightning.SetActive(true);
                 }
             }
@@ -294,9 +301,9 @@ namespace UnityStandardAssets.Characters.ThirdPerson
 		{
 			// apply extra gravity from multiplier:
 			Vector3 extraGravityForce = (Physics.gravity * m_GravityMultiplier) - Physics.gravity;
-			m_Rigidbody.AddForce(extraGravityForce);
+            m_Rigidbody.AddForce(new Vector3(0, 0, 2.5f*m_ForwardAmount));
 
-			m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.5f;
+            m_GroundCheckDistance = m_Rigidbody.velocity.y < 0 ? m_OrigGroundCheckDistance : 0.1f;
 		}
 
 

@@ -8,7 +8,8 @@ public class tresure_box : MonoBehaviour {
     // Use this for initialization
     void Start () {
         m_Animator = GetComponent<Animator>();
-        m_Animator.SetBool("isOpen", false);    
+        m_Animator.SetBool("isOpen", false);
+        m_Animator.Play("box_close");
     }
 
     // Update is called once per frame
