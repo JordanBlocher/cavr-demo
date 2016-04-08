@@ -2,7 +2,8 @@
 using System.Collections;
 
 public class DragonHealth : EnemyPlayer {
-
+    public AudioSource As;
+    public AudioSource BossTheme;
 	// Use this for initialization
 	void Start () {
 	
@@ -15,7 +16,8 @@ public class DragonHealth : EnemyPlayer {
 			Destroy(gameObject);
             GameObject warrior = GameObject.Find("warrior");
             GameObject cam = GameObject.Find("ThirdPersonCamera");
-
+            As.Play();
+            BossTheme.Stop();
         }
     }
 }

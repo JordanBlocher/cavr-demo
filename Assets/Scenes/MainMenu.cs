@@ -65,7 +65,10 @@ public class MainMenu : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-	
+	    if (GameObject.Find("cavr").GetComponent<CaVR>().InputManger.GetButtonValue("attack"))
+        {
+            Application.LoadLevel(1);
+        }
 	}
 
 	public void LoadMainScene()

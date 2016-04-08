@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class OverlordHealth : EnemyPlayer {
-
+    public AudioSource As; 
 	// Use this for initialization
 	void Start () {
 	
@@ -12,6 +12,7 @@ public class OverlordHealth : EnemyPlayer {
 	void Update () {
 		if(IsDead())
 		{
+            As.Stop();
 			Destroy(gameObject);
 		}
 	}
